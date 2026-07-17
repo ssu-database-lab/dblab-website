@@ -9,6 +9,7 @@
  * Props: { lang: 'en' | 'ko' } — rendered by /alumni and /ko/alumni.
  */
 import Base from '../layouts/Base.astro';
+import Lightbox from '../components/Lightbox.astro';
 import alumni from '../data/alumni.json';
 import { t, localizePath, type Lang } from '../i18n/utils';
 
@@ -93,15 +94,36 @@ const groups: { id: string; label: string; rows: Alum[] }[] = [
                   return (
                     <li class="lrow">
                       <span class="ly">{a.year}</span>
-                      <img
-                        class="lface"
-                        src={a.photo ?? '/assets/people/alumni-placeholder.svg'}
-                        alt={a.photo ? (ko ? `${a.name_kr ?? a.name_en} 사진` : `Photo of ${a.name_en}`) : ''}
-                        width="44"
-                        height="44"
-                        loading="lazy"
-                        decoding="async"
-                      />
+                      {a.photo ? (
+                        <button
+                          type="button"
+                          class="lface-zoom"
+                          data-lightbox-trigger
+                          aria-label={ko ? `${a.name_kr ?? a.name_en} 사진 크게 보기` : `View larger photo of ${a.name_en}`}
+                        >
+                          <img
+                            class="lface"
+                            src={a.photo}
+                            alt={ko ? `${a.name_kr ?? a.name_en} 사진` : `Photo of ${a.name_en}`}
+                            width="44"
+                            height="44"
+                            loading="lazy"
+                            decoding="async"
+                            data-lightbox
+                            data-full={a.photo}
+                          />
+                        </button>
+                      ) : (
+                        <img
+                          class="lface"
+                          src="/assets/people/alumni-placeholder.svg"
+                          alt=""
+                          width="44"
+                          height="44"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      )}
                       <div class="lbody">
                         <p class="lname">
                           {alumMain}
@@ -148,6 +170,7 @@ const groups: { id: string; label: string; rows: Alum[] }[] = [
       </div>
     </div>
   </section>
+  <Lightbox lang={lang} />
 </Base>
 
 <style>
@@ -280,6 +303,31 @@ const groups: { id: string; label: string; rows: Alum[] }[] = [
     border: 1px solid var(--line);
     background: var(--chip);
     margin-top: 2px;
+    display: block;
+  }
+
+  /* real photos are click-to-enlarge (placeholders are plain imgs) */
+  .lface-zoom {
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: zoom-in;
+    border-radius: 10px;
+    margin-top: 2px;
+    line-height: 0;
+  }
+
+  .lface-zoom .lface {
+    margin-top: 0;
+    transition:
+      box-shadow 0.15s ease,
+      border-color 0.15s ease;
+  }
+
+  .lface-zoom:hover .lface,
+  .lface-zoom:focus-visible .lface {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-ring);
   }
 
   .lrow + .lrow {
