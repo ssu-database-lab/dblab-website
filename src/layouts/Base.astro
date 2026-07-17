@@ -1,0 +1,141 @@
+---
+/**
+ * Base layout — Database Lab, Soongsil University.
+ * Head meta (OG, canonical, hreflang alternates), theme boot script,
+ * favicon, global styles, sticky Header, <main> slot, Footer.
+ *
+ * Pages must NOT render their own <main>: the slot is already wrapped
+ * in <main id="main"> (the skip-link target).
+ */
+import '../styles/tokens.css';
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { t, localizePath, stripLocale, normalizePath, type Lang } from '../i18n/utils';
+
+interface Props {
+  title: string;
+  description: string;
+  lang: Lang;
+  noindex?: boolean;
+}
+
+const { title, description, lang, noindex = false } = Astro.props;
+
+const SITE_NAME = 'Database Lab · Soongsil University';
+const fullTitle = /database lab|db lab/i.test(title) ? title : `${title} · ${SITE_NAME}`;
+
+const site = Astro.site ?? new URL('https://db.ssu.ac.kr');
+/* normalizePath strips the '.html' the file build format leaves in
+ * Astro.url.pathname, so canonical/hreflang match the served URLs. */
+const path = normalizePath(Astro.url.pathname);
+const route = stripLocale(path);
+
+const canonical = new URL(path, site).href;
+const enUrl = new URL(route, site).href;
+const koUrl = new URL(localizePath('ko', route), site).href;
+const ogImage = new URL('/assets/og-card.png', site).href;
+
+/* Organization JSON-LD — emitted on every indexable page. */
+const orgLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'ResearchOrganization',
+  name: 'Database Lab, Soongsil University',
+  alternateName: '숭실대학교 데이터베이스연구실',
+  url: site.href,
+  logo: new URL('/icon-512.png', site).href,
+  email: 'djpark@ssu.ac.kr',
+  parentOrganization: {
+    '@type': 'CollegeOrUniversity',
+    name: 'Soongsil University',
+    url: 'https://ssu.ac.kr',
+  },
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Information Science Building, 369 Sangdo-ro, Dongjak-gu',
+    addressLocality: 'Seoul',
+    postalCode: '06978',
+    addressCountry: 'KR',
+  },
+});
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    {/* canonical/alternates only make sense on indexable pages */}
+    {!noindex && <link rel="canonical" href={canonical} />}
+    {
+      !noindex && (
+        <>
+          <link rel="alternate" hreflang="en" href={enUrl} />
+          <link rel="alternate" hreflang="ko" href={koUrl} />
+          <link rel="alternate" hreflang="x-default" href={enUrl} />
+        </>
+      )
+    }
+
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    {!noindex && <meta property="og:url" content={canonical} />}
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:locale" content={lang === 'ko' ? 'ko_KR' : 'en_US'} />
+    <meta property="og:locale:alternate" content={lang === 'ko' ? 'en_US' : 'ko_KR'} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    {!noindex && <script type="application/ld+json" set:html={orgLd} is:inline />}
+
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title="DB Lab News"
+      href={new URL('/rss.xml', site).href}
+    />
+    <meta name="theme-color" content="#f3f6f7" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0b1417" media="(prefers-color-scheme: dark)" />
+
+    {/* Theme boot — runs before paint. Default = no attribute (OS preference wins).
+        Also pins the theme-color metas to the forced theme so mobile browser
+        chrome matches the page even when it disagrees with the OS scheme. */}
+    <script is:inline>
+      (function () {
+        try {
+          var t = localStorage.getItem('theme');
+          if (t === 'dark' || t === 'light') {
+            document.documentElement.setAttribute('data-theme', t);
+            var c = t === 'dark' ? '#0b1417' : '#f3f6f7';
+            var metas = document.querySelectorAll('meta[name="theme-color"]');
+            for (var i = 0; i < metas.length; i++) metas[i].setAttribute('content', c);
+          }
+        } catch (e) {
+          /* storage unavailable — keep OS preference */
+        }
+      })();
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">{t(lang, 'a11y.skip')}</a>
+    <Header lang={lang} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+  </body>
+</html>

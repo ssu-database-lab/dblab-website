@@ -1,0 +1,43 @@
+---
+/**
+ * Section heading — mono eyebrow, balance-wrapped title, optional sub.
+ * Visual design ported from mockups/mockup_b.html (.sec-head).
+ *
+ * Props: { eyebrow?: string; title: string; sub?: string }
+ * Tip: for the mockup's bilingual title aside, pass a title string and
+ * style the aside with the global `.sec-ko` utility in your own markup,
+ * or fold the aside into `sub`.
+ */
+interface Props {
+  eyebrow?: string;
+  title: string;
+  sub?: string;
+}
+
+const { eyebrow, title, sub } = Astro.props;
+---
+
+<div class="sec-head">
+  {eyebrow && <p class="eyebrow">{eyebrow}</p>}
+  <h2 class="sec-t">{title}</h2>
+  {sub && <p class="sec-s">{sub}</p>}
+</div>
+
+<style>
+  .sec-head {
+    margin-bottom: clamp(22px, 3.5vw, 34px);
+  }
+
+  .sec-t {
+    font-size: var(--fs-h2);
+    font-weight: 750;
+    letter-spacing: -0.02em;
+    margin-top: 6px;
+  }
+
+  .sec-s {
+    color: var(--muted);
+    margin-top: 8px;
+    max-width: 64ch;
+  }
+</style>

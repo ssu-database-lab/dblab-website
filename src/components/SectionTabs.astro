@@ -1,0 +1,87 @@
+---
+/**
+ * SectionTabs — the "Software & Patents" page switcher.
+ *
+ * Visually a tab bar; semantically a <nav> of plain links, because the
+ * two tabs are separate static routes (/software and /patents, plus
+ * their /ko/ mirrors) — not same-page panels, so no tablist ARIA.
+ * The current tab carries aria-current="page" and the accent underline
+ * (same 2px accent treatment as the header's active nav item).
+ *
+ * Props: { lang: 'en' | 'ko'; active: 'software' | 'patents' }
+ * Labels come from the tabs.* keys in src/i18n/ui.ts.
+ */
+import { t, localizePath, type Lang } from '../i18n/utils';
+
+interface Props {
+  lang: Lang;
+  active: 'software' | 'patents';
+}
+
+const { lang, active } = Astro.props;
+
+const tabs = [
+  { id: 'software', route: '/software', key: 'tabs.software' },
+  { id: 'patents', route: '/patents', key: 'tabs.patents' },
+] as const;
+---
+
+<nav class="tabs" aria-label={t(lang, 'tabs.label')}>
+  {
+    tabs.map((tab) => (
+      <a
+        class="tab"
+        href={localizePath(lang, tab.route)}
+        aria-current={tab.id === active ? 'page' : undefined}
+      >
+        {t(lang, tab.key)}
+      </a>
+    ))
+  }
+</nav>
+
+<style>
+  /* hairline rail; wraps instead of overflowing on very narrow
+     viewports so the body never scrolls horizontally */
+  .tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: clamp(24px, 4vw, 36px);
+  }
+
+  .tab {
+    flex: none;
+    padding: 9px 14px;
+    /* the active underline sits on top of the rail hairline */
+    margin-bottom: -1px;
+    border-bottom: 2px solid transparent;
+    border-radius: var(--radius-s) var(--radius-s) 0 0;
+    font-size: 15.5px;
+    font-weight: 600;
+    color: var(--muted);
+    white-space: nowrap;
+    transition:
+      color 0.15s ease,
+      background-color 0.15s ease,
+      border-color 0.15s ease;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tab {
+      transition: none;
+    }
+  }
+
+  .tab:hover {
+    text-decoration: none;
+    color: var(--accent-strong);
+    background: var(--accent-soft);
+  }
+
+  .tab[aria-current='page'] {
+    color: var(--accent-strong);
+    border-bottom-color: var(--accent);
+  }
+</style>

@@ -1,0 +1,210 @@
+---
+/**
+ * News page view — the full dated list from src/data/news.json,
+ * grouped by year (mono year rail, like the publications explorer),
+ * with tag chips and per-locale dates via formatDate.
+ *
+ * Visual design ported from mockups/mockup_b.html (#news: .news-it,
+ * .news-d, .news-k; year rail from .ygroup/.y).
+ * Rendered by the /news and /ko/news wrappers.
+ */
+import Base from '../layouts/Base.astro';
+import { t, type Lang } from '../i18n/utils';
+import { formatDate } from '../lib/format';
+import news from '../data/news.json';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const ko = lang === 'ko';
+
+/* news.json is newest-first by contract; sort defensively anyway. */
+const items = [...news].sort((a, b) => b.date.localeCompare(a.date));
+
+const years: string[] = [];
+for (const item of items) {
+  const year = item.date.slice(0, 4);
+  if (!years.includes(year)) years.push(year);
+}
+
+const groups = years.map((year) => ({
+  year,
+  list: items.filter((item) => item.date.startsWith(year)),
+}));
+
+/* Map data tags → i18n keys (localized chip labels). */
+const TAG_KEY: Record<string, string> = {
+  paper: 'news.tagPaper',
+  award: 'news.tagAward',
+  project: 'news.tagProject',
+  dataset: 'news.tagDataset',
+  lab: 'news.tagLab',
+  patent: 'news.tagPatent',
+};
+
+const copy = ko
+  ? {
+      metaTitle: '소식',
+      eyebrow: 'News',
+      title: '소식',
+      aside: 'News',
+    }
+  : {
+      metaTitle: 'News',
+      eyebrow: 'News',
+      title: 'News',
+      aside: '소식',
+    };
+---
+
+<Base title={copy.metaTitle} description={t(lang, 'section.news.sub')} lang={lang}>
+  <section class="sec" id="news">
+    <div class="wrap">
+      <header class="page-head">
+        <p class="eyebrow">{copy.eyebrow}</p>
+        <h1 class="page-t">{copy.title} <span class="sec-ko" lang={ko ? 'en' : 'ko'}>{copy.aside}</span></h1>
+        <p class="page-s">{t(lang, 'section.news.sub')}</p>
+      </header>
+
+      <div class="news-list">
+        {
+          groups.map((group) => (
+            <div class="ygroup" id={`y${group.year}`}>
+              <h2 class="y">{group.year}</h2>
+              <div class="ylist">
+                {group.list.map((item) => (
+                  <article class="news-it">
+                    <time class="news-d" datetime={item.date}>
+                      {formatDate(item.date, lang)}
+                    </time>
+                    <p class="news-b">
+                      <span class:list={['news-k', { hot: item.tag === 'award' }]}>
+                        {t(lang, TAG_KEY[item.tag] ?? 'news.tagLab')}
+                      </span>
+                      {ko && item.text_kr ? item.text_kr : item.text_en}
+                    </p>
+                  </article>
+                ))}
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ---------- page head ---------- */
+  .page-head {
+    margin-bottom: clamp(26px, 4vw, 38px);
+  }
+
+  .page-t {
+    font-size: var(--fs-h1);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    margin-top: 6px;
+  }
+
+  .page-s {
+    color: var(--muted);
+    margin-top: 10px;
+    max-width: 64ch;
+  }
+
+  /* ---------- year rail (mockup .ygroup/.y) ---------- */
+  .ygroup {
+    display: grid;
+    grid-template-columns: 86px 1fr;
+    gap: 0 18px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .ygroup:first-child {
+    padding-top: 0;
+  }
+
+  .ygroup:last-child {
+    border-bottom: 0;
+  }
+
+  .y {
+    font-family: var(--mono);
+    font-size: 16.5px;
+    font-weight: 700;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    padding-top: 12px;
+  }
+
+  .ylist {
+    min-width: 0;
+  }
+
+  @media (max-width: 640px) {
+    .ygroup {
+      grid-template-columns: 1fr;
+      gap: 6px;
+    }
+
+    .y {
+      padding-top: 0;
+    }
+  }
+
+  /* ---------- news rows (mockup .news-it) ---------- */
+  .news-it {
+    display: grid;
+    grid-template-columns: 108px 1fr;
+    gap: 16px;
+    padding: 13px 4px;
+    border-bottom: 1px solid var(--line);
+    align-items: baseline;
+  }
+
+  .news-it:last-child {
+    border-bottom: 0;
+  }
+
+  .news-d {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .news-b {
+    font-size: 16px;
+    min-width: 0;
+  }
+
+  .news-k {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    padding: 2px 8px;
+    border-radius: var(--radius-s);
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+    margin-right: 8px;
+    vertical-align: 1px;
+  }
+
+  .news-k.hot {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  @media (max-width: 560px) {
+    .news-it {
+      grid-template-columns: 1fr;
+      gap: 3px;
+      padding: 12px 2px;
+    }
+  }
+</style>

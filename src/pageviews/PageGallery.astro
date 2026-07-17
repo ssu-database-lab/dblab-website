@@ -1,0 +1,463 @@
+---
+/**
+ * Gallery page view — conference trips, awards, and lab life,
+ * reverse-chronological and grouped by year (mono year rail like the
+ * news page). Within each year the events are laid out two-up as
+ * cards; each card has a compact header (mono date, type Badge, venue,
+ * title, short note) followed by a uniform grid of 4:3 photo tiles (or
+ * a full-width "coming soon" placeholder banner while a folder is empty).
+ *
+ * PHOTO AUTO-DISCOVERY — drop image files into
+ *   src/assets/gallery/<event-id>/
+ * and they appear here with zero JSON editing: Vite globs the folder
+ * at build time and each file is attached to the gallery.json event
+ * whose "id" matches its parent folder. Explicit `photos` entries in
+ * gallery.json (which may carry curated alt text) are merged after
+ * the auto-discovered ones; auto photos derive alt text from the
+ * event title + index.
+ *
+ * Tiles are <button data-lightbox-trigger> wrapping
+ * <img data-lightbox data-full> for the shared Lightbox component
+ * (included once, auto-binds). Events with no photos yet render one
+ * placeholder tile ("Photos coming soon / 사진 준비 중" + event name)
+ * in the same grid cell size so the grid reads consistently.
+ *
+ * Rendered by the /gallery and /ko/gallery wrappers.
+ */
+import Base from '../layouts/Base.astro';
+import Badge from '../components/Badge.astro';
+import type { BadgeKind } from '../components/Badge.astro';
+import Lightbox from '../components/Lightbox.astro';
+import { type Lang } from '../i18n/utils';
+import { formatDate } from '../lib/format';
+import gallery from '../data/gallery.json';
+
+interface Props {
+  lang: Lang;
+}
+
+interface GalleryPhoto {
+  src: string;
+  alt_en: string;
+  alt_kr: string;
+}
+
+interface GalleryEvent {
+  id: string; // folder name under src/assets/gallery/
+  date: string; // 'YYYY-MM'
+  title_en: string;
+  title_kr: string;
+  venue: string;
+  type: string; // 'conference' | 'workshop' | 'award' | 'lab'
+  note_en: string;
+  note_kr: string;
+  photos: GalleryPhoto[];
+}
+
+/* ---------- photo auto-discovery (build-time, zero JSON) ----------
+ * Lowercase extensions only — Vite globs are case-sensitive. Files
+ * must live in a per-event subfolder; loose files directly under
+ * gallery/ match no event and are ignored. `?url` hands back the
+ * final hashed asset URL, which serves as both thumbnail src and
+ * the Lightbox full-res target. */
+const photoFiles = import.meta.glob('../assets/gallery/**/*.{jpg,jpeg,png,webp}', {
+  eager: true,
+  query: '?url',
+  import: 'default',
+}) as Record<string, string>;
+
+const autoByEvent = new Map<string, string[]>();
+/* Numeric collation so unpadded names (photo2 < photo10) order naturally —
+ * the derived "photo N" alt text / captions number tiles in this order. */
+const photoPaths = Object.keys(photoFiles).sort((a, b) => a.localeCompare(b, 'en', { numeric: true }));
+for (const path of photoPaths) {
+  const match = path.match(/\/gallery\/([^/]+)\//);
+  if (!match) continue;
+  const urls = autoByEvent.get(match[1]) ?? [];
+  urls.push(photoFiles[path]);
+  autoByEvent.set(match[1], urls);
+}
+
+const { lang } = Astro.props;
+const ko = lang === 'ko';
+
+/* gallery.json is newest-first by convention; sort defensively anyway.
+ * Attach merged photo lists: auto-discovered first, explicit after. */
+const events = [...(gallery as GalleryEvent[])]
+  .sort((a, b) => b.date.localeCompare(a.date))
+  .map((event) => {
+    const titleKr = event.title_kr || event.title_en;
+    const auto = (autoByEvent.get(event.id) ?? []).map((src, i) => ({
+      src,
+      alt_en: `${event.title_en} — photo ${i + 1}`,
+      alt_kr: `${titleKr} — 사진 ${i + 1}`,
+    }));
+    return { ...event, allPhotos: [...auto, ...event.photos] };
+  });
+
+const years: string[] = [];
+for (const event of events) {
+  const year = event.date.slice(0, 4);
+  if (!years.includes(year)) years.push(year);
+}
+
+const groups = years.map((year) => ({
+  year,
+  list: events.filter((event) => event.date.startsWith(year)),
+}));
+
+/* Event type → Badge kind (visual weight) + localized label.
+ * Badge has no gallery-specific kinds, so we borrow the closest
+ * visual style and override the text via `label`. */
+const TYPE_META: Record<string, { kind: BadgeKind; label_en: string; label_kr: string }> = {
+  conference: { kind: 'IC', label_en: 'Conference', label_kr: '학술대회' },
+  workshop: { kind: 'DC', label_en: 'Workshop', label_kr: '워크숍' },
+  award: { kind: 'award', label_en: 'Award', label_kr: '수상' },
+  lab: { kind: 'completed', label_en: 'Lab', label_kr: '연구실' },
+};
+
+const copy = ko
+  ? {
+      metaTitle: '갤러리',
+      metaDesc: '학회 출장, 수상, 연구실의 일상 — 사진으로 보는 데이터베이스연구실.',
+      eyebrow: 'Gallery',
+      title: '갤러리',
+      aside: 'Gallery',
+      sub: '학회 출장, 수상, 연구실의 일상 — 최신순으로 정리한 사진 아카이브입니다.',
+      comingSoon: '사진 준비 중',
+      comingSoonAlt: 'Photos coming soon',
+      photoCount: (n: number) => `사진 ${n}장`,
+    }
+  : {
+      metaTitle: 'Gallery',
+      metaDesc: 'Conference trips, awards, and lab life — the Database Lab in photos.',
+      eyebrow: 'Gallery',
+      title: 'Gallery',
+      aside: '갤러리',
+      sub: 'Conference trips, awards, and lab life — a photo archive, newest first.',
+      comingSoon: 'Photos coming soon',
+      comingSoonAlt: '사진 준비 중',
+      photoCount: (n: number) => `${n} photo${n === 1 ? '' : 's'}`,
+    };
+---
+
+<Base title={copy.metaTitle} description={copy.metaDesc} lang={lang}>
+  <section class="sec" id="gallery">
+    <div class="wrap">
+      <header class="page-head">
+        <p class="eyebrow">{copy.eyebrow}</p>
+        <h1 class="page-t">{copy.title} <span class="sec-ko" lang={ko ? 'en' : 'ko'}>{copy.aside}</span></h1>
+        <p class="page-s">{copy.sub}</p>
+      </header>
+
+      <div class="g-list">
+        {
+          groups.map((group) => (
+            <div class="ygroup" id={`y${group.year}`}>
+              <h2 class="y">{group.year}</h2>
+              <div class="ylist">
+                {group.list.map((event) => {
+                  const meta = TYPE_META[event.type] ?? TYPE_META.lab;
+                  const title = ko && event.title_kr ? event.title_kr : event.title_en;
+                  return (
+                    <article class="g-event">
+                      <header class="g-head">
+                        <time class="g-date" datetime={event.date}>
+                          {formatDate(event.date, lang)}
+                        </time>
+                        <Badge kind={meta.kind} label={ko ? meta.label_kr : meta.label_en} />
+                        {event.venue && <span class="g-venue">{event.venue}</span>}
+                        {event.allPhotos.length > 0 && (
+                          <span class="g-count">{copy.photoCount(event.allPhotos.length)}</span>
+                        )}
+                      </header>
+                      <h3 class="g-title">{title}</h3>
+                      {(event.note_en || event.note_kr) && (
+                        <p class="g-note">{ko && event.note_kr ? event.note_kr : event.note_en}</p>
+                      )}
+                      {event.allPhotos.length > 0 ? (
+                        <div class="g-grid">
+                          {event.allPhotos.map((photo) => (
+                            <button class="g-tile" type="button" data-lightbox-trigger>
+                              <img
+                                data-lightbox
+                                data-full={photo.src}
+                                src={photo.src}
+                                alt={ko && photo.alt_kr ? photo.alt_kr : photo.alt_en}
+                                loading="lazy"
+                                decoding="async"
+                              />
+                            </button>
+                          ))}
+                        </div>
+                      ) : (
+                        <div class="g-grid g-grid-empty">
+                          <div class="g-tile g-tile-empty">
+                            <svg class="icon" viewBox="0 0 16 16" aria-hidden="true">
+                              <path d="M5.6 2.5a1 1 0 0 1 .83-.44h3.14a1 1 0 0 1 .83.44l.6.9h2.5A1.5 1.5 0 0 1 15 4.9v7.1a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 1 12V4.9a1.5 1.5 0 0 1 1.5-1.5H5l.6-.9ZM8 5.4a3 3 0 1 0 0 6 3 3 0 0 0 0-6Zm0 1.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Z" />
+                            </svg>
+                            <p class="g-empty-t">
+                              {copy.comingSoon}
+                              <span class="g-empty-alt" lang={ko ? 'en' : 'ko'}>
+                                {copy.comingSoonAlt}
+                              </span>
+                            </p>
+                            <p class="g-empty-name">{title}</p>
+                          </div>
+                        </div>
+                      )}
+                    </article>
+                  );
+                })}
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <Lightbox lang={lang} />
+</Base>
+
+<style>
+  /* ---------- page head ---------- */
+  .page-head {
+    margin-bottom: clamp(26px, 4vw, 38px);
+  }
+
+  .page-t {
+    font-size: var(--fs-h1);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    margin-top: 6px;
+  }
+
+  .page-s {
+    color: var(--muted);
+    margin-top: 10px;
+    max-width: 64ch;
+  }
+
+  /* ---------- year rail (mockup .ygroup/.y, as on /news) ---------- */
+  .ygroup {
+    display: grid;
+    grid-template-columns: 86px 1fr;
+    gap: 0 18px;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .ygroup:first-child {
+    padding-top: 0;
+  }
+
+  .ygroup:last-child {
+    border-bottom: 0;
+  }
+
+  .y {
+    font-family: var(--mono);
+    font-size: 16.5px;
+    font-weight: 700;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    padding-top: 4px;
+  }
+
+  /* Two event cards per row so the page stays short; one column on
+     phones. */
+  .ylist {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: clamp(16px, 2vw, 22px);
+  }
+
+  @media (max-width: 720px) {
+    .ylist {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .ygroup {
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+
+    .y {
+      padding-top: 0;
+    }
+  }
+
+  /* ---------- event cards (side-by-side in the year grid) ---------- */
+  .g-event {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-l);
+    padding: clamp(16px, 2.2vw, 22px);
+    min-width: 0;
+  }
+
+  .g-head {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .g-date {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .g-venue,
+  .g-count {
+    font-family: var(--mono);
+    font-size: var(--fs-caption);
+    color: var(--muted);
+  }
+
+  .g-venue::before,
+  .g-count::before {
+    content: '· ';
+    color: var(--line-strong);
+  }
+
+  .g-title {
+    font-size: var(--fs-h3);
+    font-weight: 750;
+    letter-spacing: -0.01em;
+    margin-top: 8px;
+  }
+
+  .g-note {
+    color: var(--muted);
+    font-size: var(--fs-body-s);
+    margin-top: 5px;
+    max-width: 72ch;
+  }
+
+  /* ---------- uniform photo grid ---------- */
+  .g-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 12px;
+    margin-top: 14px;
+  }
+
+  @media (max-width: 480px) {
+    .g-grid {
+      grid-template-columns: repeat(auto-fill, minmax(136px, 1fr));
+      gap: 10px;
+    }
+  }
+
+  .g-tile {
+    aspect-ratio: 4 / 3;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-m);
+    overflow: hidden;
+    background: var(--chip-2);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  button.g-tile {
+    cursor: zoom-in;
+  }
+
+  button.g-tile:hover,
+  button.g-tile:focus-visible {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-ring);
+  }
+
+  .g-tile img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* Subtle zoom on hover — opt-in only when motion is welcome
+     (the global reduced-motion kill switch also covers this). */
+  @media (prefers-reduced-motion: no-preference) {
+    .g-tile img {
+      transition: transform 0.2s ease;
+    }
+
+    button.g-tile:hover img,
+    button.g-tile:focus-visible img {
+      transform: scale(1.03);
+    }
+  }
+
+  /* ---------- "photos coming soon" placeholder tile ----------
+     overflow:visible (vs the photo tile's hidden) restores the grid
+     item's automatic content-based min-height, so the tile grows past
+     4:3 instead of silently clipping the bilingual caption + event
+     name on narrow grids. */
+  .g-tile-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 14px;
+    text-align: center;
+    border-style: dashed;
+    border-color: var(--line-strong);
+    color: var(--muted);
+    overflow: visible;
+  }
+
+  /* placeholder spans the full card width as a short banner (not a 4:3 tile) */
+  .g-grid-empty {
+    grid-template-columns: 1fr;
+  }
+
+  .g-grid-empty .g-tile-empty {
+    aspect-ratio: auto;
+    min-height: 118px;
+  }
+
+  .g-tile-empty .icon {
+    font-size: 18px;
+    flex: none;
+  }
+
+  .g-empty-t {
+    font-family: var(--mono);
+    font-size: var(--fs-caption);
+    font-weight: 600;
+  }
+
+  /* Hierarchy via size/weight only — no opacity: --muted on --chip-2
+     sits just above 4.5:1 (AA) in both themes, so any alpha drops the
+     placeholder text below AA. */
+  .g-empty-alt {
+    font-weight: 400;
+  }
+
+  .g-empty-alt::before {
+    content: ' · ';
+  }
+
+  .g-empty-name {
+    font-size: var(--fs-micro);
+    max-width: 24ch;
+  }
+
+  /* ---------- reduced motion ---------- */
+  @media (prefers-reduced-motion: reduce) {
+    .g-tile,
+    .g-tile img {
+      transition: none;
+    }
+  }
+</style>

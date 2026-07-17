@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.astro/
+.DS_Store
+*.log
+
+# Internal-only material — must never reach the public repo:
+# docs/ holds the professor's original syllabus PDFs (supplied on condition
+# they are never hosted/uploaded), the build contract, and research notes
+# containing local paths and third-party details. mockups/ is pre-build
+# design history. *.local.sh covers machine-specific deploy helpers.
+docs/
+mockups/
+*.local.sh

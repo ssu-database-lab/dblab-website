@@ -1,0 +1,440 @@
+---
+/**
+ * Software & Data page view — one card per src/data/software.json entry
+ * (kind label, mono meta chips, external links) plus the KorCCVi
+ * dataset-versions mini-table.
+ *
+ * Visual design ported from mockups/mockup_b.html (#software: .sgrid,
+ * .scard, .vchip). Rendered by the /software and /ko/software wrappers.
+ *
+ * Shares the "Software & Patents" nav area with PagePatents — the
+ * SectionTabs bar under the page header switches between the two routes.
+ */
+import Base from '../layouts/Base.astro';
+import SectionTabs from '../components/SectionTabs.astro';
+import { t, localizePath, type Lang } from '../i18n/utils';
+import software from '../data/software.json';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const ko = lang === 'ko';
+
+/* Inline icon paths (ported from mockup_b.html's symbol sprite). */
+const ICONS = {
+  gh: {
+    viewBox: '0 0 16 16',
+    d: 'M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z',
+  },
+  data: {
+    viewBox: '0 0 24 24',
+    d: 'M12 3c-3.9 0-7 1.3-7 3v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6c0-1.7-3.1-3-7-3Zm0 2c3.1 0 5 .9 5 1s-1.9 1-5 1-5-.9-5-1 1.9-1 5-1Zm5 13c0 .1-1.9 1-5 1s-5-.9-5-1v-2.4c1.3.6 3 .9 5 .9s3.7-.3 5-.9V18Zm0-5c0 .1-1.9 1-5 1s-5-.9-5-1V9.6c1.3.6 3 .9 5 .9s3.7-.3 5-.9V13Z',
+  },
+  link: {
+    viewBox: '0 0 24 24',
+    d: 'M14 4h6v6h-2V7.4l-7.3 7.3-1.4-1.4L16.6 6H14V4ZM5 6h6v2H7v9h9v-4h2v6H5V6Z',
+  },
+  arrow: {
+    viewBox: '0 0 24 24',
+    d: 'M13.2 5.2 20 12l-6.8 6.8-1.4-1.4 4.4-4.4H4v-2h12.2l-4.4-4.4 1.4-1.4Z',
+  },
+} as const;
+
+type IconName = keyof typeof ICONS;
+
+/** Pick a link icon by label — GitHub mark, DB cylinder, or generic ↗. */
+function iconFor(label: string): IconName {
+  const l = label.toLowerCase();
+  if (l.includes('github')) return 'gh';
+  if (l.includes('dataport') || l.includes('doi')) return 'data';
+  return 'link';
+}
+
+interface VersionRow {
+  v: string;
+  type: string;
+  size: string;
+  note: string;
+}
+
+const copy = ko
+  ? {
+      metaTitle: '소프트웨어 & 데이터',
+      metaDesc:
+        '숭실대학교 데이터베이스연구실의 데이터셋과 코드 — KorCCVi 한국어 보이스피싱 코퍼스, IEEE DataPort 증강 데이터셋, 공개 탐지 코드.',
+      eyebrow: 'Software & Data',
+      title: '소프트웨어 & 데이터',
+      aside: 'Software & Data',
+      vTitle: 'KorCCVi 버전',
+      vAside: 'Dataset versions',
+      vSub: 'KorCCVi는 버전을 거듭하며 성장해 왔습니다 — 버전별 규모 차이는 충돌이 아니라 의도된 릴리스 차이입니다.',
+      vCaption: 'KorCCVi 데이터셋 버전별 구성과 규모',
+      vCols: ['버전', '유형', '규모', '비고'],
+      vRows: [
+        {
+          v: 'KorCCViD v1.3',
+          type: '텍스트',
+          size: '약 6,005행',
+          note: '레이블링된 통화 전사 — KorCCVi 라인의 최초 공개 버전 (KCC 2021에서 소개).',
+        },
+        {
+          v: 'KorCCVi v2 / v2.1',
+          type: '텍스트',
+          size: '약 20,857행',
+          note: '확장된 전사 코퍼스.',
+        },
+        {
+          v: 'KorCCVi v3',
+          type: '텍스트',
+          size: '약 18,646행',
+          note: '최신 텍스트 버전.',
+        },
+        {
+          v: 'Audio corpus',
+          type: '오디오',
+          size: '1,417통화 · 39,429세그먼트 · 66.9시간',
+          note: '16 kHz 모노 — 보이스피싱 706 / 정상 711 통화 (다중모달 연구 라인).',
+        },
+        {
+          v: 'Augmented (IEEE DataPort)',
+          type: '텍스트',
+          size: '원본 2,927 + 증강 약 3,502',
+          note: '다국어 역번역 + SMOTE 증강 · CC BY-NC-SA 4.0 · 2024년 11월 공개.',
+        },
+      ] satisfies VersionRow[],
+      vPapers: '이 데이터셋을 사용한 논문 보기',
+    }
+  : {
+      metaTitle: 'Software & Data',
+      metaDesc:
+        'Datasets and code from the Database Lab at Soongsil University — the KorCCVi Korean voice-phishing corpus line and open detection code.',
+      eyebrow: 'Software & Data',
+      title: 'Software & Data',
+      aside: '소프트웨어 & 데이터',
+      vTitle: 'KorCCVi Versions',
+      vAside: '데이터셋 버전',
+      vSub: 'KorCCVi has grown through successive releases — size differences between versions are deliberate releases, not conflicts.',
+      vCaption: 'KorCCVi dataset versions, contents and sizes',
+      vCols: ['Version', 'Type', 'Size', 'Notes'],
+      vRows: [
+        {
+          v: 'KorCCViD v1.3',
+          type: 'Text',
+          size: '~6,005 rows',
+          note: 'Labeled call transcripts — the original release of the KorCCVi line (introduced at KCC 2021).',
+        },
+        {
+          v: 'KorCCVi v2 / v2.1',
+          type: 'Text',
+          size: '~20,857 rows',
+          note: 'Expanded transcript corpus.',
+        },
+        {
+          v: 'KorCCVi v3',
+          type: 'Text',
+          size: '~18,646 rows',
+          note: 'Latest text release.',
+        },
+        {
+          v: 'Audio corpus',
+          type: 'Audio',
+          size: '1,417 calls · 39,429 segments · 66.9 h',
+          note: '16 kHz mono — 706 vishing / 711 non-vishing calls (multimodal research line).',
+        },
+        {
+          v: 'Augmented (IEEE DataPort)',
+          type: 'Text',
+          size: '2,927 original + ~3,502 augmented',
+          note: 'Multilingual back-translation + SMOTE · CC BY-NC-SA 4.0 · released Nov 2024.',
+        },
+      ] satisfies VersionRow[],
+      vPapers: 'Papers behind these datasets',
+    };
+---
+
+<Base title={copy.metaTitle} description={copy.metaDesc} lang={lang}>
+  <section class="sec" id="software">
+    <div class="wrap">
+      <header class="page-head">
+        <p class="eyebrow">{copy.eyebrow}</p>
+        <h1 class="page-t">{copy.title} <span class="sec-ko" lang={ko ? 'en' : 'ko'}>{copy.aside}</span></h1>
+        <p class="page-s">{t(lang, 'section.software.sub')}</p>
+      </header>
+
+      <SectionTabs lang={lang} active="software" />
+
+      <div class="sgrid">
+        {
+          software.map((item) => (
+            <article class="scard">
+              <p class="scard-k">
+                {item.kind === 'dataset'
+                  ? t(lang, 'software.kindDataset')
+                  : t(lang, 'software.kindCode')}
+              </p>
+              <h2 class="scard-t">{item.name}</h2>
+              <p class="scard-d">{ko && item.desc_kr ? item.desc_kr : item.desc_en}</p>
+              <div class="vchips">
+                {item.meta.split(' · ').map((chunk) => (
+                  <span class="vchip">{chunk}</span>
+                ))}
+              </div>
+              <div class="scard-x">
+                {item.links.map((link) => {
+                  const icon = ICONS[iconFor(link.label)];
+                  return (
+                    <a href={link.url} target="_blank" rel="noopener">
+                      <svg class="icon" viewBox={icon.viewBox} aria-hidden="true">
+                        <path fill="currentColor" d={icon.d} />
+                      </svg>
+                      {link.label}
+                      <span class="sr-only">({t(lang, 'common.external')})</span>
+                    </a>
+                  );
+                })}
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="sec" id="korccvi">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">KorCCVi</p>
+        <h2 class="sec-t">{copy.vTitle} <span class="sec-ko" lang={ko ? 'en' : 'ko'}>{copy.vAside}</span></h2>
+        <p class="sec-s">{copy.vSub}</p>
+      </div>
+
+      <div class="tablecard">
+        <div class="tablebox">
+          <table>
+            <caption class="sr-only">{copy.vCaption}</caption>
+            <thead>
+              <tr>
+                {copy.vCols.map((col) => <th scope="col">{col}</th>)}
+              </tr>
+            </thead>
+            <tbody>
+              {
+                copy.vRows.map((row) => (
+                  <tr>
+                    <th scope="row" class="cell-v">
+                      {row.v}
+                    </th>
+                    <td class="cell-type">{row.type}</td>
+                    <td class="cell-size">{row.size}</td>
+                    <td class="cell-note">{row.note}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <p class="vfoot">
+        <a class="linkish" href={localizePath(lang, '/publications?tag=vishing')}>
+          {copy.vPapers}
+          <svg class="icon" viewBox={ICONS.arrow.viewBox} aria-hidden="true">
+            <path fill="currentColor" d={ICONS.arrow.d}></path>
+          </svg>
+        </a>
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ---------- page head ---------- */
+  .page-head {
+    /* tighter than the usual page head — the tab bar sits right below */
+    margin-bottom: clamp(18px, 3vw, 26px);
+  }
+
+  .page-t {
+    font-size: var(--fs-h1);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    margin-top: 6px;
+  }
+
+  .page-s {
+    color: var(--muted);
+    margin-top: 10px;
+    max-width: 64ch;
+  }
+
+  /* ---------- section head (mockup .sec-head) ---------- */
+  .sec-head {
+    margin-bottom: clamp(22px, 3.5vw, 34px);
+  }
+
+  .sec-t {
+    font-size: var(--fs-h2);
+    font-weight: 750;
+    letter-spacing: -0.02em;
+    margin-top: 6px;
+  }
+
+  .sec-s {
+    color: var(--muted);
+    margin-top: 8px;
+    max-width: 64ch;
+  }
+
+  /* ---------- software cards (mockup .sgrid/.scard) ----------
+     minmax(0, 1fr) tracks: a bare 1fr floors at min-content, and the
+     unbreakable repo-name titles would inflate the cards past a
+     360px viewport */
+  .sgrid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  @media (max-width: 920px) {
+    .sgrid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  .scard {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  .scard-k {
+    font-family: var(--mono);
+    font-size: var(--fs-micro);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent-strong);
+  }
+
+  .scard-t {
+    font-size: var(--fs-h3);
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    /* repo names like Korean_Voice_Phishing_Detection have no break
+       points — allow mid-word wrapping instead of overflowing */
+    overflow-wrap: anywhere;
+  }
+
+  .scard-d {
+    font-size: var(--fs-small);
+    color: var(--muted);
+  }
+
+  .vchips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .vchip {
+    font-family: var(--mono);
+    font-size: var(--fs-micro);
+    padding: 3px 9px;
+    border-radius: var(--radius-s);
+    background: var(--chip-2);
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .scard-x {
+    margin-top: auto;
+    padding-top: 4px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 14.5px;
+    font-weight: 600;
+  }
+
+  .scard-x a {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  /* ---------- KorCCVi versions table ---------- */
+  .tablecard {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+    min-width: 680px;
+  }
+
+  thead th {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line-strong);
+    white-space: nowrap;
+  }
+
+  tbody th,
+  tbody td {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+    text-align: left;
+  }
+
+  tbody tr:last-child th,
+  tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .cell-v {
+    font-family: var(--mono);
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--accent-strong);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cell-type {
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .cell-size {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .cell-note {
+    color: var(--muted);
+  }
+
+  .vfoot {
+    margin-top: 14px;
+  }
+</style>

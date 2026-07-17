@@ -1,0 +1,138 @@
+---
+/**
+ * Members page — Database Lab, Soongsil University.
+ * The lab's current graduate members as vertical profile cards: the
+ * FULL portrait on top (shown whole, never cropped), details stacked
+ * below. Cards are size-capped and centered so the portraits read at a
+ * natural size. Photo and name both link to the member's detail page
+ * (/members/<slug>) — the click-to-enlarge Lightbox lives THERE now.
+ *
+ * Props: { lang: 'en' | 'ko' } — rendered by /members and /ko/members.
+ */
+import Base from '../layouts/Base.astro';
+import MemberCard from '../components/MemberCard.astro';
+import members from '../data/members.json';
+import { t, localizePath, type Lang } from '../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const ko = lang === 'ko';
+const other: Lang = ko ? 'en' : 'ko';
+
+const current = members.current;
+const n = current.length;
+
+const intro = ko
+  ? `박동주 교수와 함께 연구하는 대학원생 ${n}명입니다.`
+  : `${n === 2 ? 'Two' : String(n)} graduate researchers working with Prof. Dong-Joo Park.`;
+
+const title = t(lang, 'people.current');
+const description = ko
+  ? `숭실대학교 데이터베이스연구실의 현재 구성원 — 대학원생 ${n}명의 프로필과 연구 관심사.`
+  : `Current members of the Database Lab at Soongsil University — profiles and research interests of the lab's ${n === 2 ? 'two' : String(n)} graduate researchers.`;
+---
+
+<Base title={title} description={description} lang={lang}>
+  <section class="sec" id="members">
+    <div class="wrap">
+      <nav class="crumbs" aria-label={ko ? '탐색 경로' : 'Breadcrumb'}>
+        <a href={localizePath(lang, '/people')}>← {t(lang, 'section.people.title')}</a>
+      </nav>
+
+      <div class="sec-head">
+        <p class="eyebrow">
+          {ko ? '팀' : 'Team'}<span class="eb-alt" lang={other}>{ko ? 'Team' : '팀'}</span>
+        </p>
+        <h1 class="page-t">
+          {t(lang, 'people.current')}<span class="sec-ko" lang={other}
+            >{t(other, 'people.current')}</span
+          >
+        </h1>
+        <p class="page-s">{intro}</p>
+      </div>
+
+      <div class="mgrid">
+        {current.map((member) => <MemberCard member={member} lang={lang} headingLevel={2} />)}
+      </div>
+
+      <p class="join">
+        <a href={localizePath(lang, '/join')}>→ {t(lang, 'section.join.title')}</a>
+        <span class="join-alt" lang={other}>{t(other, 'section.join.title')}</span>
+      </p>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .crumbs {
+    margin-bottom: clamp(16px, 2.5vw, 24px);
+  }
+
+  .crumbs a {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  .crumbs a:hover {
+    color: var(--accent-strong);
+  }
+
+  .sec-head {
+    margin-bottom: clamp(22px, 3.5vw, 34px);
+  }
+
+  .eb-alt {
+    color: var(--muted);
+    margin-left: 8px;
+    letter-spacing: 0.04em;
+  }
+
+  .page-t {
+    font-size: var(--fs-h1);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    margin-top: 6px;
+  }
+
+  .page-s {
+    color: var(--muted);
+    margin-top: 8px;
+    max-width: 64ch;
+  }
+
+  /* Size-capped, centered cards so the full portraits read at a natural
+     size (a full-bleed photo in a half-page-wide card would be oversized).
+     One centered card ≤620px, two capped columns above. */
+  .mgrid {
+    display: grid;
+    grid-template-columns: minmax(0, 360px);
+    justify-content: center;
+    align-items: start;
+    gap: clamp(20px, 3vw, 32px);
+  }
+
+  @media (min-width: 621px) {
+    .mgrid {
+      grid-template-columns: repeat(2, minmax(0, 340px));
+    }
+  }
+
+  .join {
+    margin-top: clamp(20px, 3vw, 30px);
+    font-size: 15.5px;
+  }
+
+  .join a {
+    font-weight: 650;
+  }
+
+  .join-alt {
+    color: var(--muted);
+    font-size: 14px;
+    margin-left: 8px;
+  }
+</style>

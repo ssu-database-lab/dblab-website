@@ -1,0 +1,20 @@
+---
+/**
+ * /members/[slug] — English member detail pages.
+ * Static paths come from members.json `current[]` (the professor keeps
+ * his own page at /professor and is deliberately NOT included here).
+ */
+import MemberDetail from '../../pageviews/MemberDetail.astro';
+import members from '../../data/members.json';
+
+export function getStaticPaths() {
+  return members.current.map((member) => ({
+    params: { slug: member.slug },
+    props: { member },
+  }));
+}
+
+const { member } = Astro.props;
+---
+
+<MemberDetail lang="en" member={member} />

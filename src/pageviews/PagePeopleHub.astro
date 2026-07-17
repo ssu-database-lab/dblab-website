@@ -1,0 +1,271 @@
+---
+/**
+ * People hub — Database Lab, Soongsil University.
+ * Compact index at /people: one intro line and three teaser cards —
+ * Professor (photo) / Current Members (count + names) / Alumni (count)
+ * — each linking to its dedicated page (/professor, /members, /alumni).
+ * The teaser photo is a 1:1 face crop (object-fit: cover, center top —
+ * never distorted); the enlargeable natural-aspect portrait lives on
+ * /professor.
+ *
+ * Props: { lang: 'en' | 'ko' } — rendered by /people and /ko/people.
+ */
+import Base from '../layouts/Base.astro';
+import members from '../data/members.json';
+import alumni from '../data/alumni.json';
+import { t, localizePath, type Lang } from '../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const ko = lang === 'ko';
+const other: Lang = ko ? 'en' : 'ko';
+
+/** Locale-primary pick with cross-language fallback. */
+const pick = (en: string, kr?: string | null): string => (ko && kr ? kr : en);
+
+const prof = members.professor;
+const current = members.current;
+
+const profName = pick(prof.name_en, prof.name_kr);
+
+const phdCount = alumni.filter((a) => a.degree === 'PhD').length;
+const msCount = alumni.filter((a) => a.degree === 'MS').length;
+const total = alumni.length;
+const years = alumni.map((a) => a.year);
+const yearMin = Math.min(...years);
+const yearMax = Math.max(...years);
+
+const memberNames = current
+  .map((m) => (ko && m.name_kr ? m.name_kr : m.name_en))
+  .join(' · ');
+
+const intro = ko
+  ? `교수 1명, 대학원생 ${current.length}명, 그리고 ${yearMin}년 이후 졸업생 ${total}명.`
+  : `One professor, ${current.length === 2 ? 'two' : String(current.length)} graduate researchers, and ${total} alumni since ${yearMin}.`;
+
+const title = t(lang, 'section.people.title');
+const description = ko
+  ? `숭실대학교 데이터베이스연구실 구성원 — 박동주 교수, 현재 대학원생 ${current.length}명, 졸업생 ${total}명(박사 ${phdCount}·석사 ${msCount}).`
+  : `The people of the Database Lab at Soongsil University — Prof. Dong-Joo Park, ${current.length} current graduate members, and ${total} alumni (${phdCount} Ph.D. · ${msCount} M.S.).`;
+
+const cards = [
+  {
+    href: '/professor',
+    eyebrowKey: 'people.professor',
+    heading: profName,
+    sub: pick(prof.title_en, prof.title_kr),
+    photo: prof.photo,
+    tile: null as string | null,
+  },
+  {
+    href: '/members',
+    eyebrowKey: 'people.current',
+    heading: ko
+      ? `대학원생 ${current.length}명`
+      : `${current.length === 2 ? 'Two' : String(current.length)} graduate researchers`,
+    sub: memberNames,
+    photo: null,
+    tile: String(current.length).padStart(2, '0'),
+  },
+  {
+    href: '/alumni',
+    eyebrowKey: 'people.alumni',
+    heading: ko ? `졸업생 ${total}명` : `${total} graduates`,
+    sub: ko
+      ? `박사 ${phdCount} · 석사 ${msCount} · ${yearMin}–${yearMax}`
+      : `${phdCount} Ph.D. · ${msCount} M.S. · ${yearMin}–${yearMax}`,
+    photo: null,
+    tile: String(total),
+  },
+] as const;
+---
+
+<Base title={title} description={description} lang={lang}>
+  <section class="sec" id="people">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow">
+          {t(lang, 'nav.people')}<span class="eb-alt" lang={other}>{t(other, 'nav.people')}</span>
+        </p>
+        <h1 class="page-t">
+          {t(lang, 'section.people.title')}<span class="sec-ko" lang={other}
+            >{t(other, 'section.people.title')}</span
+          >
+        </h1>
+        <p class="page-s">{intro}</p>
+      </div>
+
+      <div class="hub">
+        {
+          cards.map((card) => (
+            <a class="hcard" href={localizePath(lang, card.href)}>
+              {card.photo ? (
+                <img
+                  class="h-photo"
+                  src={card.photo}
+                  alt=""
+                  width="192"
+                  height="192"
+                  loading="eager"
+                  decoding="async"
+                />
+              ) : (
+                <span class="h-tile" aria-hidden="true">
+                  {card.tile}
+                </span>
+              )}
+              <p class="h-eyebrow">
+                {t(lang, card.eyebrowKey)}
+                <span class="h-eyebrow-alt" lang={other}>
+                  {t(other, card.eyebrowKey)}
+                </span>
+              </p>
+              <h2 class="h-t">{card.heading}</h2>
+              <p class="h-s">{card.sub}</p>
+              <span class="h-go" aria-hidden="true">
+                →
+              </span>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .sec-head {
+    margin-bottom: clamp(22px, 3.5vw, 34px);
+  }
+
+  .eb-alt {
+    color: var(--muted);
+    margin-left: 8px;
+    letter-spacing: 0.04em;
+  }
+
+  .page-t {
+    font-size: var(--fs-h1);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    margin-top: 6px;
+  }
+
+  .page-s {
+    color: var(--muted);
+    margin-top: 8px;
+    max-width: 64ch;
+  }
+
+  /* ---------- teaser cards ---------- */
+  .hub {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(14px, 2vw, 22px);
+  }
+
+  @media (max-width: 880px) {
+    .hub {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .hcard {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-l);
+    padding: clamp(20px, 2.6vw, 28px);
+    color: var(--ink);
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+
+  .hcard:hover {
+    border-color: var(--accent);
+    box-shadow: var(--shadow);
+    text-decoration: none;
+  }
+
+  .hcard:hover .h-go {
+    color: var(--accent-strong);
+    transform: translateX(3px);
+  }
+
+  /* 1:1 face crop — cover + center top, never squeezed */
+  .h-photo {
+    width: 96px;
+    height: 96px;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    object-position: center top;
+    border-radius: var(--radius-m);
+    background: var(--chip-2);
+    border: 1px solid var(--line);
+    margin-bottom: 10px;
+  }
+
+  .h-tile {
+    width: 96px;
+    height: 96px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--mono);
+    font-size: 33px;
+    font-weight: 750;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.02em;
+    color: var(--accent-strong);
+    background: var(--chip-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-m);
+    margin-bottom: 10px;
+  }
+
+  .h-eyebrow {
+    font-family: var(--mono);
+    font-size: var(--fs-micro);
+    color: var(--accent-strong);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .h-eyebrow-alt {
+    color: var(--muted);
+    margin-left: 7px;
+    letter-spacing: 0.03em;
+  }
+
+  .h-t {
+    font-size: 20.5px;
+    font-weight: 750;
+    letter-spacing: -0.015em;
+    line-height: 1.3;
+  }
+
+  .h-s {
+    font-size: 14.5px;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+
+  .h-go {
+    position: absolute;
+    top: clamp(20px, 2.6vw, 28px);
+    right: clamp(20px, 2.6vw, 28px);
+    font-family: var(--mono);
+    font-size: 20px;
+    color: var(--muted);
+    transition:
+      color 0.15s ease,
+      transform 0.15s ease;
+  }
+</style>

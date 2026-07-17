@@ -1,0 +1,445 @@
+---
+/**
+ * Funded-projects sortable table — adopted from mockup_a.html,
+ * restyled to the Proposal B tokens.
+ *
+ * Props: { lang: 'en' | 'ko' }
+ *
+ * - Real <button> column headers; click toggles asc/desc and sets
+ *   aria-sort on the <th> (only the active column carries a value).
+ * - Default order on initial render: period start DESCENDING (newest
+ *   project first) — rows are pre-sorted server-side and the Period
+ *   header ships with aria-sort="descending" / data-dir="desc".
+ * - Status column renders the shared <Badge> with a localized label.
+ * - Rows sourced from acknowledgements / unfunded proposals carry a
+ *   footnote symbol (†, ‡, …) resolved in the note below the table.
+ * - Wrapped in a focusable overflow-x:auto region so the body never
+ *   scrolls horizontally on small screens.
+ */
+import projects from '../data/projects.json';
+import Badge from './Badge.astro';
+import { t, type Lang } from '../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const ko = lang === 'ko';
+
+type Project = (typeof projects)[number];
+type Status = 'active' | 'completed' | 'proposal';
+
+/* ---------- footnote symbols (order of first appearance) ---------- */
+const SYMBOLS = ['†', '‡', '§', '¶'] as const;
+const footnoteKeys: string[] = [];
+for (const p of projects) {
+  if (p.footnote && !footnoteKeys.includes(p.footnote)) footnoteKeys.push(p.footnote);
+}
+const symbolFor = (footnote: string | null): string | null =>
+  footnote ? (SYMBOLS[footnoteKeys.indexOf(footnote)] ?? SYMBOLS[0]) : null;
+
+/* Localized long-form copy for the footnote strings in projects.json.
+ * Unknown footnote strings fall back to the raw data value. */
+const FOOTNOTE_COPY: Record<string, { en: string; ko: string }> = {
+  'listed from publication acknowledgements': {
+    en: 'Listed from publication acknowledgements; project title and role pending confirmation with the funding agency.',
+    ko: '논문 사사(acknowledgement)를 근거로 수록한 과제 — 과제명과 역할은 지원기관 확인 전입니다.',
+  },
+  'under review — not a funded award': {
+    en: 'Submitted proposal — under review, not a funded award.',
+    ko: '제출된 제안 과제 — 심사 중이며, 아직 선정된 과제가 아닙니다.',
+  },
+};
+const footnoteText = (key: string): string => FOOTNOTE_COPY[key]?.[ko ? 'ko' : 'en'] ?? key;
+
+/* ---------- display + sort helpers ---------- */
+const fmtYm = (ym: string): string => ym.replace('-', '.');
+
+function periodDisplay(p: Project): string {
+  const start = p.period?.start ?? null;
+  const end = p.period?.end ?? null;
+  if (start && end) return `${fmtYm(start)} – ${fmtYm(end)}`;
+  if (start) return `${fmtYm(start)} –`;
+  return '—';
+}
+
+/** Numeric YYYYMM sort key; falls back to a year found in grant_no/program. */
+function periodSortKey(p: Project): number {
+  const start = p.period?.start ?? null;
+  if (start) {
+    const [y, m] = start.split('-');
+    return Number(y) * 100 + Number(m ?? '0');
+  }
+  const source = `${p.grant_no ?? ''} ${p.program ?? ''}`;
+  const match = source.match(/\b(?:19|20)\d{2}\b/);
+  return match ? Number(match[0]) * 100 : 0;
+}
+
+const STATUS_RANK: Record<Status, number> = { active: 0, completed: 1, proposal: 2 };
+
+const rows = projects.map((p) => {
+  const status = p.status as Status;
+  const symbol = symbolFor(p.footnote);
+  const title = ko ? p.title_kr : p.title_en;
+  const titleAlt = ko ? p.title_en : p.title_kr;
+  const agency = ko ? p.agency_kr : p.agency_en;
+  return {
+    project: p,
+    status,
+    symbol,
+    title,
+    titleAlt,
+    agency,
+    program: p.program,
+    role: ko ? p.role_kr : p.role_en,
+    period: periodDisplay(p),
+    partners: p.partners.length > 0 ? p.partners.join(' · ') : '—',
+    sort: {
+      project: title.toLowerCase(),
+      agency: `${agency} ${p.program ?? ''}`.toLowerCase(),
+      start: String(periodSortKey(p)).padStart(6, '0'),
+      partners: (p.partners[0] ?? '').toLowerCase(),
+      status: String(STATUS_RANK[status]),
+    },
+  };
+});
+
+/* Default sort: period start descending — newest project first.
+ * Matches the aria-sort/data-dir shipped on the Period header so the
+ * client script's toggle semantics stay consistent (next click = asc). */
+rows.sort((a, b) => b.sort.start.localeCompare(a.sort.start));
+
+const DEFAULT_SORT_KEY = 'start';
+
+const columns = [
+  { key: 'project', label: t(lang, 'research.colProject') },
+  { key: 'agency', label: t(lang, 'research.colAgency') },
+  { key: 'start', label: t(lang, 'research.colPeriod') },
+  { key: 'partners', label: t(lang, 'research.colPartners') },
+  { key: 'status', label: t(lang, 'research.colStatus') },
+] as const;
+---
+
+<div class="ptable">
+  <p class="table-note mono">{t(lang, 'research.sortHint')}</p>
+
+  <div
+    class="table-scroll tablebox"
+    tabindex="0"
+    role="region"
+    aria-label={t(lang, 'section.projects.title')}
+  >
+    <table class="projects" id="projects-table">
+      <thead>
+        <tr>
+          {
+            columns.map((col) => (
+              <th
+                scope="col"
+                data-key={col.key}
+                data-dir={col.key === DEFAULT_SORT_KEY ? 'desc' : undefined}
+                aria-sort={col.key === DEFAULT_SORT_KEY ? 'descending' : 'none'}
+              >
+                <button type="button" class="th-btn">
+                  <span>{col.label}</span>
+                  <span class="sort-ind" aria-hidden="true">
+                    {col.key === DEFAULT_SORT_KEY ? '↓' : ''}
+                  </span>
+                </button>
+              </th>
+            ))
+          }
+        </tr>
+      </thead>
+      <tbody>
+        {
+          rows.map((row) => (
+            <tr
+              data-project={row.sort.project}
+              data-agency={row.sort.agency}
+              data-start={row.sort.start}
+              data-partners={row.sort.partners}
+              data-status={row.sort.status}
+            >
+              <td class="proj">
+                <span class="pt">
+                  {row.title}
+                  {row.symbol && <sup class="fn">{row.symbol}</sup>}
+                </span>
+                <span class="ps">{row.titleAlt}</span>
+                {row.project.grant_no && (
+                  <span class="pg mono">
+                    {t(lang, 'research.grantNo')} {row.project.grant_no}
+                  </span>
+                )}
+                {row.role && (
+                  <details class="role">
+                    <summary>{t(lang, 'research.role')}</summary>
+                    <p>{row.role}</p>
+                  </details>
+                )}
+              </td>
+              <td>
+                {row.agency}
+                {row.program && <span class="prog">{row.program}</span>}
+              </td>
+              <td>
+                <span class="period mono">{row.period}</span>
+              </td>
+              <td class="partners">{row.partners}</td>
+              <td>
+                <Badge kind={row.status} label={t(lang, `status.${row.status}`)} />
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  {
+    footnoteKeys.map((key, i) => (
+      <p class="footnote">
+        <span class="fn" aria-hidden="true">
+          {SYMBOLS[i] ?? SYMBOLS[0]}
+        </span>{' '}
+        {footnoteText(key)}
+      </p>
+    ))
+  }
+</div>
+
+<style>
+  .table-note {
+    font-size: var(--fs-caption);
+    color: var(--muted);
+    margin: 0 0 10px;
+  }
+
+  .table-scroll {
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-m);
+    background: var(--card);
+  }
+
+  table.projects {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 940px;
+    font-size: 15.5px;
+  }
+
+  .projects thead th {
+    padding: 0;
+    text-align: left;
+    border-bottom: 2px solid var(--accent);
+    background: var(--card);
+  }
+
+  .th-btn {
+    font-family: var(--mono);
+    font-size: var(--fs-micro);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent-strong);
+    padding: 13px 18px;
+    width: 100%;
+    text-align: left;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  .th-btn:hover {
+    color: var(--accent);
+  }
+
+  .sort-ind {
+    min-width: 0.9em;
+    display: inline-block;
+    color: var(--accent);
+  }
+
+  .projects tbody td {
+    padding: 15px 18px;
+    border-top: 1px solid var(--line);
+    vertical-align: top;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.55;
+  }
+
+  .projects tbody tr:first-child td {
+    border-top: 0;
+  }
+
+  .projects tbody tr:hover td {
+    background: var(--chip-2);
+  }
+
+  td.proj {
+    color: var(--ink);
+    min-width: 21rem;
+    max-width: 34rem;
+  }
+
+  .pt {
+    display: block;
+    font-weight: 680;
+    letter-spacing: -0.005em;
+    line-height: 1.4;
+    font-size: 16px;
+  }
+
+  .fn {
+    color: var(--accent-strong);
+    font-family: var(--mono);
+    font-weight: 700;
+  }
+
+  sup.fn {
+    font-size: 0.75em;
+    margin-left: 2px;
+    line-height: 0;
+  }
+
+  .ps {
+    display: block;
+    font-size: 14px;
+    color: var(--muted);
+    margin-top: 3px;
+    line-height: 1.5;
+  }
+
+  .pg {
+    display: inline-block;
+    font-size: var(--fs-micro);
+    color: var(--muted);
+    background: var(--chip-2);
+    border-radius: var(--radius-s);
+    padding: 2px 8px;
+    margin-top: 7px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .role {
+    margin-top: 8px;
+  }
+
+  .role summary {
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--mono);
+    font-size: var(--fs-micro);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--accent-strong);
+    border-radius: 4px;
+    width: fit-content;
+  }
+
+  .role summary::marker {
+    content: '';
+  }
+
+  .role summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .role summary::before {
+    content: '▸';
+    font-size: 11px;
+    color: var(--accent);
+  }
+
+  .role[open] summary::before {
+    content: '▾';
+  }
+
+  .role p {
+    margin: 6px 0 0;
+    font-size: 14px;
+    color: var(--muted);
+    max-width: 58ch;
+    font-weight: 400;
+  }
+
+  .prog {
+    display: block;
+    font-size: var(--fs-caption);
+    color: var(--muted);
+    margin-top: 3px;
+  }
+
+  .period {
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    font-size: 14px;
+    color: var(--ink);
+  }
+
+  td.partners {
+    min-width: 13rem;
+  }
+
+  .footnote {
+    font-size: 14px;
+    color: var(--muted);
+    margin: 10px 0 0;
+    max-width: 78ch;
+  }
+</style>
+
+<script>
+  /* Sortable columns — ported from mockup_a.html, unchanged semantics:
+   * click a header button to sort by that column (asc, then desc);
+   * aria-sort tracks the active column, ↑/↓ shown in .sort-ind. */
+  const table = document.getElementById('projects-table') as HTMLTableElement | null;
+
+  if (table && table.tBodies.length > 0) {
+    const tbody = table.tBodies[0];
+    const headers = Array.from(table.querySelectorAll<HTMLTableCellElement>('th[data-key]'));
+
+    const clearSortState = (): void => {
+      for (const th of headers) {
+        th.setAttribute('aria-sort', 'none');
+        th.removeAttribute('data-dir');
+        const ind = th.querySelector('.sort-ind');
+        if (ind) ind.textContent = '';
+      }
+    };
+
+    const sortBy = (th: HTMLTableCellElement): void => {
+      const key = th.getAttribute('data-key') ?? '';
+      const dir = th.getAttribute('data-dir') === 'asc' ? 'desc' : 'asc';
+      clearSortState();
+      th.setAttribute('data-dir', dir);
+      th.setAttribute('aria-sort', dir === 'asc' ? 'ascending' : 'descending');
+      const ind = th.querySelector('.sort-ind');
+      if (ind) ind.textContent = dir === 'asc' ? '↑' : '↓';
+
+      const rows = Array.from(tbody.rows);
+      rows.sort((a, b) => {
+        const av = a.getAttribute(`data-${key}`) ?? '';
+        const bv = b.getAttribute(`data-${key}`) ?? '';
+        const an = Number.parseFloat(av);
+        const bn = Number.parseFloat(bv);
+        const cmp =
+          !Number.isNaN(an) && !Number.isNaN(bn)
+            ? an - bn
+            : av.localeCompare(bv, undefined, { sensitivity: 'base' });
+        return dir === 'asc' ? cmp : -cmp;
+      });
+      for (const row of rows) tbody.appendChild(row);
+    };
+
+    for (const th of headers) {
+      th.querySelector('.th-btn')?.addEventListener('click', () => sortBy(th));
+    }
+  }
+</script>

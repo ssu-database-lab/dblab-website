@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://db.ssu.ac.kr/sitemap-index.xml

@@ -1,0 +1,159 @@
+{
+  "professor": {
+    "name_en": "Dong-Joo Park",
+    "name_kr": "박동주",
+    "title_en": "Professor, School of Computer Science and Engineering",
+    "title_kr": "교수, 컴퓨터학부",
+    "photo": "/assets/people/dongjoo-park.jpg",
+    "email": "djpark@ssu.ac.kr",
+    "office": {
+      "building_en": "Information Science Building",
+      "building_kr": "정보과학관",
+      "room": "326",
+      "phone": "+82-2-820-0924",
+      "phone_display": "02-820-0924",
+      "faculty_url": "https://cse.ssu.ac.kr/bbs/board.php?bo_table=faculty&wr_id=43",
+      "dept_office_phone": "02-820-0920",
+      "dept_office_email": "cse_office@ssu.ac.kr",
+      "dept_hours_en": "Mon–Fri 09:00–17:30 (during term)",
+      "dept_hours_kr": "월–금 09:00–17:30 (학기 중)"
+    },
+    "education_review": "UNRESOLVED CONFLICT (content-inventory §2): the official SSU faculty page states '서울대학교 전기공학부 학사 / 전기컴퓨터공학부 석사' for the B.S./M.S., while the SciProfiles wording used below says 컴퓨터공학과. Confirm the professor's preferred wording before treating the B.S./M.S. lines as final.",
+    "education": [
+      {
+        "when_en": "2001.08",
+        "when_kr": "2001.08",
+        "en": "Ph.D., School of Computer Science & Engineering, Seoul National University",
+        "kr": "서울대학교 컴퓨터공학부 박사"
+      },
+      {
+        "when_en": "1997.02",
+        "when_kr": "1997.02",
+        "en": "M.S. in Computer Engineering, Seoul National University",
+        "kr": "서울대학교 컴퓨터공학과 석사"
+      },
+      {
+        "when_en": "1995.02",
+        "when_kr": "1995.02",
+        "en": "B.S. in Computer Engineering, Seoul National University",
+        "kr": "서울대학교 컴퓨터공학과 학사"
+      }
+    ],
+    "career": [
+      {
+        "when_en": "Now",
+        "when_kr": "현재",
+        "en": "Professor, School of Computer Science and Engineering, Soongsil University",
+        "kr": "숭실대학교 컴퓨터학부 교수"
+      },
+      {
+        "when_en": "Prev.",
+        "when_kr": "이전",
+        "en": "Senior Researcher, Samsung Electronics",
+        "kr": "삼성전자 책임연구원"
+      }
+    ],
+    "interests_en": "Database systems, flash memory-based DBMSs and flash translation layers, multimedia databases, digital forensics, and AI-based data intelligence including voice-phishing detection and rights-metadata extraction",
+    "interests_kr": "데이터베이스, 플래시 메모리 기반 DBMS 및 FTL, 멀티미디어 데이터베이스, 디지털 포렌식, 보이스피싱 탐지·권리 메타데이터 추출 등 AI 기반 데이터 인텔리전스",
+    "service": [
+      {
+        "en": "Editorial Board Member, Journal of KIISE: Databases (Korean Institute of Information Scientists and Engineers)",
+        "kr": "한국정보과학회 데이타베이스 논문지 편집위원"
+      },
+      {
+        "en": "Department Chair, Software Engineering, Graduate School of Information Science, Soongsil University",
+        "kr": "숭실대학교 정보과학대학원 소프트웨어공학과 주임교수"
+      }
+    ],
+    "links": {
+      "orcid": "https://orcid.org/0000-0002-2724-1520",
+      "dblp": "https://dblp.org/pid/82/464.html",
+      "scholarworks": "https://ssu.scholarworks.kr/researcher-profile?ep=628"
+    }
+  },
+  "current": [
+    {
+      "slug": "milandu-boussougou",
+      "name_en": "Milandu Keith Moussavou Boussougou",
+      "name_kr": "밀란두",
+      "role_en": "Ph.D. Candidate",
+      "role_kr": "박사과정",
+      "photo": "/assets/people/milandu-boussougou.jpg",
+      "email": "mbmk92@soongsil.ac.kr",
+      "interests_en": "Korean voice-phishing detection, multimodal audio–text learning, on-device and privacy-preserving machine learning",
+      "interests_kr": "한국어 보이스피싱 탐지, 멀티모달 오디오·텍스트 학습, 온디바이스·프라이버시 보존 머신러닝",
+      "bio_en": "Milandu is a Ph.D. candidate from Gabon working on Korean voice-phishing detection. He received his M.S. from Soongsil University in February 2021 with a thesis on detecting voice-phishing crime by analyzing call content with AI, created the KorCCVi corpus, and is the first author of the lab's voice-phishing detection series — from the KCC 2021 study to the IEEE Access 2025 article. He serves as a reviewer for IEEE Access. Before graduate school he worked in industry at WeCrest (Seoul) and Huawei Technologies (Libreville).",
+      "bio_kr": "밀란두는 한국어 보이스피싱 탐지를 연구하는 가봉 출신 박사과정 학생입니다. 2021년 2월 숭실대학교에서 통화 내용 분석을 통한 보이스피싱 범죄 탐지를 주제로 석사 학위를 받았고, KorCCVi 데이터셋을 구축했으며, KCC 2021 연구부터 IEEE Access 2025 논문까지 연구실 보이스피싱 탐지 연구 시리즈의 제1저자로 참여해 왔습니다. IEEE Access 리뷰어로 활동하고 있으며, 대학원 진학 전에는 WeCrest(서울)와 Huawei Technologies(리브르빌)에서 근무했습니다.",
+      "education": [
+        {
+          "when_en": "Now",
+          "when_kr": "현재",
+          "en": "Ph.D. candidate in Computer Science (AI track), Soongsil University",
+          "kr": "숭실대학교 컴퓨터학과 박사과정 (AI 트랙)"
+        },
+        {
+          "when_en": "2021.02",
+          "when_kr": "2021.02",
+          "en": "M.S. in Computer Science, Soongsil University — thesis: \"An Artificial Intelligent Approach To Detect Voice Phishing Crime By Analyzing The Call Content: A Case Study on Voice Phishing Crime in South Korea\"",
+          "kr": "숭실대학교 컴퓨터학과 석사 — 학위논문 「통화 내용 분석을 통한 보이스피싱 범죄 탐지를 위한 인공지능적 접근법」"
+        },
+        {
+          "when_en": "2011–2014",
+          "when_kr": "2011–2014",
+          "en": "Licence Professionnelle, Institut Supérieur de Technologie, Libreville, Gabon",
+          "kr": "가봉 리브르빌 고등기술학교(Institut Supérieur de Technologie) 전문학사(Licence Professionnelle)"
+        }
+      ],
+      "awards": [
+        {
+          "year": "2022",
+          "text": "Outstanding Paper Award (우수논문상), KCC 2022 — KIISE"
+        },
+        {
+          "year": "2021",
+          "text": "Encouragement Paper Award (장려논문상), ACK 2021 — KIPS"
+        }
+      ],
+      "links": {
+        "github": "https://github.com/selfcontrol7",
+        "orcid": "https://orcid.org/0000-0002-2407-6750",
+        "dblp": "https://dblp.org/pid/398/8538.html",
+        "linkedin": "https://www.linkedin.com/in/mbmk92/"
+      },
+      "unverified": false,
+      "photo_w": 413,
+      "photo_h": 531
+    },
+    {
+      "slug": "seonghun-hwang",
+      "name_en": "SeongHun Hwang",
+      "name_kr": "황성훈",
+      "role_en": "Master Student",
+      "role_kr": "석사과정",
+      "photo": "/assets/people/seonghun-hwang.jpg",
+      "email": "peppermint@soongsil.ac.kr",
+      "interests_en": "Named-entity recognition, information extraction, and NER–LLM pipelines for rights metadata",
+      "interests_kr": "개체명 인식(NER), 정보 추출, 권리 메타데이터를 위한 NER–LLM 파이프라인",
+      "bio_en": "SeongHun leads the named-entity recognition (NER) work on the lab's copyright rights-metadata project, building and evaluating Korean NER models and NER–LLM consolidation pipelines that extract metadata from openly licensed works. He is a co-author of the lab's JSAV 2025 journal article and the IC-EEECS 2026 papers.",
+      "bio_kr": "황성훈은 연구실 저작권 권리 메타데이터 프로젝트의 개체명 인식(NER) 연구를 이끌며, 공유저작물에서 메타데이터를 추출하는 한국어 NER 모델과 NER–LLM 통합 파이프라인을 구축·평가하고 있습니다. JSAV 2025 학술지 논문과 IC-EEECS 2026 논문의 공저자입니다.",
+      "education": [
+        {
+          "when_en": "Now",
+          "when_kr": "현재",
+          "en": "Master's student, Department of Computer Science, Soongsil University",
+          "kr": "숭실대학교 대학원 컴퓨터학과 석사과정 재학"
+        }
+      ],
+      "awards": [],
+      "links": {
+        "github": "https://github.com/hwangseonghun1225",
+        "orcid": "https://orcid.org/0009-0003-3565-4610",
+        "dblp": null,
+        "linkedin": null
+      },
+      "unverified": false,
+      "photo_w": 640,
+      "photo_h": 853
+    }
+  ]
+}

@@ -1,0 +1,860 @@
+---
+/**
+ * Home pageview — Database Lab, Soongsil University.
+ * Rendered by src/pages/index.astro (lang="en") and
+ * src/pages/ko/index.astro (lang="ko").
+ *
+ * Sections (design ported from mockups/mockup_b.html):
+ *   hero      bilingual tagline, schema-graph canvas, Latest chip
+ *             (fed from news.json[0]), 3 CTAs, 5 stat tiles
+ *   research  4 area cards linking /research#<slug>
+ *             (card order derives from src/data/research.ts)
+ *   news      latest 4 items from news.json
+ *   selected  6 curated publications (PubEntry compact variant)
+ *   join      recruiting banner
+ */
+import Base from '../layouts/Base.astro';
+import StatTile from '../components/StatTile.astro';
+import PubEntry from '../components/PubEntry.astro';
+import { t, localizePath, type Lang } from '../i18n/utils';
+import { formatDate } from '../lib/format';
+import publications from '../data/publications.json';
+import patents from '../data/patents.json';
+import alumni from '../data/alumni.json';
+import news from '../data/news.json';
+import { researchAreas } from '../data/research';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const other: Lang = lang === 'en' ? 'ko' : 'en';
+const ko = lang === 'ko';
+
+/* ---------- publications stat (computed at build time — never hardcode the count).
+ * Under-review / in-preparation entries (type UR) are excluded: the tile
+ * claims published output, so counting manuscripts would inflate it. ---------- */
+const publishedPubs = publications.filter((p) => p.type !== 'UR');
+const pubYears = publishedPubs.map((p) => p.year);
+const pubCount = String(publishedPubs.length);
+const pubRange = `${Math.min(...pubYears)} – ${Math.max(...pubYears)}`;
+
+/* ---------- alumni stat (computed at build time from alumni.json) ---------- */
+const alumniCount = String(alumni.length);
+
+/* ---------- external stats that CANNOT be computed from repo data.
+ * Update by hand and adjust the as-of note when refreshed:
+ *   712  = Google Scholar citations of the FAST FTL paper (as of 2026-07)
+ *   9,132 = KOCW view count of the 데이터베이스 2015-2 open courseware (as of 2026-07) ---------- */
+
+/* ---------- patents stat (computed at build time from patents.json) ---------- */
+const patentCount = String(patents.length);
+const patentGranted = patents.filter((p) => p.status === 'granted').length;
+const patentPending = patents.length - patentGranted;
+
+/* ---------- strings not (yet) in src/i18n/ui.ts — see build report ---------- */
+const extra = {
+  en: {
+    selectedSub:
+      'Six papers that trace the lab’s arc — from arbitrated NER–LLM metadata extraction back to the FAST FTL.',
+    statPublications: `publications · ${pubRange}`,
+    statPatents: `patents · ${patentGranted} granted + ${patentPending} filed`,
+    joinChip: 'recruiting M.S. & Ph.D. — inquiries welcome',
+    joinMore: 'How to apply & FAQ',
+  },
+  ko: {
+    selectedSub: '연구실의 궤적을 담은 여섯 편 — NER–LLM 중재 메타데이터 추출에서 FAST FTL까지.',
+    statPublications: `편의 논문 · ${pubRange}`,
+    statPatents: `건의 특허 · 등록 ${patentGranted} + 출원 ${patentPending}`,
+    joinChip: '대학원생 상시 문의 환영',
+    joinMore: '지원 방법과 FAQ',
+  },
+}[lang];
+
+/* ---------- Latest chip + latest 4 news (news.json is newest-first; sort defensively) ---------- */
+const newsSorted = [...news].sort((a, b) => b.date.localeCompare(a.date));
+const latest = newsSorted[0];
+/* Chip wants a headline, not a paragraph — keep the part before the first em-dash clause. */
+const latestText = (ko ? latest.text_kr : latest.text_en).split(' — ')[0];
+const latestNews = newsSorted.slice(0, 4);
+
+const newsTagKey = (tag: string): string => `news.tag${tag.charAt(0).toUpperCase()}${tag.slice(1)}`;
+
+/* ---------- 4 research area cards (teaser copy from mockup B; canonical copy lives on /research;
+ *            display ORDER derives from src/data/research.ts — see below) ---------- */
+const areaTeasers = [
+  {
+    slug: 'flash-ftl',
+    title_en: 'Flash Storage & FTL',
+    title_kr: '플래시 스토리지 & FTL',
+    label_kr: '플래시 스토리지',
+    desc_en:
+      'Log-buffer flash translation layers (FAST, LSTAFF*), hybrid address mapping, flash-aware B-tree indexes, and crash recovery for NAND flash and SSDs.',
+    desc_kr:
+      '로그 버퍼 기반 플래시 변환 계층(FAST, LSTAFF*), 하이브리드 주소 매핑, 플래시 인지 B-트리 인덱스, 그리고 NAND 플래시·SSD의 크래시 복구를 연구합니다.',
+    stat_en: 'FAST FTL — 712 citations (ACM TECS 2007)',
+    stat_kr: 'FAST FTL — 712회 인용 (ACM TECS 2007)',
+    links: [] as { label: string; url: string; icon: 'gh' | 'data' }[],
+  },
+  {
+    slug: 'forensics',
+    title_en: 'Digital Forensics',
+    title_kr: '디지털 포렌식',
+    label_kr: '디지털 포렌식',
+    desc_en:
+      'Recovery of deleted and wiped files on NAND flash, SSD TRIM selective recovery, YAFFS2 metadata, and SQLite deleted-record and messenger forensics.',
+    desc_kr:
+      'NAND 플래시에서 삭제·와이핑된 파일의 복구, SSD TRIM 선별 복구, YAFFS2 메타데이터, 그리고 SQLite 삭제 레코드·메신저 포렌식을 다룹니다.',
+    stat_en: '10+ M.S. theses on flash & SQLite recovery (2010–2020)',
+    stat_kr: '플래시·SQLite 복구 석사논문 10편 이상 (2010–2020)',
+    links: [] as { label: string; url: string; icon: 'gh' | 'data' }[],
+  },
+  {
+    slug: 'vishing',
+    title_en: 'Voice Phishing Detection',
+    title_kr: '보이스피싱 탐지',
+    label_kr: '보이스피싱 탐지',
+    desc_en:
+      'KorCCVi — Korea’s first labeled vishing corpus — and a model line from KoBERT to multimodal audio–text fusion and privacy-preserving real-time detection.',
+    desc_kr:
+      '국내 최초의 레이블링된 보이스피싱 코퍼스 KorCCVi를 구축하고, KoBERT에서 오디오·텍스트 다중모달 융합, 프라이버시 보존 실시간 탐지까지 모델 라인을 발전시켜 왔습니다.',
+    stat_en: 'KorCCVi — the first labeled Korean voice-phishing dataset',
+    stat_kr: 'KorCCVi — 국내 최초의 레이블링된 보이스피싱 데이터셋',
+    links: [
+      {
+        label: 'GitHub',
+        url: 'https://github.com/selfcontrol7/Korean_Voice_Phishing_Detection',
+        icon: 'gh' as const,
+      },
+      { label: ko ? '데이터셋' : 'Dataset', url: 'https://doi.org/10.21227/163c-0542', icon: 'data' as const },
+    ],
+  },
+  {
+    slug: 'nlp-metadata',
+    title_en: 'NLP & Rights Metadata',
+    title_kr: 'NLP & 권리 메타데이터',
+    label_kr: '권리 메타데이터',
+    desc_en:
+      'A NER + LLM “division of labor” pipeline for Korean openly licensed works, with per-field provenance — built in the KOCCA consortium with 무하유, HM컴퍼니, 한국저작권위원회, and 한국문화정보원.',
+    desc_kr:
+      '한국어 공유저작물 권리문서를 위한 NER + LLM “분업” 파이프라인과 필드별 출처 근거(provenance) — 무하유, HM컴퍼니, 한국저작권위원회, 한국문화정보원과 함께하는 KOCCA 컨소시엄에서 개발합니다.',
+    stat_en: '67-field metadata schema · 144k-work KOGL corpus',
+    stat_kr: '67개 필드 메타데이터 스키마 · 14.4만 건 KOGL 코퍼스',
+    links: [] as { label: string; url: string; icon: 'gh' | 'data' }[],
+  },
+];
+
+/* Order follows research.ts (single source of truth for area ordering).
+ * Areas present there but lacking home teaser copy are skipped. */
+const teaserBySlug = new Map(areaTeasers.map((card) => [card.slug, card]));
+const areas = researchAreas.flatMap((area) => teaserBySlug.get(area.slug) ?? []);
+
+/* ---------- 6 curated publications, looked up by id (newest first; TECS 2007 closes as the classic) ---------- */
+const SELECTED_IDS = [
+  'iceeecs2026-ner-llm',
+  'access2025-bt',
+  'math2023-cnn-bilstm',
+  'ktsde2022-kobert',
+  'jsa2009-survey',
+  'tecs2007-fast',
+] as const;
+
+const pubById = new Map(publications.map((p) => [p.id, p]));
+const selectedPubs = SELECTED_IDS.map((id) => {
+  const pub = pubById.get(id);
+  if (!pub) throw new Error(`PageHome: publication id "${id}" not found in publications.json`);
+  return pub;
+});
+
+/* ---------- inline SVG icon paths (from mockup B's symbol sheet) ---------- */
+const icons = {
+  arrow: {
+    viewBox: '0 0 24 24',
+    d: 'M13.2 5.2 20 12l-6.8 6.8-1.4-1.4 4.4-4.4H4v-2h12.2l-4.4-4.4 1.4-1.4Z',
+  },
+  gh: {
+    viewBox: '0 0 16 16',
+    d: 'M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z',
+  },
+  data: {
+    viewBox: '0 0 24 24',
+    d: 'M12 3c-3.9 0-7 1.3-7 3v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6c0-1.7-3.1-3-7-3Zm0 2c3.1 0 5 .9 5 1s-1.9 1-5 1-5-.9-5-1 1.9-1 5-1Zm5 13c0 .1-1.9 1-5 1s-5-.9-5-1v-2.4c1.3.6 3 .9 5 .9s3.7-.3 5-.9V18Zm0-5c0 .1-1.9 1-5 1s-5-.9-5-1V9.6c1.3.6 3 .9 5 .9s3.7-.3 5-.9V13Z',
+  },
+} as const;
+
+const title = ko
+  ? '데이터베이스연구실 · Database Lab · Soongsil University'
+  : 'Database Lab · Soongsil University';
+---
+
+<Base title={title} description={t(lang, 'site.description')} lang={lang}>
+  <!-- ============ HERO ============ -->
+  <section class="hero" id="top">
+    <canvas id="schema" aria-hidden="true"></canvas>
+    <div class="wrap hero-in">
+      <a class="chip hero-chip" href={localizePath(lang, '/news')}>
+        <span class="dot" aria-hidden="true"></span>
+        <b>{t(lang, 'common.latest')}</b>
+        <span class="chip-txt">{latestText}</span>
+      </a>
+      <h1 class="hero-h">
+        <span class="h-main">{t(lang, 'home.heroTitle')}</span>
+        <span class="h-sub" lang={other}>{t(lang, 'home.heroTitleSub')}</span>
+      </h1>
+      <p class="hero-sub">{t(lang, 'home.heroDesc')}</p>
+      <div class="cta-row">
+        <a class="btn btn-pri" href={localizePath(lang, '/people')}>{t(lang, 'home.ctaTeam')}</a>
+        <a class="btn btn-gho" href={localizePath(lang, '/publications')}
+          >{t(lang, 'home.ctaPublications')}</a
+        >
+        <a class="btn btn-gho" href={localizePath(lang, '/join')}>{t(lang, 'home.ctaJoin')}</a>
+      </div>
+      <div class="stats">
+        <StatTile value="712" label={t(lang, 'home.statCitations')} />
+        <StatTile value={alumniCount} label={t(lang, 'home.statAlumni')} />
+        <StatTile value={pubCount} label={extra.statPublications} />
+        <StatTile value={patentCount} label={extra.statPatents} />
+        <StatTile value="9,132" label={t(lang, 'home.statKocw')} />
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ RESEARCH ============ -->
+  <section class="sec" id="research">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">Research</span>
+        <h2 class="sec-t">
+          {t(lang, 'section.research.title')}<span class="sec-ko" lang={other}
+            >{t(other, 'section.research.title')}</span
+          >
+        </h2>
+        <p class="sec-s">{t(lang, 'section.research.sub')}</p>
+      </div>
+      <div class="rgrid">
+        {
+          areas.map((area) => (
+            <article class="rcard">
+              <span class="rcard-kr">
+                {area.slug} · {ko ? area.title_en : area.label_kr}
+              </span>
+              <h3>
+                <a href={localizePath(lang, `/research#${area.slug}`)}>
+                  {ko ? area.title_kr : area.title_en}
+                </a>
+              </h3>
+              <p class="rcard-d">{ko ? area.desc_kr : area.desc_en}</p>
+              <p class="rcard-stat">{ko ? area.stat_kr : area.stat_en}</p>
+              <div class="rcard-x">
+                {area.links.map((link) => (
+                  <a href={link.url} target="_blank" rel="noopener">
+                    <svg class="icon" viewBox={icons[link.icon].viewBox} aria-hidden="true">
+                      <path fill="currentColor" d={icons[link.icon].d} />
+                    </svg>
+                    {link.label}
+                  </a>
+                ))}
+                <a href={localizePath(lang, `/publications?tag=${area.slug}`)}>
+                  {t(lang, 'research.relatedPapers')}
+                  <svg class="icon" viewBox={icons.arrow.viewBox} aria-hidden="true">
+                    <path fill="currentColor" d={icons.arrow.d} />
+                  </svg>
+                </a>
+              </div>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ NEWS ============ -->
+  <section class="sec" id="news">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">News</span>
+        <h2 class="sec-t">
+          {t(lang, 'section.news.title')}<span class="sec-ko" lang={other}
+            >{t(other, 'section.news.title')}</span
+          >
+        </h2>
+      </div>
+      <div class="news">
+        {
+          latestNews.map((item) => (
+            <div class="news-it">
+              <span class="news-d">{formatDate(item.date, lang)}</span>
+              <p class="news-b">
+                <span class="news-k">{t(lang, newsTagKey(item.tag))}</span>
+                {ko ? item.text_kr : item.text_en}
+              </p>
+            </div>
+          ))
+        }
+      </div>
+      <p class="more">
+        <a class="linkish" href={localizePath(lang, '/news')}>
+          {t(lang, 'home.allNews')}
+          <svg class="icon" viewBox={icons.arrow.viewBox} aria-hidden="true">
+            <path fill="currentColor" d={icons.arrow.d} />
+          </svg>
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ SELECTED PUBLICATIONS ============ -->
+  <section class="sec" id="publications">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="eyebrow">Selected Work</span>
+        <h2 class="sec-t">
+          {t(lang, 'home.selectedPubs')}<span class="sec-ko" lang={other}
+            >{t(other, 'home.selectedPubs')}</span
+          >
+        </h2>
+        <p class="sec-s">{extra.selectedSub}</p>
+      </div>
+      <div class="pub-stack">
+        {selectedPubs.map((pub) => <PubEntry pub={pub} lang={lang} compact />)}
+      </div>
+      <p class="more">
+        <a class="linkish" href={localizePath(lang, '/publications')}>
+          {t(lang, 'home.allPublications')}
+          <svg class="icon" viewBox={icons.arrow.viewBox} aria-hidden="true">
+            <path fill="currentColor" d={icons.arrow.d} />
+          </svg>
+        </a>
+      </p>
+    </div>
+  </section>
+
+  <!-- ============ JOIN ============ -->
+  <section class="sec" id="join">
+    <div class="wrap">
+      <div class="join-card">
+        <div class="join-b">
+          <span class="eyebrow">Join · 모집</span>
+          <h2 class="join-t">{t(lang, 'join.title')}</h2>
+          <p class="join-d">{t(lang, 'join.desc')}</p>
+        </div>
+        <div class="join-x">
+          <span class="chip"><b>2026</b><span>{extra.joinChip}</span></span>
+          <a class="btn btn-pri" href="mailto:djpark@ssu.ac.kr">{t(lang, 'join.cta')}</a>
+          <a class="linkish" href={localizePath(lang, '/join')}>
+            {extra.joinMore}
+            <svg class="icon" viewBox={icons.arrow.viewBox} aria-hidden="true">
+              <path fill="currentColor" d={icons.arrow.d} />
+            </svg>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ============ hero ============ */
+  .hero {
+    position: relative;
+    border-bottom: 1px solid var(--line);
+    overflow: hidden;
+  }
+
+  #schema {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 120px;
+    background: linear-gradient(to bottom, transparent, var(--paper));
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .hero-in {
+    position: relative;
+    z-index: 2;
+    padding: clamp(56px, 9vw, 104px) 0 clamp(40px, 6vw, 64px);
+    text-align: center;
+  }
+
+  .hero-chip {
+    max-width: 100%;
+  }
+
+  .chip-txt {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .hero-h {
+    margin: 20px auto 16px;
+    max-width: none;
+    text-wrap: balance;
+  }
+
+  .h-main {
+    display: block;
+    font-size: clamp(40px, 9vw, 104px);
+    font-weight: 800;
+    letter-spacing: -0.035em;
+    line-height: 1.02;
+  }
+
+  .h-sub {
+    display: block;
+    margin-top: 14px;
+    font-size: clamp(19px, 3.1vw, 31px);
+    font-weight: 560;
+    color: var(--muted);
+    letter-spacing: -0.012em;
+  }
+
+  .hero-sub {
+    max-width: 74ch;
+    margin-inline: auto;
+    color: var(--muted);
+    font-size: clamp(16px, 2vw, 18.5px);
+    text-wrap: pretty;
+  }
+
+  .cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 26px;
+  }
+
+  /* 5 tiles: 5-up desktop → 3+2 mid → 2+2+1 narrow (last tile full-width) */
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+    margin-top: clamp(32px, 5vw, 52px);
+  }
+
+  @media (max-width: 900px) {
+    .stats {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  @media (max-width: 560px) {
+    .stats {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .stats > :global(:last-child) {
+      grid-column: 1 / -1;
+    }
+  }
+
+  /* ============ section heads (mockup .sec-head with bilingual aside) ============ */
+  .sec-head {
+    margin-bottom: clamp(22px, 3.5vw, 34px);
+  }
+
+  .sec-t {
+    font-size: var(--fs-h2);
+    font-weight: 750;
+    letter-spacing: -0.02em;
+    margin-top: 6px;
+  }
+
+  .sec-s {
+    color: var(--muted);
+    margin-top: 8px;
+    max-width: 64ch;
+  }
+
+  /* ============ research cards ============ */
+  .rgrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  @media (max-width: 820px) {
+    .rgrid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .rcard {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px 22px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .rcard:hover {
+    border-color: var(--accent);
+    box-shadow: var(--shadow);
+  }
+
+  .rcard-kr {
+    font-family: var(--mono);
+    font-size: var(--fs-micro);
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  .rcard h3 {
+    font-size: 21px;
+    font-weight: 720;
+    letter-spacing: -0.015em;
+  }
+
+  .rcard h3 a {
+    color: var(--ink);
+  }
+
+  .rcard h3 a:hover {
+    color: var(--accent-strong);
+  }
+
+  .rcard-d {
+    font-size: 15.5px;
+    color: var(--muted);
+  }
+
+  .rcard-stat {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--accent-strong);
+    background: var(--accent-soft);
+    border-radius: 8px;
+    padding: 8px 11px;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.5;
+  }
+
+  .rcard-x {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: auto;
+    padding-top: 6px;
+    font-size: 14.5px;
+    font-weight: 600;
+  }
+
+  .rcard-x a {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  /* ============ selected publications ============ */
+  .pub-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .more {
+    margin-top: 18px;
+  }
+
+  /* ============ news ============ */
+  .news {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .news-it {
+    display: grid;
+    grid-template-columns: 100px 1fr;
+    gap: 16px;
+    padding: 13px 4px;
+    border-bottom: 1px solid var(--line);
+    align-items: baseline;
+  }
+
+  .news-it:last-child {
+    border-bottom: 0;
+  }
+
+  .news-d {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .news-b {
+    font-size: 16px;
+    min-width: 0;
+  }
+
+  .news-k {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    padding: 2px 8px;
+    border-radius: 6px;
+    background: var(--accent-soft);
+    color: var(--accent-strong);
+    margin-right: 8px;
+    vertical-align: 1px;
+  }
+
+  @media (max-width: 560px) {
+    .news-it {
+      grid-template-columns: 1fr;
+      gap: 3px;
+      padding: 12px 2px;
+    }
+  }
+
+  /* ============ join banner ============ */
+  .join-card {
+    background: var(--card);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius-l);
+    box-shadow: 0 0 0 4px var(--accent-soft);
+    padding: clamp(24px, 4.5vw, 44px);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px;
+    align-items: center;
+  }
+
+  .join-b {
+    flex: 1 1 380px;
+    min-width: 0;
+  }
+
+  .join-t {
+    font-size: clamp(23px, 3.2vw, 30px);
+    font-weight: 750;
+    letter-spacing: -0.02em;
+    margin-top: 6px;
+  }
+
+  .join-d {
+    color: var(--muted);
+    margin-top: 10px;
+    max-width: 58ch;
+    font-size: var(--fs-body-s);
+  }
+
+  .join-x {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: flex-start;
+  }
+</style>
+
+<script>
+  /* ---------- hero schema-graph canvas (ported from mockup B) ----------
+   * Drifting nodes/edges suggesting a database schema diagram.
+   *   - static single frame under prefers-reduced-motion
+   *   - theme-aware colors, re-read on <html data-theme> mutation
+   *     and on OS color-scheme change (covers the no-attribute case)
+   *   - animation pauses while the tab is hidden
+   */
+  const canvas = document.getElementById('schema') as HTMLCanvasElement | null;
+  const hero = canvas?.parentElement ?? null;
+  const ctx = canvas?.getContext('2d') ?? null;
+
+  if (canvas && hero && ctx) {
+    const reducedMq = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const darkMq = window.matchMedia('(prefers-color-scheme: dark)');
+
+    type SchemaNode = { x: number; y: number; vx: number; vy: number; r: number; tbl: boolean };
+    let nodes: SchemaNode[] = [];
+    let W = 0;
+    let H = 0;
+    let rafId = 0;
+    let running = false;
+    const colors = { accent: '#00707d', faint: '#52686e' };
+
+    const readColors = (): void => {
+      const cs = getComputedStyle(document.documentElement);
+      colors.accent = cs.getPropertyValue('--accent').trim() || colors.accent;
+      colors.faint = cs.getPropertyValue('--muted').trim() || colors.faint;
+    };
+
+    const makeNode = (): SchemaNode => ({
+      x: Math.random() * W,
+      y: Math.random() * H,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3,
+      r: 1.6 + Math.random() * 1.8,
+      tbl: Math.random() < 0.28,
+    });
+
+    const targetCount = (): number => Math.max(14, Math.min(30, Math.round(W / 46)));
+
+    const seed = (): void => {
+      nodes = [];
+      const n = targetCount();
+      for (let i = 0; i < n; i++) nodes.push(makeNode());
+    };
+
+    const draw = (): void => {
+      ctx.clearRect(0, 0, W, H);
+      ctx.lineWidth = 1;
+      for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+          const a = nodes[i];
+          const b = nodes[j];
+          const d = Math.hypot(a.x - b.x, a.y - b.y);
+          if (d < 150) {
+            ctx.globalAlpha = (1 - d / 150) * 0.16;
+            ctx.strokeStyle = colors.faint;
+            ctx.beginPath();
+            ctx.moveTo(a.x, a.y);
+            ctx.lineTo(b.x, b.y);
+            ctx.stroke();
+          }
+        }
+      }
+      for (let i = 0; i < nodes.length; i++) {
+        const a = nodes[i];
+        if (a.tbl) {
+          /* tiny table glyph */
+          ctx.globalAlpha = 0.3;
+          ctx.strokeStyle = colors.accent;
+          ctx.strokeRect(a.x - 6, a.y - 4.5, 12, 9);
+          ctx.beginPath();
+          ctx.moveTo(a.x - 6, a.y - 1.5);
+          ctx.lineTo(a.x + 6, a.y - 1.5);
+          ctx.stroke();
+        } else {
+          ctx.globalAlpha = 0.38;
+          ctx.fillStyle = colors.accent;
+          ctx.beginPath();
+          ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+      ctx.globalAlpha = 1;
+    };
+
+    let lastDpr = 0;
+
+    const resize = (): void => {
+      const rect = hero.getBoundingClientRect();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      /* Mobile URL-bar collapse fires resize while scrolling — bail out
+       * when nothing actually changed so the graph doesn't re-scatter. */
+      if (rect.width === W && rect.height === H && dpr === lastDpr) return;
+      const prevW = W;
+      const prevH = H;
+      W = rect.width;
+      H = rect.height;
+      lastDpr = dpr;
+      canvas.width = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (nodes.length === 0 || prevW <= 0 || prevH <= 0) {
+        seed();
+      } else {
+        /* keep the existing constellation: rescale positions into the new
+         * box and only add/remove nodes to hit the density target */
+        const sx = W / prevW;
+        const sy = H / prevH;
+        for (const n of nodes) {
+          n.x *= sx;
+          n.y *= sy;
+        }
+        const n = targetCount();
+        while (nodes.length > n) nodes.pop();
+        while (nodes.length < n) nodes.push(makeNode());
+      }
+      draw();
+    };
+
+    const tick = (): void => {
+      for (let i = 0; i < nodes.length; i++) {
+        const n = nodes[i];
+        n.x += n.vx;
+        n.y += n.vy;
+        if (n.x < -10) n.x = W + 10;
+        if (n.x > W + 10) n.x = -10;
+        if (n.y < -10) n.y = H + 10;
+        if (n.y > H + 10) n.y = -10;
+      }
+      draw();
+      rafId = requestAnimationFrame(tick);
+    };
+
+    const start = (): void => {
+      if (!running && !reducedMq.matches && !document.hidden) {
+        running = true;
+        rafId = requestAnimationFrame(tick);
+      }
+    };
+
+    const stop = (): void => {
+      if (running) {
+        cancelAnimationFrame(rafId);
+        running = false;
+      }
+    };
+
+    readColors();
+    resize();
+    start();
+
+    window.addEventListener('resize', resize);
+
+    /* pause while the tab is hidden */
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        stop();
+      } else {
+        start();
+      }
+    });
+
+    /* theme changes: explicit toggle writes data-theme on <html> … */
+    const repaint = (): void => {
+      readColors();
+      if (W) draw();
+    };
+    new MutationObserver(repaint).observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme'],
+    });
+    /* … and the OS can flip the theme when no data-theme is set */
+    if (typeof darkMq.addEventListener === 'function') {
+      darkMq.addEventListener('change', repaint);
+    }
+
+    /* honor live changes to the reduced-motion preference */
+    if (typeof reducedMq.addEventListener === 'function') {
+      reducedMq.addEventListener('change', () => {
+        if (reducedMq.matches) {
+          stop();
+          draw(); /* leave a static frame */
+        } else {
+          start();
+        }
+      });
+    }
+  }
+</script>

@@ -1,0 +1,56 @@
+# Build the Astro site and deploy it to GitHub Pages.
+#
+# Custom domain state (2026-07):
+#   The university granted db.ssu.ac.kr and public/CNAME already contains it,
+#   so the first successful deploy registers that custom domain on the repo.
+#   NOTE: until SSU's DNS admin points db.ssu.ac.kr at GitHub Pages (CNAME
+#   record → <user>.github.io), the site is NOT publicly reachable through
+#   GitHub — the <user>.github.io/<repo> URL redirects to the dead domain.
+#   Use the lab's VPS preview during that window. Once DNS resolves, enable
+#   "Enforce HTTPS" in Settings → Pages (certificate issues automatically).
+
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  # Allow manual runs from the Actions tab.
+  workflow_dispatch:
+
+# Minimal permissions required for OIDC-based Pages deployment.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Never run two deployments at once; let in-flight production deploys finish.
+concurrency:
+  group: github-pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+
+      - name: Install, build, and upload site
+        uses: withastro/action@v6
+        with:
+          # Pin to the Node major the site is developed and tested on.
+          node-version: 20
+        # Other defaults are correct for this repo:
+        #   path: .              (root of the repository)
+        #   package-manager: npm (detected from package-lock.json)
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

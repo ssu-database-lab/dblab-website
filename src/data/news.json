@@ -1,0 +1,86 @@
+[
+  {
+    "date": "2026-07-01",
+    "tag": "paper",
+    "text_en": "Two papers accepted at IC-EEECS 2026 — the NER–LLM consolidation pipeline for metadata extraction from Korean public-domain rights documents, and the KLUE-BERT B-I-O training-data composition analysis.",
+    "text_kr": "IC-EEECS 2026에 논문 2편 게재 확정 — 한국어 공공저작물 권리문서 메타데이터 추출을 위한 NER–LLM 통합(중재) 파이프라인과 KLUE-BERT B-I-O 학습데이터 구성 분석."
+  },
+  {
+    "date": "2026-06-08",
+    "tag": "lab",
+    "text_en": "Recruiting graduate students — Soongsil 2026 fall (후기) graduate admissions: applications June 8–16, interviews June 26, results July 21 (grad.ssu.ac.kr).",
+    "text_kr": "대학원생 모집 — 2026학년도 후기 숭실대학교 대학원 입학: 원서접수 6.8–6.16, 면접 6.26, 합격자 발표 7.21 (grad.ssu.ac.kr)."
+  },
+  {
+    "date": "2026-06-01",
+    "tag": "paper",
+    "text_en": "Research impact: the FAST flash translation layer paper (ACM TECS 2007) has passed 700 citations.",
+    "text_kr": "연구 임팩트: FAST 플래시 변환 계층 논문(ACM TECS 2007)이 인용 700회를 돌파했습니다."
+  },
+  {
+    "date": "2026-05-01",
+    "tag": "paper",
+    "text_en": "Revised manuscript on lightweight on-device vishing detection submitted to IEEE Access (revise-and-resubmit).",
+    "text_kr": "경량 온디바이스 보이스피싱 탐지 논문의 수정본을 IEEE Access에 제출했습니다(수정 후 재심사)."
+  },
+  {
+    "date": "2025-06-01",
+    "tag": "paper",
+    "text_en": "Multimodal audio–text Korean vishing detection presented at KCC 2025, with four student co-authors.",
+    "text_kr": "오디오·텍스트 융합 한국어 보이스피싱 다중모달 탐지 연구를 KCC 2025에서 발표 — 학생 공저자 4명이 참여했습니다."
+  },
+  {
+    "date": "2025-04-01",
+    "tag": "project",
+    "text_en": "The lab joins the Muhayu-led MCST/KOCCA R&D consortium building copyright-metadata AI for openly licensed works (with HM Company; demand organizations: Korea Copyright Commission and KCISA).",
+    "text_kr": "무하유 주관 문화체육관광부·KOCCA R&D 컨소시엄에 참여 — 공유저작물 콘텐츠 분석 및 유형정보 판단 AI 기술 개발(에이치엠컴퍼니 공동, 수요처: 한국저작권위원회·한국문화정보원)."
+  },
+  {
+    "date": "2025-02-01",
+    "tag": "paper",
+    "text_en": "IEEE Access publishes our study on enhancing voice-phishing detection with multilingual back-translation and SMOTE.",
+    "text_kr": "다국어 역번역과 SMOTE를 활용한 보이스피싱 탐지 성능 향상 연구가 IEEE Access에 게재되었습니다."
+  },
+  {
+    "date": "2024-11-11",
+    "tag": "dataset",
+    "text_en": "Augmented Korean voice-phishing detection dataset released on IEEE DataPort (CC BY-NC-SA 4.0, DOI 10.21227/163c-0542).",
+    "text_kr": "다국어 역번역·SMOTE 증강 한국어 보이스피싱 탐지 데이터셋을 IEEE DataPort에 공개했습니다 (CC BY-NC-SA 4.0, DOI 10.21227/163c-0542)."
+  },
+  {
+    "date": "2024-02-22",
+    "tag": "patent",
+    "text_en": "Korean patent granted: \"Deep learning-based voice phishing detection apparatus and method\" (KR 10-2640315, filed 2022 with Soongsil University IACF).",
+    "text_kr": "특허 등록: 「딥 러닝 기반 보이스 피싱 감지 장치 및 그 방법」 (등록번호 10-2640315, 숭실대학교 산학협력단)."
+  },
+  {
+    "date": "2022-10-01",
+    "tag": "paper",
+    "text_en": "Journal paper published in KIPS Transactions on Software and Data Engineering — exploiting the KoBERT Korean language model to improve voice-phishing detection (accuracy 99.60%).",
+    "text_kr": "정보처리학회논문지(소프트웨어 및 데이터공학)에 게재 — 한국어 언어 모델(KoBERT)을 활용한 보이스피싱 탐지 기능 개선(정확도 99.60%)."
+  },
+  {
+    "date": "2022-06-30",
+    "tag": "award",
+    "text_en": "Outstanding Paper Award (우수논문상) at KCC 2022 for the attention-based CNN-BiLSTM Korean voice-phishing detection model.",
+    "text_kr": "어텐션 기반 CNN-BiLSTM 한국어 보이스피싱 탐지 모델 연구로 KCC 2022 우수논문상을 수상했습니다."
+  },
+  {
+    "date": "2022-06-01",
+    "tag": "paper",
+    "text_en": "An attention-based CNN-BiLSTM model for Korean voice-phishing detection presented at KCC 2022 in Jeju.",
+    "text_kr": "어텐션 기반 CNN-BiLSTM 한국어 보이스피싱 탐지 모델을 KCC 2022(제주)에서 발표했습니다."
+  },
+  {
+    "date": "2021-11-05",
+    "tag": "award",
+    "text_en": "Encouragement Paper Award (장려논문상) at KIPS ACK 2021 (Yeosu) for our machine-learning study of Korean voice-phishing text classification.",
+    "text_kr": "머신러닝 기법을 활용한 한국어 보이스피싱 텍스트 분류 성능 분석 연구로 한국정보처리학회 ACK 2021(여수) 장려논문상을 수상했습니다."
+  },
+  {
+    "date": "2021-06-01",
+    "tag": "dataset",
+    "text_en": "KorCCVi — the first labeled Korean voice-phishing transcript dataset — introduced alongside a real-time AI detection technique at KCC 2021 (Jeju).",
+    "text_kr": "국내 최초의 레이블링된 한국어 보이스피싱 통화내용 데이터셋 KorCCVi를 실시간 AI 탐지 기법과 함께 KCC 2021(제주)에서 소개했습니다."
+  }
+]

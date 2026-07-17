@@ -1,0 +1,499 @@
+---
+/**
+ * PubEntry — one publication card. Visual design ported from
+ * mockups/mockup_b.html (.pub / .pbadge / .pnote / .paward).
+ *
+ * Props: { pub: Pub; lang?: 'en' | 'ko'; compact?: boolean }
+ *   - `pub` follows the src/data/publications.json schema.
+ *   - `compact` is the tighter variant for the home page's
+ *     "Selected Publications" list.
+ *
+ * Server-rendered features:
+ *   - title links to https://doi.org/<doi>, else `url`, else plain text
+ *   - authors bolded via formatAuthors (lab members + verified alumni)
+ *   - type Badge, award chip, citation chip (≥ 30), review-flag note
+ *   - DOI / PDF / Dataset / Code / KCI link chips
+ *   - BibTeX copy button when `bibtex` is non-null (clipboard API with
+ *     textarea fallback, "Copied" state — one delegated listener page-wide)
+ *
+ * Filtering hooks for PagePublications (data attributes):
+ *   data-type  publication type code (IJ/IC/DJ/DC/DS/UR)
+ *   data-tags  space-joined topic slugs
+ *   data-hay   lowercased search haystack (title + authors + venue + year)
+ */
+import Badge from './Badge.astro';
+import { t, type Lang } from '../i18n/utils';
+import { formatAuthors, LAB_NAMES } from '../lib/format';
+import alumni from '../data/alumni.json';
+
+export interface Pub {
+  id: string;
+  year: number;
+  type: string;
+  title: string;
+  title_en_note?: string | null;
+  authors: string[];
+  venue: string;
+  venue_short?: string | null;
+  doi?: string | null;
+  url?: string | null;
+  kci?: string | null;
+  citations?: number | null;
+  tags?: string[];
+  award?: string | null;
+  pdf?: string | null;
+  code?: string | null;
+  dataset?: string | null;
+  bibtex?: string | null;
+  review?: string | null;
+  /** true = the author list is known to be incomplete → render " et al." */
+  etal?: boolean;
+}
+
+interface Props {
+  pub: Pub;
+  lang?: Lang;
+  compact?: boolean;
+}
+
+const { pub, lang = 'en', compact = false } = Astro.props;
+
+/* Cross-language content gets an explicit lang attribute (WCAG 3.1.2):
+ * a Korean paper title on the EN page is tagged ko, an English one on the
+ * KO page is tagged en. Detection: any Hangul syllable/jamo → Korean. */
+const langOf = (s: string): 'ko' | 'en' => (/[ᄀ-ᇿ㄰-㆏가-힯]/.test(s) ? 'ko' : 'en');
+const titleLang = langOf(pub.title);
+const titleLangAttr = titleLang === lang ? undefined : titleLang;
+const authorsLang = langOf(pub.authors.join(' '));
+const authorsLangAttr = authorsLang === lang ? undefined : authorsLang;
+
+type TypeKind = 'IJ' | 'IC' | 'DJ' | 'DC' | 'DS' | 'UR';
+const TYPE_KINDS: readonly TypeKind[] = ['IJ', 'IC', 'DJ', 'DC', 'DS', 'UR'];
+const kind: TypeKind = (TYPE_KINDS as readonly string[]).includes(pub.type)
+  ? (pub.type as TypeKind)
+  : 'UR';
+
+/* Bold lab members AND verified alumni (mockup parity: alumni first
+ * authors are bolded too). Name-order variants cover Vietnamese names
+ * as they appear in the published author lines. */
+const NAME_VARIANTS = ['Van Phi Ho', 'Van Dai Tran', 'Van-Dai Tran'];
+const BOLD_NAMES: string[] = [
+  ...LAB_NAMES,
+  ...alumni.flatMap((a) => [a.name_kr, a.name_en].filter((n): n is string => Boolean(n))),
+  ...NAME_VARIANTS,
+];
+
+/* `etal` marks inventory-flagged incomplete author lists — rendered
+ * visibly ("… et al.") so nobody reads the first author as sole author. */
+const authorsHtml =
+  pub.authors.length > 0
+    ? formatAuthors(pub.authors, lang, BOLD_NAMES) + (pub.etal ? ' et al.' : '')
+    : '';
+
+const titleHref = pub.doi ? `https://doi.org/${pub.doi}` : pub.url ?? null;
+const kciHref = pub.kci
+  ? `https://www.kci.go.kr/kciportal/ci/sereArticleSearch/ciSereArtiView.kci?sereArticleSearchBean.artiId=${pub.kci}`
+  : null;
+
+const showCitations = typeof pub.citations === 'number' && pub.citations >= 30;
+const citationText = showCitations
+  ? lang === 'ko'
+    ? `${pub.citations}${t(lang, 'common.citations')}`
+    : `${pub.citations} ${t(lang, 'common.citations')}`
+  : '';
+
+const hasExtras = Boolean(
+  pub.award ||
+    showCitations ||
+    pub.review ||
+    pub.doi ||
+    pub.pdf ||
+    pub.dataset ||
+    pub.code ||
+    kciHref ||
+    pub.bibtex,
+);
+
+const hay = [
+  pub.title,
+  pub.title_en_note ?? '',
+  pub.authors.join(' '),
+  pub.venue,
+  pub.venue_short ?? '',
+  String(pub.year),
+]
+  .join(' ')
+  .toLowerCase();
+---
+
+<article
+  class:list={['pub', { compact }]}
+  data-id={pub.id}
+  data-type={pub.type}
+  data-tags={(pub.tags ?? []).join(' ')}
+  data-hay={hay}
+>
+  <Badge kind={kind} />
+  <div class="pub-body">
+    <h3 class="pub-ti" lang={titleLangAttr}>
+      {
+        titleHref ? (
+          <a href={titleHref} target="_blank" rel="noopener">
+            {pub.title}
+          </a>
+        ) : (
+          pub.title
+        )
+      }
+    </h3>
+    {authorsHtml && <p class="pub-au" lang={authorsLangAttr} set:html={authorsHtml} />}
+    <p class="pub-ve"><em>{pub.venue}</em></p>
+    {
+      hasExtras && (
+        <div class="pub-x">
+          {pub.award && (
+            <span class="paward">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M12 2a6 6 0 0 1 3.7 10.7l1.9 7.1-3.9-2-1.7 2.7-1.7-2.7-3.9 2 1.9-7.1A6 6 0 0 1 12 2Zm0 2a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z"
+                />
+              </svg>
+              {pub.award}
+            </span>
+          )}
+          {showCitations && <span class="pnote hot">{citationText}</span>}
+          {pub.review && (
+            <span class="pnote p-review" title={pub.review}>
+              ⚠ {t(lang, 'pubs.underVerification')}
+            </span>
+          )}
+          {pub.doi && (
+            <a class="pbadge" href={`https://doi.org/${pub.doi}`} target="_blank" rel="noopener">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M14 4h6v6h-2V7.4l-7.3 7.3-1.4-1.4L16.6 6H14V4ZM5 6h6v2H7v9h9v-4h2v6H5V6Z"
+                />
+              </svg>
+              {t(lang, 'common.doi')}
+            </a>
+          )}
+          {pub.pdf && (
+            <a class="pbadge" href={pub.pdf} target="_blank" rel="noopener">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M6 2h9l5 5v15H6V2Zm8 2H8v16h10V9h-4V4Zm2 .8V7h2.2L16 4.8ZM9 12h8v2H9v-2Zm0 4h8v2H9v-2Z"
+                />
+              </svg>
+              {t(lang, 'common.pdf')}
+            </a>
+          )}
+          {pub.dataset && (
+            <a class="pbadge" href={pub.dataset} target="_blank" rel="noopener">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M12 3c-3.9 0-7 1.3-7 3v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6c0-1.7-3.1-3-7-3Zm0 2c3.1 0 5 .9 5 1s-1.9 1-5 1-5-.9-5-1 1.9-1 5-1Zm5 13c0 .1-1.9 1-5 1s-5-.9-5-1v-2.4c1.3.6 3 .9 5 .9s3.7-.3 5-.9V18Zm0-5c0 .1-1.9 1-5 1s-5-.9-5-1V9.6c1.3.6 3 .9 5 .9s3.7-.3 5-.9V13Z"
+                />
+              </svg>
+              {t(lang, 'common.dataset')}
+            </a>
+          )}
+          {pub.code && (
+            <a class="pbadge" href={pub.code} target="_blank" rel="noopener">
+              <svg class="icon" viewBox="0 0 16 16" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"
+                />
+              </svg>
+              {t(lang, 'common.code')}
+            </a>
+          )}
+          {kciHref && (
+            <a class="pbadge" href={kciHref} target="_blank" rel="noopener">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M14 4h6v6h-2V7.4l-7.3 7.3-1.4-1.4L16.6 6H14V4ZM5 6h6v2H7v9h9v-4h2v6H5V6Z"
+                />
+              </svg>
+              {t(lang, 'common.kci')}
+            </a>
+          )}
+          {pub.bibtex && (
+            <button
+              class="pbadge bib-btn"
+              type="button"
+              hidden
+              data-bibtex={pub.bibtex}
+              data-copied-label={t(lang, 'common.copied')}
+              aria-label={t(lang, 'common.copyBibtex')}
+            >
+              <svg class="icon i-copy" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M8 3h11a1 1 0 0 1 1 1v11h-2V5H8V3ZM4 7h11a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V8a1 1 0 0 1 1-1Zm1 2v10h9V9H5Z"
+                />
+              </svg>
+              <svg class="icon i-check" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="m9.6 15.6 9-9L20 8l-10.4 10.4L4 12.8l1.4-1.4 4.2 4.2Z"
+                />
+              </svg>
+              <span class="bib-label">{t(lang, 'common.bibtex')}</span>
+            </button>
+          )}
+        </div>
+      )
+    }
+  </div>
+</article>
+
+<style>
+  .pub {
+    display: grid;
+    grid-template-columns: 40px 1fr;
+    gap: 12px;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 14px 16px;
+  }
+
+  /* filtering (PagePublications) toggles the hidden attribute */
+  .pub[hidden] {
+    display: none;
+  }
+
+  .pub:hover {
+    border-color: var(--line-strong);
+  }
+
+  .pub > :global(.badge) {
+    margin-top: 2px;
+  }
+
+  .pub-body {
+    min-width: 0;
+  }
+
+  .pub-ti {
+    font-size: 16.5px;
+    font-weight: 660;
+    letter-spacing: -0.005em;
+    line-height: 1.4;
+    /* fill the line greedily instead of the global heading `balance`,
+       which splits titles into two short lines and leaves space at right */
+    text-wrap: pretty;
+  }
+
+  .pub-ti a {
+    color: inherit;
+  }
+
+  .pub-ti a:hover {
+    color: var(--accent-strong);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .pub-au {
+    font-size: 14.5px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+
+  .pub-au :global(b) {
+    color: var(--ink);
+    font-weight: 640;
+  }
+
+  .pub-ve {
+    font-size: 14.5px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .pub-ve em {
+    font-style: italic;
+  }
+
+  .pub-x {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 9px;
+    align-items: center;
+  }
+
+  .pbadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--mono);
+    font-size: var(--fs-micro);
+    padding: 3px 9px;
+    border-radius: var(--radius-s);
+    border: 1px solid var(--line-strong);
+    color: var(--accent-strong);
+    background: var(--chip);
+  }
+
+  a.pbadge:hover {
+    border-color: var(--accent);
+    text-decoration: none;
+    box-shadow: 0 0 0 2px var(--accent-ring);
+  }
+
+  button.pbadge:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-ring);
+  }
+
+  button.pbadge.copied {
+    color: var(--ok);
+    border-color: var(--ok);
+  }
+
+  .pnote {
+    font-family: var(--mono);
+    font-size: var(--fs-micro);
+    color: var(--muted);
+    padding: 3px 9px;
+    border-radius: var(--radius-s);
+    background: var(--chip-2);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pnote.hot {
+    color: var(--accent-strong);
+    background: var(--accent-soft);
+  }
+
+  .paward {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--mono);
+    font-size: var(--fs-micro);
+    padding: 3px 9px;
+    border-radius: var(--radius-s);
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  /* BibTeX copy is JS-only: ships hidden, revealed by the script below */
+  .bib-btn[hidden] {
+    display: none;
+  }
+
+  /* BibTeX copy button: icon swap on .copied */
+  .i-check {
+    display: none;
+  }
+
+  .bib-btn.copied .i-copy {
+    display: none;
+  }
+
+  .bib-btn.copied .i-check {
+    display: inline;
+  }
+
+  /* compact variant (home "Selected Publications") */
+  .pub.compact {
+    padding: 12px 14px;
+    border-radius: var(--radius-m);
+  }
+
+  .pub.compact .pub-ti {
+    font-size: 16px;
+  }
+
+  .pub.compact .pub-x {
+    margin-top: 7px;
+  }
+</style>
+
+<script>
+  /* BibTeX copy — one delegated listener regardless of how many
+   * PubEntry instances the page renders (Astro dedupes this script).
+   * Clipboard API first, hidden-textarea execCommand fallback. */
+  function legacyCopy(text: string): void {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.position = 'fixed';
+    ta.style.left = '-9999px';
+    document.body.appendChild(ta);
+    ta.select();
+    try {
+      document.execCommand('copy');
+    } catch {
+      /* nothing left to try */
+    }
+    document.body.removeChild(ta);
+  }
+
+  /* reveal the (JS-only) copy buttons now that the handler exists */
+  document.querySelectorAll<HTMLButtonElement>('.bib-btn[hidden]').forEach((btn) => {
+    btn.hidden = false;
+  });
+
+  /* Shared visually-hidden live region: the button's aria-label pins its
+   * accessible name, so the visual "Copied!" swap alone is silent for
+   * screen readers — announce the confirmation here instead. */
+  function liveRegion(): HTMLElement {
+    let el = document.getElementById('bib-live');
+    if (!el) {
+      el = document.createElement('div');
+      el.id = 'bib-live';
+      el.setAttribute('aria-live', 'polite');
+      el.style.cssText =
+        'position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;';
+      document.body.appendChild(el);
+    }
+    return el;
+  }
+
+  document.addEventListener('click', (event) => {
+    const target = event.target as Element | null;
+    const btn = target?.closest?.('.bib-btn') as HTMLButtonElement | null;
+    if (!btn || btn.classList.contains('copied')) return;
+
+    const text = btn.getAttribute('data-bibtex') || '';
+    if (!text) return;
+
+    const done = () => {
+      const label = btn.querySelector<HTMLElement>('.bib-label');
+      const original = label ? label.textContent : null;
+      const originalAria = btn.getAttribute('aria-label');
+      const copiedLabel = btn.getAttribute('data-copied-label') || 'Copied!';
+      btn.classList.add('copied');
+      if (label) label.textContent = copiedLabel;
+      btn.setAttribute('aria-label', copiedLabel);
+      const live = liveRegion();
+      live.textContent = '';
+      live.textContent = copiedLabel;
+      window.setTimeout(() => {
+        btn.classList.remove('copied');
+        if (label && original !== null) label.textContent = original;
+        if (originalAria !== null) btn.setAttribute('aria-label', originalAria);
+      }, 1600);
+    };
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, () => {
+        legacyCopy(text);
+        done();
+      });
+    } else {
+      legacyCopy(text);
+      done();
+    }
+  });
+</script>

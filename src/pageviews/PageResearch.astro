@@ -1,0 +1,363 @@
+---
+/**
+ * Research page — shared pageview rendered by /research (en) and
+ * /ko/research (ko).
+ *
+ * Structure (per docs/build-contract.md RESEARCH spec):
+ *   intro (h1 + anchor chips)
+ *   → 4 research-area sections, anchor ids = slugs, each with an SVG
+ *     glyph, era line, mono stat chip, prose from the content
+ *     inventory §3, and tag links to /publications?tag=<slug>
+ *   → Funded Projects: sortable table (ProjectsTable, from Proposal A
+ *     restyled to B tokens).
+ *
+ * NOTE: no <main> here — Base.astro already wraps the slot in
+ * <main id="main">.
+ */
+import Base from '../layouts/Base.astro';
+import ProjectsTable from '../components/ProjectsTable.astro';
+import { researchAreas } from '../data/research';
+import { t, localizePath, type Lang } from '../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const ko = lang === 'ko';
+const other: Lang = ko ? 'en' : 'ko';
+
+const title = t(lang, 'nav.research');
+const description = t(lang, 'section.research.sub');
+
+/* Page-local strings not present in src/i18n/ui.ts (noted in the
+ * agent report as candidates for promotion to ui.ts). */
+const local = {
+  tocLabel: ko ? '연구 분야 바로가기' : 'Research area shortcuts',
+  externalHint: ko ? '(새 창)' : '(opens in a new tab)',
+};
+
+const areas = researchAreas.map((area) => ({
+  ...area,
+  title: ko ? area.title_kr : area.title_en,
+  titleAlt: ko ? area.title_en : area.title_kr,
+  era: ko ? area.era_kr : area.era_en,
+  flag: ko ? area.flag_kr : area.flag_en,
+  descs: ko ? area.desc_kr : area.desc_en,
+}));
+
+/* Small inline icon set (subset of mockup B's symbols). */
+const ICON_PATHS: Record<string, string> = {
+  github:
+    'M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z',
+  dataset:
+    'M12 3c-3.9 0-7 1.3-7 3v12c0 1.7 3.1 3 7 3s7-1.3 7-3V6c0-1.7-3.1-3-7-3Zm0 2c3.1 0 5 .9 5 1s-1.9 1-5 1-5-.9-5-1 1.9-1 5-1Zm5 13c0 .1-1.9 1-5 1s-5-.9-5-1v-2.4c1.3.6 3 .9 5 .9s3.7-.3 5-.9V18Zm0-5c0 .1-1.9 1-5 1s-5-.9-5-1V9.6c1.3.6 3 .9 5 .9s3.7-.3 5-.9V13Z',
+  doi: 'M14 4h6v6h-2V7.4l-7.3 7.3-1.4-1.4L16.6 6H14V4ZM5 6h6v2H7v9h9v-4h2v6H5V6Z',
+  external: 'M14 4h6v6h-2V7.4l-7.3 7.3-1.4-1.4L16.6 6H14V4ZM5 6h6v2H7v9h9v-4h2v6H5V6Z',
+  arrow: 'M13.2 5.2 20 12l-6.8 6.8-1.4-1.4 4.4-4.4H4v-2h12.2l-4.4-4.4 1.4-1.4Z',
+};
+
+const iconViewBox = (icon: string): string => (icon === 'github' ? '0 0 16 16' : '0 0 24 24');
+---
+
+<Base title={title} description={description} lang={lang}>
+  <!-- ============ Intro ============ -->
+  <section class="sec intro">
+    <div class="wrap">
+      <p class="eyebrow">{t(lang, 'nav.research')}</p>
+      <h1 class="page-t">
+        {t(lang, 'section.research.title')}<span class="sec-ko" lang={other}
+          >{t(other, 'section.research.title')}</span
+        >
+      </h1>
+      <p class="page-s">{t(lang, 'section.research.sub')}</p>
+
+      <nav class="toc" aria-label={local.tocLabel}>
+        {
+          areas.map((area) => (
+            <a class="chip toc-chip" href={`#${area.slug}`}>
+              #{area.slug}
+            </a>
+          ))
+        }
+        <a class="chip toc-chip" href="#projects">#projects</a>
+      </nav>
+    </div>
+  </section>
+
+  <!-- ============ Areas ============ -->
+  {
+    areas.map((area) => (
+      <section class="sec area" id={area.slug} aria-labelledby={`${area.slug}-title`}>
+        <div class="wrap area-in">
+          <div class="area-side">
+            <span class="glyph-tile">
+              <svg
+                class="glyph"
+                viewBox="0 0 26 26"
+                fill="none"
+                aria-hidden="true"
+                set:html={area.glyph}
+              />
+            </span>
+            <p class="area-era mono">
+              {area.era}
+              {area.flag && <span class="flag"> · {area.flag}</span>}
+            </p>
+          </div>
+
+          <div class="area-main">
+            <p class="area-kicker mono">{area.kicker}</p>
+            <h2 class="area-t" id={`${area.slug}-title`}>
+              {area.title}
+              <span class="sec-ko" lang={other}>
+                {area.titleAlt}
+              </span>
+            </h2>
+            <p class="area-stat mono">{area.stat}</p>
+            {area.descs.map((paragraph) => (
+              <p class="area-p" set:html={paragraph} />
+            ))}
+            <div class="area-links">
+              <span class="links-lbl mono">{t(lang, 'research.relatedPapers')}</span>
+              {area.tags.map((tag) => (
+                <a class="tag-link" href={localizePath(lang, `/publications?tag=${tag}`)}>
+                  {t(lang, `topics.${tag}`)}
+                  <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path fill="currentColor" d={ICON_PATHS.arrow} />
+                  </svg>
+                </a>
+              ))}
+              {area.links.map((link) => (
+                <a class="tag-link ext" href={link.href} target="_blank" rel="noopener">
+                  <svg class="icon" viewBox={iconViewBox(link.icon)} aria-hidden="true">
+                    <path fill="currentColor" d={ICON_PATHS[link.icon]} />
+                  </svg>
+                  {link.label}
+                  <span class="sr-only">{local.externalHint}</span>
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+    ))
+  }
+
+  <!-- ============ Funded projects ============ -->
+  <section class="sec" id="projects" aria-labelledby="projects-title">
+    <div class="wrap">
+      <div class="sec-head">
+        <p class="eyebrow" lang={other}>{t(other, 'section.projects.title')}</p>
+        <h2 class="sec-t" id="projects-title">
+          {t(lang, 'section.projects.title')}<span class="sec-ko" lang={other}
+            >{t(other, 'section.projects.title')}</span
+          >
+        </h2>
+        <p class="sec-s">{t(lang, 'section.projects.sub')}</p>
+      </div>
+      <ProjectsTable lang={lang} />
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ---------- intro ---------- */
+  .page-t {
+    font-size: var(--fs-h1);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    margin-top: 8px;
+  }
+
+  .page-s {
+    color: var(--muted);
+    margin-top: 10px;
+    max-width: 64ch;
+    font-size: clamp(16px, 2vw, 18px);
+  }
+
+  .toc {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 22px;
+  }
+
+  .toc-chip {
+    color: var(--muted);
+    transition: border-color 0.15s ease, color 0.15s ease;
+  }
+
+  .toc-chip:hover {
+    text-decoration: none;
+    border-color: var(--accent);
+    color: var(--accent-strong);
+  }
+
+  /* ---------- area sections ---------- */
+  .area-in {
+    display: grid;
+    grid-template-columns: 148px minmax(0, 1fr);
+    gap: 8px 28px;
+    align-items: start;
+  }
+
+  .area-side {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .glyph-tile {
+    width: 56px;
+    height: 56px;
+    display: grid;
+    place-items: center;
+    background: var(--accent-soft);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-m);
+    color: var(--accent-strong);
+  }
+
+  .glyph {
+    width: 26px;
+    height: 26px;
+  }
+
+  .area-era {
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.6;
+  }
+
+  .area-era .flag {
+    color: var(--accent-strong);
+  }
+
+  .area-kicker {
+    font-size: var(--fs-micro);
+    color: var(--muted);
+    letter-spacing: 0.05em;
+  }
+
+  .area-t {
+    font-size: clamp(23px, 3.2vw, 31px);
+    font-weight: 750;
+    letter-spacing: -0.02em;
+    margin-top: 6px;
+  }
+
+  .area-stat {
+    display: inline-flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 14px;
+    color: var(--accent-strong);
+    background: var(--accent-soft);
+    border-radius: 8px;
+    padding: 8px 11px;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.5;
+    margin-top: 14px;
+  }
+
+  .area-p {
+    margin-top: 14px;
+    max-width: 72ch;
+    font-size: 16.5px;
+    color: var(--muted);
+  }
+
+  .area-p :global(strong) {
+    color: var(--ink);
+    font-weight: 680;
+  }
+
+  /* ---------- related-paper / external links ---------- */
+  .area-links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    margin-top: 20px;
+  }
+
+  .links-lbl {
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-right: 4px;
+  }
+
+  .tag-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: var(--mono);
+    font-size: var(--fs-caption);
+    padding: 4px 11px;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    background: var(--chip);
+    color: var(--accent-strong);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .tag-link:hover {
+    text-decoration: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-ring);
+  }
+
+  .tag-link .icon {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* ---------- projects heading (mockup B .sec-head, page-scoped) ---------- */
+  .sec-head {
+    margin-bottom: clamp(22px, 3.5vw, 34px);
+  }
+
+  .sec-t {
+    font-size: var(--fs-h2);
+    font-weight: 750;
+    letter-spacing: -0.02em;
+    margin-top: 6px;
+  }
+
+  .sec-s {
+    color: var(--muted);
+    margin-top: 8px;
+    max-width: 64ch;
+  }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 720px) {
+    .area-in {
+      grid-template-columns: 1fr;
+    }
+
+    .area-side {
+      flex-direction: row;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+
+    .glyph-tile {
+      width: 44px;
+      height: 44px;
+    }
+
+    .glyph {
+      width: 22px;
+      height: 22px;
+    }
+  }
+</style>

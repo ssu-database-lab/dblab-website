@@ -1,0 +1,113 @@
+---
+/**
+ * Site footer — bilingual address block, contact, SSU logo on a white
+ * chip, auto © year, and the quiet mono easter-egg link to /console.
+ * Visual design ported from mockups/mockup_b.html.
+ */
+import { t, type Lang } from '../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const year = new Date().getFullYear();
+/* Build date doubles as the site's "last updated" stamp (static site —
+ * every content change ships through a rebuild). */
+const updated = new Date().toLocaleDateString('sv-SE', { timeZone: 'Asia/Seoul' });
+---
+
+<footer class="ftr">
+  <div class="wrap ftr-in">
+    <div class="ftr-l">
+      <p class="ftr-t">{t(lang, 'footer.lab')}</p>
+      <p>{t(lang, 'footer.school')}</p>
+      <p>{t(lang, 'footer.address')}</p>
+      <p><a href="mailto:djpark@ssu.ac.kr">djpark@ssu.ac.kr</a></p>
+      <p class="ftr-c">
+        © {year}
+        {t(lang, 'footer.rights')} · {lang === 'ko' ? '업데이트' : 'updated'}
+        <time datetime={updated}>{updated}</time> ·
+        <a class="egg" href="/console">SELECT * FROM lab;</a>
+      </p>
+    </div>
+    <a
+      class="ssu-chip"
+      href="https://ssu.ac.kr"
+      target="_blank"
+      rel="noopener"
+      aria-label={t(lang, 'site.university')}
+    >
+      <img
+        src="/assets/ssu-logo.jpg"
+        alt={t(lang, 'footer.ssuAlt')}
+        width="480"
+        height="96"
+        loading="lazy"
+        decoding="async"
+      />
+    </a>
+  </div>
+</footer>
+
+<style>
+  .ftr {
+    border-top: 1px solid var(--line);
+    padding: 40px 0 48px;
+    color: var(--muted);
+    font-size: 14.5px;
+  }
+
+  .ftr-in {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 22px;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .ftr-l {
+    /* wide enough to keep the school line and the KR/EN address on one
+       line each on desktop; wraps naturally on narrow screens */
+    max-width: 620px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .ftr-t {
+    color: var(--ink);
+    font-weight: 700;
+    font-size: 15.5px;
+  }
+
+  /* SSU logo sits on a white chip in both themes */
+  .ssu-chip {
+    background: #ffffff;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-m);
+    padding: 8px 12px;
+    display: inline-flex;
+  }
+
+  .ssu-chip img {
+    height: 26px;
+    width: auto;
+  }
+
+  .ftr-c {
+    margin-top: 14px;
+    font-family: var(--mono);
+    font-size: var(--fs-micro);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .egg {
+    font-family: var(--mono);
+    color: var(--muted);
+  }
+
+  .egg:hover {
+    color: var(--accent-strong);
+  }
+</style>

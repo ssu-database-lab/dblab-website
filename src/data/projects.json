@@ -1,0 +1,58 @@
+[
+  {
+    "title_en": "Development of Content Analysis and Type-Information Determination Technology for the Global Diffusion of Openly Licensed (Shared) Works",
+    "title_kr": "공유저작물의 글로벌 확산을 위한 콘텐츠 분석 및 유형정보 판단 기술 개발",
+    "agency_en": "Ministry of Culture, Sports and Tourism (MCST) · KOCCA",
+    "agency_kr": "문화체육관광부 · 한국콘텐츠진흥원(KOCCA)",
+    "program": "2025 문화체육관광 연구개발사업 (Culture, Sports and Tourism R&D Program)",
+    "grant_no": null,
+    "period": { "start": "2025-04", "end": "2026-12" },
+    "partners": ["Muhayu Inc. (lead)", "HM Company", "Soongsil University IACF"],
+    "role_en": "Co-research (Soongsil University Industry–Academic Cooperation Foundation). Stage 1: metadata-learning auto-extraction (NER/BERT), a copyright-infringement-possibility AI algorithm, a multimodal (CLIP-based) survey, and a UCI-based metadata format. Stage 2: image–text multimodal AI analysis, large-scale training with standardized reliability enhancement, and open-platform pilot support. Demand organizations: Korea Copyright Commission (Gongu Madang) and Korea Culture Information Service Agency (KOGL).",
+    "role_kr": "공동연구(숭실대학교 산학협력단). 1단계: 메타데이터 학습형 자동 추출(NER/BERT), 저작권 침해 가능성 판단 AI 알고리즘, 멀티모달(CLIP 기반) 기법 조사, UCI 기반 메타데이터 포맷 설계. 2단계: 이미지·텍스트 멀티모달 AI 분석, 대규모 학습 및 신뢰성 표준화 제고, 개방형 플랫폼 시범 적용 지원. 수요처: 한국저작권위원회(공유마당), 한국문화정보원(공공누리).",
+    "status": "active",
+    "footnote": null
+  },
+  {
+    "title_en": "SW-Centered University Program",
+    "title_kr": "SW중심대학 사업",
+    "agency_en": "Ministry of Science and ICT (MSIT) · IITP",
+    "agency_kr": "과학기술정보통신부 · 정보통신기획평가원(IITP)",
+    "program": "SW중심대학 (Software-Centered University)",
+    "grant_no": "2024-0-00071",
+    "period": { "start": null, "end": null },
+    "partners": [],
+    "role_en": "Acknowledged as a funding source in the lab's copyright-metadata publications.",
+    "role_kr": "연구실의 공유저작물 메타데이터 논문 사사(acknowledgement)에서 확인된 지원 과제.",
+    "status": "active",
+    "footnote": "listed from publication acknowledgements"
+  },
+  {
+    "title_en": "MSIT/IITP research grant 2018-0-00209 (title not published)",
+    "title_kr": "과학기술정보통신부/IITP 연구과제 2018-0-00209 (과제명 미공개)",
+    "agency_en": "Ministry of Science and ICT (MSIT) · IITP",
+    "agency_kr": "과학기술정보통신부 · 정보통신기획평가원(IITP)",
+    "program": null,
+    "grant_no": "2018-0-00209",
+    "period": { "start": null, "end": null },
+    "partners": [],
+    "role_en": "Acknowledged as a funding source of the Mathematics 2023 voice-phishing detection paper (Crossref funder data).",
+    "role_kr": "Mathematics 2023 보이스피싱 탐지 논문의 사사(Crossref 펀더 데이터)에서 확인된 지원 과제.",
+    "status": "completed",
+    "footnote": "listed from publication acknowledgements"
+  },
+  {
+    "title_en": "Basic Research on Multimodal Korean Voice Phishing Detection: Adversarial Defense and Privacy Preservation in the LLM Era",
+    "title_kr": "한국어 보이스피싱 다중모달 탐지의 기초연구: LLM 시대 적대적 방어와 프라이버시 보존을 중심으로",
+    "agency_en": "Ministry of Science and ICT (MSIT)",
+    "agency_kr": "과학기술정보통신부",
+    "program": "2026 기본연구 유형A (Basic Research, Type A) — 5-year proposal",
+    "grant_no": null,
+    "period": { "start": null, "end": null },
+    "partners": [],
+    "role_en": "Principal-investigator proposal. Five pillars (Y1–Y5): cross-modal attention foundations; the KorCCVi-DF deepfake benchmark; certified defenses against LLM-paraphrase and acoustic attacks; large audio–language models with LoRA/PEFT; and federated learning with differential privacy and secure aggregation.",
+    "role_kr": "연구책임 제안 과제. 5대 축(1–5차년도): 교차모달 어텐션 기초 연구, KorCCVi-DF 딥페이크 벤치마크, LLM 패러프레이즈·음향 공격에 대한 검증된 방어, 대형 오디오-언어 모델과 LoRA/PEFT, 연합학습·차분 프라이버시·보안 집계.",
+    "status": "proposal",
+    "footnote": "under review — not a funded award"
+  }
+]

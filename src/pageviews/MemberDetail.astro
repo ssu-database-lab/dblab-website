@@ -1,0 +1,734 @@
+---
+/**
+ * Member detail page — Database Lab, Soongsil University.
+ * AICA-style member profile rendered in OUR design language (Proposal B
+ * tokens, mono when-columns, hairline rules — same visual system as
+ * PageProfessor): portrait at its NATURAL aspect ratio (click-to-enlarge
+ * via Lightbox) or the SVG-initials avatar, bilingual name/role, and
+ * Links & Contact (kept in the identity block, right under the name —
+ * same as the professor page); then bio, research-interest chips,
+ * education timeline, awards, and a Publications section AUTO-FILTERED
+ * from src/data/publications.json (entries whose author list contains
+ * the member's EN or KR name), rendered with PubEntry's compact variant.
+ *
+ * Props: { lang: 'en' | 'ko'; member: DetailMember } — rendered by the
+ * dynamic routes /members/[slug] and /ko/members/[slug].
+ *
+ * i18n note: new strings live in the inline `copy` object below
+ * (PageNews precedent); t() is only used for keys that already exist.
+ */
+import Base from '../layouts/Base.astro';
+import Lightbox from '../components/Lightbox.astro';
+import PubEntry from '../components/PubEntry.astro';
+import publications from '../data/publications.json';
+import { t, localizePath, type Lang } from '../i18n/utils';
+
+export interface TimelineRow {
+  when_en: string;
+  when_kr: string;
+  en: string;
+  kr: string;
+}
+
+export interface MemberAward {
+  year: string;
+  text: string;
+}
+
+export interface DetailMember {
+  slug: string;
+  name_en: string;
+  name_kr?: string | null;
+  role_en: string;
+  role_kr?: string | null;
+  photo?: string | null;
+  email?: string | null;
+  interests_en?: string | null;
+  interests_kr?: string | null;
+  bio_en?: string | null;
+  bio_kr?: string | null;
+  education?: TimelineRow[];
+  awards?: MemberAward[];
+  links?: {
+    github?: string | null;
+    orcid?: string | null;
+    dblp?: string | null;
+    linkedin?: string | null;
+  } | null;
+  unverified?: boolean;
+}
+
+interface Props {
+  lang: Lang;
+  member: DetailMember;
+}
+
+const { lang, member } = Astro.props;
+const ko = lang === 'ko';
+const other: Lang = ko ? 'en' : 'ko';
+
+/** Locale-primary pick with cross-language fallback. */
+const pick = (en?: string | null, kr?: string | null): string => (ko && kr ? kr : en ?? '');
+
+const nameMain = ko && member.name_kr ? member.name_kr : member.name_en;
+const nameAlt = ko ? (member.name_kr ? member.name_en : null) : (member.name_kr ?? null);
+const roleMain = pick(member.role_en, member.role_kr);
+const roleAlt = ko ? member.role_en : member.role_kr;
+
+const bio = pick(member.bio_en, member.bio_kr);
+const interests = pick(member.interests_en, member.interests_kr);
+/* AICA mirrors interests as tag chips — our data is a comma-separated
+ * phrase list, so split it (both locales use ', ' between items). */
+const interestChips = interests
+  .split(/,\s+/)
+  .map((s) => s.trim())
+  .filter(Boolean);
+
+const education = member.education ?? [];
+const awards = member.awards ?? [];
+const links = member.links ?? {};
+
+/* ---------- publications, auto-filtered by author name ---------- */
+const names = [member.name_en, member.name_kr]
+  .filter((n): n is string => Boolean(n))
+  .map((n) => n.trim().toLowerCase());
+
+const memberPubs = publications.filter((pub) =>
+  pub.authors.some((author) => {
+    const hay = author.trim().toLowerCase();
+    return names.some((needle) => hay === needle || hay.includes(needle));
+  })
+);
+
+const pubCount = memberPubs.length;
+
+/* ---------- inline bilingual copy (do not touch ui.ts) ---------- */
+const copy = ko
+  ? {
+      about: '소개',
+      aboutAlt: 'About',
+      awards: '수상',
+      awardsAlt: 'Awards',
+      pubs: `논문 (${pubCount})`,
+      pubsAlt: 'Publications',
+      pubsNote: '연구실 논문 목록에서 저자명 기준으로 자동 추출된 목록입니다.',
+      pubsEmpty: '아직 등록된 논문이 없습니다.',
+      contact: '링크 · 연락처',
+      contactAlt: 'Links & Contact',
+      photoAlt: `${nameMain} 사진`,
+      zoomLabel: `${nameMain} 사진 크게 보기`,
+      avatarLabel: `${nameMain} 아바타`,
+      crumbLabel: '탐색 경로',
+      metaDesc: `숭실대학교 데이터베이스연구실 구성원 ${nameMain} — 소개, 학력, 논문, 연락처.`,
+    }
+  : {
+      about: 'About',
+      aboutAlt: '소개',
+      awards: 'Awards',
+      awardsAlt: '수상',
+      pubs: `Publications (${pubCount})`,
+      pubsAlt: '논문',
+      pubsNote: "Auto-listed from the lab's publication index by author name.",
+      pubsEmpty: 'No publications indexed yet.',
+      contact: 'Links & Contact',
+      contactAlt: '링크 · 연락처',
+      photoAlt: `Portrait of ${nameMain}`,
+      zoomLabel: `View larger photo of ${nameMain}`,
+      avatarLabel: `Avatar of ${nameMain}`,
+      crumbLabel: 'Breadcrumb',
+      metaDesc: `${member.name_en}, member of the Database Lab at Soongsil University — bio, education, publications, and contact.`,
+    };
+
+/* ------------------------------------------------------------------
+   Generated avatar (photo == null) — same visual language and same
+   deterministic name-hash edge as MemberCard's grid avatar.
+   ------------------------------------------------------------------ */
+function initials(name: string): string {
+  const words = name.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return '·';
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+  return (words[0].charAt(0) + words[words.length - 1].charAt(0)).toUpperCase();
+}
+
+function nameHash(s: string): number {
+  let h = 0;
+  for (const ch of s) h = (h * 31 + (ch.codePointAt(0) ?? 0)) >>> 0;
+  return h;
+}
+
+const EDGES = [
+  { x1: 12, y1: 82, x2: 63, y2: 18 },
+  { x1: 12, y1: 18, x2: 63, y2: 82 },
+  { x1: 8, y1: 50, x2: 67, y2: 50 },
+  { x1: 37.5, y1: 12, x2: 37.5, y2: 88 },
+] as const;
+
+const edge = EDGES[nameHash(member.name_en) % EDGES.length];
+const avatarInitials = initials(member.name_en);
+---
+
+<Base title={nameMain} description={copy.metaDesc} lang={lang}>
+  <section class="sec" id="member">
+    <div class="wrap">
+      <nav class="crumbs" aria-label={copy.crumbLabel}>
+        <a href={localizePath(lang, '/members')}>← {t(lang, 'people.current')}</a>
+      </nav>
+
+      <!-- ============ identity: portrait · name · role · email ============ -->
+      <div class="head">
+        <figure class="fig">
+          {
+            member.photo ? (
+              <button type="button" class="fig-zoom" data-lightbox-trigger aria-label={copy.zoomLabel}>
+                <img
+                  src={member.photo}
+                  alt={copy.photoAlt}
+                  width="413"
+                  height="531"
+                  loading="eager"
+                  decoding="async"
+                  data-lightbox
+                  data-full={member.photo}
+                />
+              </button>
+            ) : (
+              <svg class="avatar" viewBox="0 0 75 100" role="img" aria-label={copy.avatarLabel}>
+                <line class="av-edge" x1={edge.x1} y1={edge.y1} x2={edge.x2} y2={edge.y2} />
+                <circle class="av-dot" cx={edge.x1} cy={edge.y1} r="3" />
+                <circle class="av-dot" cx={edge.x2} cy={edge.y2} r="3" />
+                <circle class="av-ring" cx="37.5" cy="50" r="21" fill="none" stroke-width="1.5" />
+                <text x="37.5" y="57" text-anchor="middle" font-size="18">
+                  {avatarInitials}
+                </text>
+              </svg>
+            )
+          }
+        </figure>
+
+        <div class="id">
+          <p class="eyebrow">
+            {roleMain}{
+              roleAlt && roleAlt !== roleMain && (
+                <span class="eb-alt" lang={other}>
+                  {roleAlt}
+                </span>
+              )
+            }
+          </p>
+          <h1 class="name">
+            {nameMain}
+            {nameAlt && <span class="name-alt" lang={other}>{nameAlt}</span>}
+          </h1>
+
+          <!-- Links & Contact — kept next to the photo & name (as on the professor page) -->
+          <div class="id-contact">
+            <p class="id-contact-t">
+              {copy.contact}<span class="sec-ko" lang={other}>{copy.contactAlt}</span>
+            </p>
+            <div class="badges">
+              {
+                member.email && (
+                  <a class="pbadge" href={`mailto:${member.email}`}>
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        fill="currentColor"
+                        d="M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm1 3.2V17h14V8.2l-7 4.4-7-4.4ZM5.6 7l6.4 4 6.4-4H5.6Z"
+                      />
+                    </svg>
+                    {member.email}
+                  </a>
+                )
+              }
+              {
+                links.github && (
+                  <a class="pbadge" href={links.github} target="_blank" rel="noopener">
+                    <svg class="icon" viewBox="0 0 16 16" aria-hidden="true">
+                      <path
+                        fill="currentColor"
+                        d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"
+                      />
+                    </svg>
+                    GitHub
+                  </a>
+                )
+              }
+              {
+                links.orcid && (
+                  <a class="pbadge" href={links.orcid} target="_blank" rel="noopener">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        fill="currentColor"
+                        d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16ZM8.2 7.3a.9.9 0 1 1 0 1.8.9.9 0 0 1 0-1.8Zm-.7 3h1.5v6.5H7.5v-6.5Zm3 0h2.9c2.1 0 3.5 1.3 3.5 3.2 0 2-1.4 3.3-3.5 3.3h-2.9v-6.5Zm1.5 1.3v3.9h1.3c1.3 0 2.1-.7 2.1-2 0-1.2-.8-1.9-2.1-1.9H12Z"
+                      />
+                    </svg>
+                    ORCID
+                  </a>
+                )
+              }
+              {
+                links.dblp && (
+                  <a class="pbadge" href={links.dblp} target="_blank" rel="noopener">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        fill="currentColor"
+                        d="M14 4h6v6h-2V7.4l-7.3 7.3-1.4-1.4L16.6 6H14V4ZM5 6h6v2H7v9h9v-4h2v6H5V6Z"
+                      />
+                    </svg>
+                    DBLP
+                  </a>
+                )
+              }
+              {
+                links.linkedin && (
+                  <a class="pbadge" href={links.linkedin} target="_blank" rel="noopener">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        fill="currentColor"
+                        d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.72v20.55c0 .95.79 1.73 1.77 1.73h20.45c.98 0 1.78-.78 1.78-1.73V1.72C24 .77 23.2 0 22.22 0Z"
+                      />
+                    </svg>
+                    LinkedIn
+                  </a>
+                )
+              }
+            </div>
+          </div>
+
+          {
+            member.unverified && (
+              <p class="veri">
+                <span aria-hidden="true">⚠</span> {t(lang, 'people.memberUnverified')}
+              </p>
+            )
+          }
+        </div>
+      </div>
+
+      <div class="cols">
+        <!-- ============ about ============ -->
+        {
+          bio && (
+            <section class="card" id="about" aria-labelledby="about-t">
+              <h2 class="card-t" id="about-t">
+                {copy.about}
+                <span class="sec-ko" lang={other}>
+                  {copy.aboutAlt}
+                </span>
+              </h2>
+              <p class="prose">{bio}</p>
+            </section>
+          )
+        }
+
+        <!-- ============ research interests (chips) ============ -->
+        {
+          interestChips.length > 0 && (
+            <section class="card" id="interests" aria-labelledby="interests-t">
+              <h2 class="card-t" id="interests-t">
+                {t(lang, 'people.interests')}
+                <span class="sec-ko" lang={other}>
+                  {t(other, 'people.interests')}
+                </span>
+              </h2>
+              <ul class="chips" role="list">
+                {interestChips.map((chip) => (
+                  <li class="chip">{chip}</li>
+                ))}
+              </ul>
+            </section>
+          )
+        }
+
+        <!-- ============ education timeline ============ -->
+        {
+          education.length > 0 && (
+            <section class="card" id="education" aria-labelledby="education-t">
+              <h2 class="card-t" id="education-t">
+                {t(lang, 'people.education')}
+                <span class="sec-ko" lang={other}>
+                  {t(other, 'people.education')}
+                </span>
+              </h2>
+              {/* list-style:none strips list semantics in Safari/VoiceOver — role="list" restores it */}
+              <ol class="rows" role="list">
+                {education.map((row) => (
+                  <li class="row">
+                    <span class="when">{pick(row.when_en, row.when_kr)}</span>
+                    <p class="body">{pick(row.en, row.kr)}</p>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          )
+        }
+
+        <!-- ============ awards ============ -->
+        {
+          awards.length > 0 && (
+            <section class="card" id="awards" aria-labelledby="awards-t">
+              <h2 class="card-t" id="awards-t">
+                {copy.awards}
+                <span class="sec-ko" lang={other}>
+                  {copy.awardsAlt}
+                </span>
+              </h2>
+              <ol class="rows" role="list">
+                {awards.map((award) => (
+                  <li class="row">
+                    <span class="when">{award.year}</span>
+                    <p class="body">{award.text}</p>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          )
+        }
+
+      </div>
+
+      <!-- ============ publications (auto-filtered) ============ -->
+      <section class="pubs" id="publications" aria-labelledby="pubs-t">
+        <h2 class="pubs-t" id="pubs-t">
+          {copy.pubs}
+          <span class="sec-ko" lang={other}>{copy.pubsAlt}</span>
+        </h2>
+        <p class="pubs-note">{copy.pubsNote}</p>
+        {
+          pubCount > 0 ? (
+            <div class="pubs-list">
+              {memberPubs.map((pub) => (
+                <PubEntry pub={pub} lang={lang} compact />
+              ))}
+            </div>
+          ) : (
+            <p class="pubs-empty">{copy.pubsEmpty}</p>
+          )
+        }
+      </section>
+    </div>
+  </section>
+
+  {member.photo && <Lightbox lang={lang} />}
+</Base>
+
+<style>
+  .crumbs {
+    margin-bottom: clamp(16px, 2.5vw, 24px);
+  }
+
+  .crumbs a {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  .crumbs a:hover {
+    color: var(--accent-strong);
+  }
+
+  /* ---------- identity header (PageProfessor's language) ---------- */
+  .head {
+    display: grid;
+    grid-template-columns: minmax(180px, 260px) 1fr;
+    gap: clamp(20px, 4vw, 44px);
+    align-items: start;
+    margin-bottom: clamp(24px, 4vw, 40px);
+  }
+
+  .fig {
+    margin: 0;
+  }
+
+  /* Natural aspect ratio — max-width constrained, no crop, no squeeze.
+     The trigger button reset comes from Lightbox.astro. */
+  .fig-zoom {
+    border-radius: var(--radius-l);
+  }
+
+  .fig img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-l);
+    background: var(--chip-2);
+    border: 1px solid var(--line);
+  }
+
+  .avatar {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 3 / 4;
+    border-radius: var(--radius-l);
+    background: var(--chip-2);
+    border: 1px solid var(--line);
+  }
+
+  .avatar text {
+    font-family: var(--mono);
+    font-weight: 700;
+    fill: var(--accent-strong);
+  }
+
+  .av-ring {
+    stroke: var(--accent);
+    opacity: 0.5;
+  }
+
+  .av-dot {
+    fill: var(--accent);
+    opacity: 0.55;
+  }
+
+  .av-edge {
+    stroke: var(--line-strong);
+  }
+
+  .eb-alt {
+    color: var(--muted);
+    margin-left: 8px;
+    letter-spacing: 0.04em;
+  }
+
+  .name {
+    font-size: var(--fs-h1);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    margin-top: 8px;
+  }
+
+  .name-alt {
+    font-weight: 550;
+    color: var(--muted);
+    font-size: 0.55em;
+    margin-left: 12px;
+    letter-spacing: 0;
+  }
+
+  /* Links & Contact, sitting right under the name beside the photo */
+  .id-contact {
+    margin-top: clamp(16px, 2.5vw, 22px);
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+  }
+
+  .id-contact-t {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-strong);
+  }
+
+  .id-contact-t .sec-ko {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: none;
+    color: var(--muted);
+    margin-left: 8px;
+  }
+
+  .id-contact .badges {
+    padding: 10px 0 0;
+  }
+
+  .veri {
+    display: inline-block;
+    margin-top: 12px;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    line-height: 1.4;
+    color: var(--muted);
+    border: 1px dashed var(--line-strong);
+    border-radius: var(--radius-s);
+    padding: 2px 7px;
+  }
+
+  @media (max-width: 640px) {
+    .head {
+      grid-template-columns: 1fr;
+    }
+
+    .fig {
+      max-width: 220px;
+    }
+  }
+
+  /* ---------- info cards ---------- */
+  .cols {
+    display: grid;
+    gap: 14px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 6px 20px 12px;
+  }
+
+  .card-t {
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent-strong);
+    padding: 12px 0 10px;
+    border-bottom: 1px solid var(--line-strong);
+  }
+
+  .card-t .sec-ko {
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: none;
+  }
+
+  .prose {
+    font-size: var(--fs-body-s);
+    line-height: 1.7;
+    color: var(--ink);
+    padding: 13px 0 4px;
+  }
+
+  /* interests as tag chips (AICA mirror, our tokens) */
+  .chips {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 14px 0 6px;
+    margin: 0;
+  }
+
+  .chip {
+    font-size: var(--fs-small);
+    color: var(--ink);
+    background: var(--chip);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 4px 12px;
+  }
+
+  .rows {
+    list-style: none;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 84px minmax(0, 1fr);
+    gap: 2px 16px;
+    padding: 13px 0;
+  }
+
+  .row + .row {
+    border-top: 1px solid var(--line);
+  }
+
+  .when {
+    font-family: var(--mono);
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    padding-top: 2px;
+  }
+
+  .body {
+    font-size: var(--fs-body-s);
+    line-height: 1.55;
+    color: var(--ink);
+  }
+
+  .badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 14px 0 6px;
+  }
+
+  .pbadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: var(--fs-caption);
+    padding: 5px 11px;
+    border-radius: var(--radius-s);
+    border: 1px solid var(--line-strong);
+    color: var(--accent-strong);
+    background: var(--chip);
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  .pbadge:hover {
+    border-color: var(--accent);
+    text-decoration: none;
+    box-shadow: 0 0 0 2px var(--accent-ring);
+  }
+
+  .pbadge .icon {
+    width: 13px;
+    height: 13px;
+    flex: none;
+  }
+
+  /* ---------- publications ---------- */
+  .pubs {
+    margin-top: clamp(28px, 4.5vw, 44px);
+  }
+
+  .pubs-t {
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent-strong);
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line-strong);
+  }
+
+  .pubs-t .sec-ko {
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: none;
+  }
+
+  .pubs-note {
+    font-family: var(--mono);
+    font-size: var(--fs-micro);
+    color: var(--muted);
+    margin-top: 8px;
+  }
+
+  .pubs-list {
+    display: grid;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .pubs-empty {
+    color: var(--muted);
+    font-size: var(--fs-body-s);
+    margin-top: 14px;
+  }
+
+  @media (max-width: 480px) {
+    .card {
+      padding: 4px 14px 10px;
+    }
+
+    .row {
+      grid-template-columns: 1fr;
+      gap: 1px;
+    }
+
+    .when {
+      padding-top: 0;
+    }
+  }
+</style>

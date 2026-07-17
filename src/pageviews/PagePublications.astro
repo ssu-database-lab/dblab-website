@@ -1,0 +1,461 @@
+---
+/**
+ * PagePublications — the full publications explorer.
+ * Design ported from mockups/mockup_b.html (#publications section).
+ *
+ * SEO: the COMPLETE list is server-rendered, grouped by year descending —
+ * every entry is present in the static HTML. The toolbar (search, topic
+ * chips, type chips, live count) is a pure client-side enhancement: it
+ * ships `hidden` and is revealed by the script, so no-JS visitors see the
+ * full list and never see dead controls.
+ *
+ * URL state: ?tag=<topic>&type=<IJ…UR>&q=<text> — read on load, written
+ * back via history.replaceState while filtering.
+ *
+ * Patents live on their own page now — see PagePatents.astro (/patents).
+ */
+import Base from '../layouts/Base.astro';
+import PubEntry from '../components/PubEntry.astro';
+import publications from '../data/publications.json';
+import { t, type Lang } from '../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+
+/* Contract-canonical topic slugs and type codes (chip order). */
+const TAGS = [
+  'flash-ftl',
+  'forensics',
+  'indexing',
+  'vishing',
+  'nlp-metadata',
+  'systems-other',
+] as const;
+const TYPES = ['IJ', 'IC', 'DJ', 'DC', 'DS', 'UR'] as const;
+
+/* Group by year, newest first; JSON order is preserved within a year. */
+const years = [...new Set(publications.map((p) => p.year))].sort((a, b) => b - a);
+const byYear = new Map(years.map((y) => [y, publications.filter((p) => p.year === y)]));
+
+const total = publications.length;
+const countText = t(lang, 'pubs.count')
+  .replace('{shown}', String(total))
+  .replace('{total}', String(total));
+
+const other: Lang = lang === 'ko' ? 'en' : 'ko';
+const title = t(lang, 'section.publications.title');
+const titleAside = t(other, 'section.publications.title');
+const description = t(lang, 'section.publications.sub');
+---
+
+<Base title={title} description={description} lang={lang}>
+  <section class="sec" id="publications">
+    <div class="wrap">
+      <header class="page-head">
+        <p class="eyebrow">Publications Explorer</p>
+        <h1 class="page-t">{title}<span class="sec-ko" lang={other}>{titleAside}</span></h1>
+        <p class="page-s">{description}</p>
+      </header>
+
+      {/* Toolbar — ships hidden; the enhancement script reveals it. */}
+      <div class="pub-bar" id="pubBar" hidden>
+        <div class="pub-row1">
+          <label class="pub-search">
+            <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                fill="currentColor"
+                d="M10.5 3a7.5 7.5 0 0 1 5.9 12.2l4.7 4.7-1.4 1.4-4.7-4.7A7.5 7.5 0 1 1 10.5 3Zm0 2a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11Z"
+              ></path>
+            </svg>
+            <input
+              id="pubSearch"
+              type="search"
+              placeholder={t(lang, 'pubs.searchPlaceholder')}
+              aria-label={t(lang, 'pubs.searchLabel')}
+              autocomplete="off"
+            />
+          </label>
+          <output class="pub-count" id="pubCount" aria-live="polite" data-tpl={t(lang, 'pubs.count')}>
+            {countText}
+          </output>
+        </div>
+        <div class="chip-row" id="topicChips" role="group" aria-label={t(lang, 'pubs.filterByTopic')}>
+          <span class="chip-lbl">{t(lang, 'pubs.topic')}</span>
+          <button class="fchip on" type="button" data-v="all" aria-pressed="true">
+            {t(lang, 'common.all')}
+          </button>
+          {
+            TAGS.map((tag) => (
+              <button class="fchip" type="button" data-v={tag} aria-pressed="false">
+                {t(lang, `topics.${tag}`)}
+              </button>
+            ))
+          }
+        </div>
+        <div class="chip-row" id="typeChips" role="group" aria-label={t(lang, 'pubs.filterByType')}>
+          <span class="chip-lbl">{t(lang, 'pubs.type')}</span>
+          <button class="fchip on" type="button" data-v="all" aria-pressed="true">
+            {t(lang, 'common.all')}
+          </button>
+          {
+            TYPES.map((ty) => (
+              <button class="fchip" type="button" data-v={ty} aria-pressed="false" title={t(lang, `types.${ty}`)}>
+                {ty}
+              </button>
+            ))
+          }
+        </div>
+      </div>
+
+      <div class="pub-list" id="pubList">
+        {
+          years.map((year) => (
+            <section class="ygroup" data-year={year} aria-labelledby={`y-${year}`}>
+              <h2 class="y" id={`y-${year}`}>
+                {year}
+              </h2>
+              <div class="ylist">
+                {(byYear.get(year) ?? []).map((pub) => (
+                  <PubEntry pub={pub} lang={lang} />
+                ))}
+              </div>
+            </section>
+          ))
+        }
+      </div>
+
+      <div class="pub-empty" id="pubEmpty" hidden>
+        <p>
+          {t(lang, 'pubs.empty')}
+          <button class="linkish" id="pubReset" type="button">{t(lang, 'pubs.reset')}</button>
+        </p>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* page heading (h1 variant of SectionHeading's design) */
+  .page-head {
+    margin-bottom: clamp(22px, 3.5vw, 34px);
+  }
+
+  .page-t {
+    font-size: var(--fs-h2);
+    font-weight: 750;
+    letter-spacing: -0.02em;
+    margin-top: 6px;
+  }
+
+  .page-s {
+    color: var(--muted);
+    margin-top: 8px;
+    max-width: 64ch;
+  }
+
+  /* toolbar — sticky under the 60px header */
+  .pub-bar {
+    position: sticky;
+    top: 60px;
+    z-index: 40;
+    background: var(--paper);
+    padding: 10px 0 12px;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* on small screens the wrapped chip rows would pin ~half the viewport,
+     so the toolbar scrolls with the page instead */
+  @media (max-width: 640px) {
+    .pub-bar {
+      position: static;
+    }
+  }
+
+  .pub-bar[hidden] {
+    display: none;
+  }
+
+  .pub-row1 {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .pub-search {
+    flex: 1 1 240px;
+    max-width: 420px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--chip);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-m);
+    padding: 8px 12px;
+  }
+
+  .pub-search:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-ring);
+  }
+
+  .pub-search input {
+    border: 0;
+    background: none;
+    outline: none;
+    color: var(--ink);
+    font: inherit;
+    font-size: 15.5px;
+    width: 100%;
+    padding: 0;
+  }
+
+  .pub-search .icon {
+    color: var(--muted);
+    flex: none;
+  }
+
+  .pub-count {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 14.5px;
+    color: var(--accent-strong);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  .chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+  }
+
+  .chip-lbl {
+    font-family: var(--mono);
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-right: 4px;
+    flex: none;
+  }
+
+  .fchip {
+    font-family: var(--mono);
+    font-size: var(--fs-caption);
+    padding: 4px 11px;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    background: var(--chip);
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .fchip:hover {
+    border-color: var(--accent);
+    color: var(--accent-strong);
+  }
+
+  .fchip.on {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  /* year-grouped list */
+  .pub-list {
+    margin-top: 8px;
+  }
+
+  .ygroup {
+    display: grid;
+    grid-template-columns: 86px 1fr;
+    gap: 0 18px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .ygroup:last-child {
+    border-bottom: 0;
+  }
+
+  .ygroup[hidden] {
+    display: none;
+  }
+
+  .y {
+    font-family: var(--mono);
+    font-size: 16.5px;
+    font-weight: 700;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    padding-top: 14px;
+    line-height: 1.25;
+  }
+
+  .ylist {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+  }
+
+  @media (max-width: 640px) {
+    .ygroup {
+      grid-template-columns: 1fr;
+      gap: 8px 0;
+    }
+
+    .y {
+      padding-top: 0;
+    }
+  }
+
+  /* empty state */
+  .pub-empty {
+    padding: 36px 0;
+    text-align: center;
+    color: var(--muted);
+  }
+
+  .pub-empty .linkish {
+    margin-left: 6px;
+  }
+</style>
+
+<script>
+  /* Publications explorer — filter the server-rendered list by hiding
+   * non-matching entries and empty year groups. State lives in the URL
+   * (?tag=&type=&q=) via replaceState; read back on load so links from
+   * the Research page (/publications?tag=<slug>) preselect a chip. */
+  const bar = document.getElementById('pubBar');
+  const list = document.getElementById('pubList');
+  const search = document.getElementById('pubSearch') as HTMLInputElement | null;
+  const countEl = document.getElementById('pubCount');
+  const emptyEl = document.getElementById('pubEmpty');
+  const topicRow = document.getElementById('topicChips');
+  const typeRow = document.getElementById('typeChips');
+  const resetBtn = document.getElementById('pubReset');
+
+  if (bar && list && search && topicRow && typeRow) {
+    const entries = Array.from(list.querySelectorAll<HTMLElement>('.pub'));
+    const groups = Array.from(list.querySelectorAll<HTMLElement>('.ygroup'));
+    const total = entries.length;
+    const tpl = countEl?.getAttribute('data-tpl') || '{shown} / {total}';
+
+    const state = { topic: 'all', type: 'all', q: '' };
+
+    /** Activate the chip whose data-v matches `value`; falls back to
+     *  'all' when the value is unknown. Returns the applied value. */
+    function setChip(row: HTMLElement, value: string): string {
+      const chips = Array.from(row.querySelectorAll<HTMLElement>('.fchip'));
+      const valid = chips.some((c) => c.getAttribute('data-v') === value);
+      const applied = valid ? value : 'all';
+      for (const chip of chips) {
+        const on = chip.getAttribute('data-v') === applied;
+        chip.classList.toggle('on', on);
+        chip.setAttribute('aria-pressed', String(on));
+      }
+      return applied;
+    }
+
+    function apply(): void {
+      const q = state.q.trim().toLowerCase();
+      let shown = 0;
+      for (const el of entries) {
+        const tags = (el.getAttribute('data-tags') || '').split(/\s+/);
+        const okTopic = state.topic === 'all' || tags.indexOf(state.topic) !== -1;
+        const okType = state.type === 'all' || el.getAttribute('data-type') === state.type;
+        const okQ = !q || (el.getAttribute('data-hay') || '').indexOf(q) !== -1;
+        const ok = okTopic && okType && okQ;
+        el.hidden = !ok;
+        if (ok) shown++;
+      }
+      for (const group of groups) {
+        group.hidden = !group.querySelector('.pub:not([hidden])');
+      }
+      if (emptyEl) emptyEl.hidden = shown !== 0;
+      if (countEl) {
+        countEl.textContent = tpl
+          .replace('{shown}', String(shown))
+          .replace('{total}', String(total));
+      }
+    }
+
+    let urlTimer: number | null = null;
+
+    function syncUrl(): void {
+      if (urlTimer !== null) {
+        window.clearTimeout(urlTimer);
+        urlTimer = null;
+      }
+      const params = new URLSearchParams();
+      if (state.topic !== 'all') params.set('tag', state.topic);
+      if (state.type !== 'all') params.set('type', state.type);
+      const q = state.q.trim();
+      if (q) params.set('q', q);
+      const qs = params.toString();
+      try {
+        history.replaceState(null, '', location.pathname + (qs ? `?${qs}` : '') + location.hash);
+      } catch {
+        /* Safari throttles history mutations — the URL just lags briefly */
+      }
+    }
+
+    /** Debounced variant for keystroke-rate callers (Safari rate-limits
+     *  replaceState to ~100 calls / 30 s and throws beyond that). */
+    function syncUrlSoon(): void {
+      if (urlTimer !== null) window.clearTimeout(urlTimer);
+      urlTimer = window.setTimeout(() => {
+        urlTimer = null;
+        syncUrl();
+      }, 250);
+    }
+
+    function bindRow(row: HTMLElement, key: 'topic' | 'type'): void {
+      row.addEventListener('click', (event) => {
+        const chip = (event.target as Element | null)?.closest?.('.fchip');
+        if (!chip || !row.contains(chip)) return;
+        state[key] = setChip(row, chip.getAttribute('data-v') || 'all');
+        apply();
+        syncUrl();
+      });
+    }
+
+    bindRow(topicRow, 'topic');
+    bindRow(typeRow, 'type');
+
+    search.addEventListener('input', () => {
+      state.q = search.value;
+      apply();
+      syncUrlSoon();
+    });
+
+    resetBtn?.addEventListener('click', () => {
+      state.topic = setChip(topicRow, 'all');
+      state.type = setChip(typeRow, 'all');
+      state.q = '';
+      search.value = '';
+      apply();
+      syncUrl();
+    });
+
+    /* boot: restore state from the URL, then reveal the toolbar */
+    const params = new URLSearchParams(location.search);
+    const bootType = (params.get('type') || 'all').toUpperCase();
+    state.topic = setChip(topicRow, (params.get('tag') || 'all').toLowerCase());
+    state.type = setChip(typeRow, bootType === 'ALL' ? 'all' : bootType);
+    state.q = params.get('q') || '';
+    if (state.q) search.value = state.q;
+
+    bar.hidden = false;
+    apply();
+  }
+</script>

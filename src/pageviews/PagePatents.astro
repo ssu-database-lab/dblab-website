@@ -1,0 +1,172 @@
+---
+/**
+ * Patents page view — the lab's Korean patents, one card per
+ * src/data/patents.json entry: status Badge (granted/pending),
+ * bilingual title, inventors, applicant, application/registration
+ * numbers, and a Google Patents link.
+ *
+ * Shares the "Software & Patents" nav area with PageSoftware — the
+ * SectionTabs bar under the page header switches between the two
+ * routes. Card markup/styles moved verbatim from PagePublications
+ * (round 2: patents sat too far down the publications page); patent
+ * titles are <h2> here since they sit directly under the page <h1>.
+ * Rendered by the /patents and /ko/patents wrappers.
+ */
+import Base from '../layouts/Base.astro';
+import Badge from '../components/Badge.astro';
+import SectionTabs from '../components/SectionTabs.astro';
+import patents from '../data/patents.json';
+import { t, type Lang } from '../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const other: Lang = lang === 'ko' ? 'en' : 'ko';
+
+const title = t(lang, 'patents.title');
+const description = t(lang, 'patents.sub');
+---
+
+<Base title={title} description={description} lang={lang}>
+  <section class="sec" id="patents">
+    <div class="wrap">
+      <header class="page-head">
+        <p class="eyebrow">Patents</p>
+        <h1 class="page-t">{title}<span class="sec-ko" lang={other}>{t(other, 'patents.title')}</span></h1>
+        <p class="page-s">{description}</p>
+      </header>
+
+      <SectionTabs lang={lang} active="patents" />
+
+      <div class="patent-list">
+        {
+          patents.map((pat) => (
+            <article class="patent">
+              <div class="patent-head">
+                <Badge
+                  kind={pat.status === 'granted' ? 'active' : 'proposal'}
+                  label={t(lang, pat.status === 'granted' ? 'patents.granted' : 'patents.pending')}
+                />
+                <h2 class="patent-title">
+                  <span lang="ko">{pat.title_kr}</span>
+                  <span class="patent-title-en" lang="en">
+                    {pat.title_en}
+                  </span>
+                </h2>
+              </div>
+              <p class="patent-meta">
+                <span class="patent-lbl">{t(lang, 'patents.inventors')}</span>
+                {pat.inventors.join(' · ')}
+              </p>
+              <p class="patent-meta">
+                <span class="patent-lbl">{t(lang, 'patents.applicant')}</span>
+                <span lang={lang === 'ko' ? undefined : 'ko'}>
+                  {lang === 'ko' ? pat.applicant_kr : `${pat.applicant_kr} (${pat.applicant_en})`}
+                </span>
+              </p>
+              <p class="patent-nums">
+                <span>
+                  {t(lang, 'patents.appNo')} {pat.number_app} · {t(lang, 'patents.filed')} {pat.filed}
+                </span>
+                {pat.number_reg && (
+                  <span>
+                    {t(lang, 'patents.regNo')} {pat.number_reg} · {t(lang, 'patents.registered')} {pat.registered}
+                  </span>
+                )}
+                <a href={pat.link} rel="noopener" target="_blank">
+                  {t(lang, 'patents.view')} ↗
+                </a>
+              </p>
+            </article>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ---------- page head (h1 variant, as on Software/News) ---------- */
+  .page-head {
+    /* tighter than the usual page head — the tab bar sits right below */
+    margin-bottom: clamp(18px, 3vw, 26px);
+  }
+
+  .page-t {
+    font-size: var(--fs-h1);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    margin-top: 6px;
+  }
+
+  .page-s {
+    color: var(--muted);
+    margin-top: 10px;
+    max-width: 64ch;
+  }
+
+  /* ---------- patent cards (moved from PagePublications) ---------- */
+  .patent-list {
+    display: grid;
+    gap: 14px;
+  }
+
+  .patent {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-m);
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .patent-head {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .patent-title {
+    font-size: var(--fs-h3);
+    font-weight: 700;
+    line-height: 1.4;
+    min-width: 0;
+  }
+
+  .patent-title-en {
+    display: block;
+    font-size: var(--fs-small);
+    font-weight: 500;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .patent-meta {
+    font-size: var(--fs-small);
+    color: var(--ink);
+  }
+
+  .patent-lbl {
+    font-family: var(--mono);
+    font-size: var(--fs-micro);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-right: 8px;
+  }
+
+  .patent-nums {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 18px;
+    font-family: var(--mono);
+    font-size: var(--fs-caption);
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+</style>

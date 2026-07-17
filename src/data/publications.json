@@ -1,0 +1,1612 @@
+[
+  {
+    "id": "iceeecs2026-ner-llm",
+    "year": 2026,
+    "type": "IC",
+    "title": "Arbitrating Two Extractors: A NER-LLM Consolidation Pipeline for Metadata Extraction from Korean Public Domain Right Documents",
+    "authors": [
+      "Milandu Keith Moussavou Boussougou",
+      "SeongHun Hwang",
+      "Dong-Joo Park"
+    ],
+    "venue": "IC-EEECS 2026 (short paper, to appear)",
+    "venue_short": "IC-EEECS 2026",
+    "doi": null,
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "nlp-metadata"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": null
+  },
+  {
+    "id": "iceeecs2026-klue-bio",
+    "year": 2026,
+    "type": "IC",
+    "title": "Performance Analysis of KLUE-BERT with B-I-O Training Data Composition for Metadata Extraction from Rights Documents as Korean Openly Licensed Works",
+    "authors": [
+      "SeongHun Hwang",
+      "Milandu Keith Moussavou Boussougou",
+      "Dong-Joo Park"
+    ],
+    "venue": "IC-EEECS 2026 (companion short paper, to appear)",
+    "venue_short": "IC-EEECS 2026",
+    "doi": null,
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "nlp-metadata"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": null
+  },
+  {
+    "id": "kcc2026-klue-bio",
+    "year": 2026,
+    "type": "DC",
+    "title": "한국어 공공저작물 권리문서 메타데이터 추출을 위한 B-I-O 태깅 기반 학습데이터 구성에 따른 Klue BERT 성능 분석",
+    "authors": [
+      "황성훈"
+    ],
+    "etal": true,
+    "venue": "KCC 2026 (한국컴퓨터종합학술대회) — short paper, submitted",
+    "venue_short": "KCC 2026",
+    "doi": null,
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "nlp-metadata"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": "author list incomplete (황성훈 et al.) — confirm"
+  },
+  {
+    "id": "ur2026-lightweight-acoustic",
+    "year": 2026,
+    "type": "UR",
+    "title": "Lightweight Acoustic Approaches for Real-Time Voice-Phishing Detection on Mobile Devices",
+    "authors": [
+      "Milandu Keith Moussavou Boussougou",
+      "Dong-Joo Park"
+    ],
+    "venue": "IEEE Access — revise & resubmit",
+    "venue_short": "IEEE Access",
+    "doi": null,
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "vishing"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": null
+  },
+  {
+    "id": "ur2026-cross-attention",
+    "year": 2026,
+    "type": "UR",
+    "title": "Multi-Branch Cross-Attention for Audio-Text Fusion in Korean Vishing Detection",
+    "authors": [],
+    "venue": "In preparation",
+    "venue_short": "In preparation",
+    "doi": null,
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "vishing"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": "in preparation — author list to be confirmed"
+  },
+  {
+    "id": "ur2026-metadata-journal",
+    "year": 2026,
+    "type": "UR",
+    "title": "Division of Labor for Trustworthy Metadata: Consolidating Fine-Tuned Korean NER and LLM Extraction for Public-Domain Rights Documents",
+    "authors": [],
+    "venue": "Journal article — in preparation",
+    "venue_short": "In preparation",
+    "doi": null,
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "nlp-metadata"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": "in preparation — author list to be confirmed"
+  },
+  {
+    "id": "jsav2025-ner",
+    "year": 2025,
+    "type": "DJ",
+    "title": "공유저작물 자동 정보 추출을 위한 미세조정 BERT-BiLSTM-CRF NER 모델의 성능 및 안정성 분석",
+    "title_en_note": "Performance and Stability Analysis of a Fine-Tuned BERT-BiLSTM-CRF NER Model for Automated Information Extraction in Openly Licensed Works",
+    "authors": [
+      "황성훈",
+      "Milandu Keith Moussavou Boussougou",
+      "박동주"
+    ],
+    "venue": "한국소프트웨어감정평가학회 논문지 (Journal of Software Assessment and Valuation) 21(4):53–61",
+    "venue_short": "JSAV",
+    "doi": "10.29056/jsav.2025.12.05",
+    "url": null,
+    "kci": "ART003277346",
+    "citations": null,
+    "tags": [
+      "nlp-metadata"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": "source PDF abstract discrepancy (XLM-RoBERTa-Large-CRF avg F1 0.9641 KR vs 0.998 EN) — confirm"
+  },
+  {
+    "id": "kcc2025-multimodal",
+    "year": 2025,
+    "type": "DC",
+    "title": "Multimodal Detection of Korean Voice Phishing Using Audio and Text Fusion",
+    "authors": [
+      "Milandu Keith Moussavou Boussougou",
+      "Minhyuk Song",
+      "Bongchan Jeong",
+      "YuSeok Hwang",
+      "Dong-Joo Park"
+    ],
+    "venue": "KCC 2025 (한국컴퓨터종합학술대회)",
+    "venue_short": "KCC 2025",
+    "doi": null,
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "vishing"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": null
+  },
+  {
+    "id": "access2025-bt",
+    "year": 2025,
+    "type": "IJ",
+    "title": "Enhancing Voice Phishing Detection Using Multilingual Back-Translation and SMOTE: An Empirical Study",
+    "authors": [
+      "Milandu Keith Moussavou Boussougou",
+      "Prince Hamandawana",
+      "Dong-Joo Park"
+    ],
+    "venue": "IEEE Access 13:37946–37965",
+    "venue_short": "IEEE Access",
+    "doi": "10.1109/ACCESS.2025.3545250",
+    "url": null,
+    "kci": null,
+    "citations": 12,
+    "tags": [
+      "vishing"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": "@article{boussougou2025enhancing,\n  author  = {Moussavou Boussougou, Milandu Keith and Hamandawana, Prince and Park, Dong-Joo},\n  title   = {Enhancing Voice Phishing Detection Using Multilingual Back-Translation and SMOTE: An Empirical Study},\n  journal = {IEEE Access},\n  volume  = {13},\n  pages   = {37946--37965},\n  year    = {2025},\n  doi     = {10.1109/ACCESS.2025.3545250}\n}",
+    "review": "Crossref metadata misspells 'Moussavou' as 'Moussovou'"
+  },
+  {
+    "id": "dataport2024-korccvi",
+    "year": 2024,
+    "type": "DS",
+    "title": "Korean Voice Phishing Detection Dataset with Multilingual Back-Translation and SMOTE Augmentations",
+    "authors": [
+      "Milandu Keith Moussavou Boussougou",
+      "Prince Hamandawana",
+      "Dong-Joo Park"
+    ],
+    "venue": "IEEE DataPort",
+    "venue_short": "IEEE DataPort",
+    "doi": "10.21227/163c-0542",
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "vishing"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": "https://doi.org/10.21227/163c-0542",
+    "bibtex": null,
+    "review": null
+  },
+  {
+    "id": "electronics2024-hyperledger",
+    "year": 2024,
+    "type": "IJ",
+    "title": "An Efficient Privacy and Anonymity Setup on Hyperledger Fabric for Blockchain-Enabled Internet of Things (IoT) Devices",
+    "authors": [
+      "Muhammad Saad",
+      "Saqib Ali Haidery",
+      "Aavash Bhandari",
+      "Muhammad Raheel Bhutta",
+      "Dong-Joo Park",
+      "Tae-Sun Chung"
+    ],
+    "venue": "Electronics 13(13):2652",
+    "venue_short": "Electronics",
+    "doi": "10.3390/electronics13132652",
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "systems-other"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": "@article{saad2024efficient,\n  author  = {Saad, Muhammad and Haidery, Saqib Ali and Bhandari, Aavash and Bhutta, Muhammad Raheel and Park, Dong-Joo and Chung, Tae-Sun},\n  title   = {An Efficient Privacy and Anonymity Setup on Hyperledger Fabric for Blockchain-Enabled Internet of Things (IoT) Devices},\n  journal = {Electronics},\n  volume  = {13},\n  number  = {13},\n  pages   = {2652},\n  year    = {2024},\n  doi     = {10.3390/electronics13132652}\n}",
+    "review": null
+  },
+  {
+    "id": "math2023-cnn-bilstm",
+    "year": 2023,
+    "type": "IJ",
+    "title": "Attention-Based 1D CNN-BiLSTM Hybrid Model Enhanced with FastText Word Embedding for Korean Voice Phishing Detection",
+    "authors": [
+      "Milandu Keith Moussavou Boussougou",
+      "Dong-Joo Park"
+    ],
+    "venue": "Mathematics (MDPI) 11(14):3217",
+    "venue_short": "Mathematics",
+    "doi": "10.3390/math11143217",
+    "url": null,
+    "kci": null,
+    "citations": 32,
+    "tags": [
+      "vishing"
+    ],
+    "award": null,
+    "pdf": "https://www.mdpi.com/2227-7390/11/14/3217/pdf",
+    "code": null,
+    "dataset": null,
+    "bibtex": "@article{boussougou2023attention,\n  author  = {Moussavou Boussougou, Milandu Keith and Park, Dong-Joo},\n  title   = {Attention-Based 1D CNN-BiLSTM Hybrid Model Enhanced with FastText Word Embedding for Korean Voice Phishing Detection},\n  journal = {Mathematics},\n  volume  = {11},\n  number  = {14},\n  pages   = {3217},\n  year    = {2023},\n  doi     = {10.3390/math11143217}\n}",
+    "review": null
+  },
+  {
+    "id": "kcc2023-federated",
+    "year": 2023,
+    "type": "DC",
+    "title": "Towards Privacy-Preserving Korean Voice Phishing Detection: A Federated Learning Approach with RoBERTA",
+    "authors": [
+      "Milandu Keith Moussavou Boussougou",
+      "Chang Kyun Hong",
+      "Soyeon Hong",
+      "Dong-Joo Park"
+    ],
+    "venue": "KCC 2023, pp. 626–628",
+    "venue_short": "KCC 2023",
+    "doi": null,
+    "url": "https://www.dbpia.co.kr/journal/articleDetail?nodeId=NODE11488126",
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "vishing"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": "possible camera-ready variant PDF ('Changing the Paradigm…') on disk — confirm"
+  },
+  {
+    "id": "ktsde2022-kobert",
+    "year": 2022,
+    "type": "DJ",
+    "title": "한국어 언어 모델을 활용한 보이스피싱 탐지 기능 개선",
+    "title_en_note": "Exploiting Korean Language Model to Improve Korean Voice Phishing Detection",
+    "authors": [
+      "Milandu Keith Moussavou Boussougou",
+      "Dong-Joo Park"
+    ],
+    "venue": "KIPS Transactions on Software and Data Engineering 11(10):437–446",
+    "venue_short": "KIPS TSDE",
+    "doi": "10.3745/KTSDE.2022.11.10.437",
+    "url": null,
+    "kci": "ART002889534",
+    "citations": null,
+    "tags": [
+      "vishing"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": null
+  },
+  {
+    "id": "kcc2022-cnn-bilstm",
+    "year": 2022,
+    "type": "DC",
+    "title": "An Attention-Based CNN-BiLSTM Model for Korean Voice Phishing Detection",
+    "authors": [
+      "Milandu Keith Moussavou Boussougou",
+      "Myoung-Gyu Park",
+      "Dong-Joo Park"
+    ],
+    "venue": "KCC 2022, Jeju, pp. 1139–1141",
+    "venue_short": "KCC 2022",
+    "doi": null,
+    "url": "https://www.dbpia.co.kr/journal/articleDetail?nodeId=NODE11113590",
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "vishing"
+    ],
+    "award": "Outstanding Paper Award (우수논문상), KCC 2022 — KIISE",
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": null
+  },
+  {
+    "id": "ack2021-ml",
+    "year": 2021,
+    "type": "DC",
+    "title": "Korean Voice Phishing Text Classification Performance Analysis Using Machine Learning Techniques",
+    "authors": [
+      "Milandu Keith Moussavou Boussougou",
+      "Sangyoon Jin",
+      "Daeho Chang",
+      "Dong-Joo Park"
+    ],
+    "venue": "ACK 2021 (한국정보처리학회 학술발표대회), Yeosu, vol. 28 no. 2, pp. 297–299",
+    "venue_short": "ACK 2021",
+    "doi": "10.3745/PKIPS.y2021m11a.297",
+    "url": "https://koreascience.kr/article/CFKO202133649085984.page",
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "vishing"
+    ],
+    "award": "Encouragement Paper Award (장려논문상), ACK 2021 — KIPS",
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": null
+  },
+  {
+    "id": "kcc2021-realtime",
+    "year": 2021,
+    "type": "DC",
+    "title": "A Real-time Efficient Detection Technique of Voice Phishing with AI",
+    "authors": [
+      "Milandu Keith Moussavou Boussougou",
+      "Dong-Joo Park"
+    ],
+    "venue": "KCC 2021 (한국정보과학회 한국컴퓨터종합학술대회), Jeju, pp. 768–770",
+    "venue_short": "KCC 2021",
+    "doi": null,
+    "url": "https://www.dbpia.co.kr/journal/articleDetail?nodeId=NODE10583070",
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "vishing"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": null
+  },
+  {
+    "id": "electronics2021-crash",
+    "year": 2021,
+    "type": "IJ",
+    "title": "A Crash Recovery Scheme for a Hybrid Mapping FTL in NAND Flash Storage Devices",
+    "authors": [
+      "Jong-Hyeok Park",
+      "Dong-Joo Park",
+      "Tae-Sun Chung",
+      "Sang-Won Lee"
+    ],
+    "venue": "Electronics 10(3):327",
+    "venue_short": "Electronics",
+    "doi": "10.3390/electronics10030327",
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "flash-ftl"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": "@article{park2021crash,\n  author  = {Park, Jong-Hyeok and Park, Dong-Joo and Chung, Tae-Sun and Lee, Sang-Won},\n  title   = {A Crash Recovery Scheme for a Hybrid Mapping FTL in NAND Flash Storage Devices},\n  journal = {Electronics},\n  volume  = {10},\n  number  = {3},\n  pages   = {327},\n  year    = {2021},\n  doi     = {10.3390/electronics10030327}\n}",
+    "review": null
+  },
+  {
+    "id": "cccis2020-recovery",
+    "year": 2020,
+    "type": "IC",
+    "title": "An Efficient Data Recovery Scheme with Block-level Mapping Approach on NAND Flash Memory",
+    "authors": [
+      "Van-Dai Tran",
+      "Dong-Joo Park"
+    ],
+    "venue": "CCCIS 2020 (ACM), pp. 6–9",
+    "venue_short": "CCCIS 2020",
+    "doi": "10.1145/3418994.3418997",
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "forensics"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": "@inproceedings{tran2020efficient,\n  author    = {Tran, Van-Dai and Park, Dong-Joo},\n  title     = {An Efficient Data Recovery Scheme with Block-level Mapping Approach on NAND Flash Memory},\n  booktitle = {Proceedings of CCCIS 2020},\n  publisher = {ACM},\n  pages     = {6--9},\n  year      = {2020},\n  doi       = {10.1145/3418994.3418997}\n}",
+    "review": null
+  },
+  {
+    "id": "kse2019-mlc",
+    "year": 2019,
+    "type": "IC",
+    "title": "A Novel Recovery Data Technique on MLC NAND Flash Memory",
+    "authors": [
+      "Tran Van Dai",
+      "Jingi Park",
+      "Dong-Joo Park"
+    ],
+    "venue": "KSE 2019 (11th Int. Conf. on Knowledge and Systems Engineering), pp. 1–5",
+    "venue_short": "KSE 2019",
+    "doi": "10.1109/KSE.2019.8919382",
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "forensics"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": "@inproceedings{tran2019novel,\n  author    = {Tran, Van Dai and Park, Jingi and Park, Dong-Joo},\n  title     = {A Novel Recovery Data Technique on MLC NAND Flash Memory},\n  booktitle = {Proceedings of the 11th International Conference on Knowledge and Systems Engineering (KSE)},\n  pages     = {1--5},\n  year      = {2019},\n  doi       = {10.1109/KSE.2019.8919382}\n}",
+    "review": null
+  },
+  {
+    "id": "dbr2019-sqlite",
+    "year": 2019,
+    "type": "DJ",
+    "title": "Journaling of Journal 기반 SQLite 파일 복구 기법",
+    "authors": [
+      "김찬규",
+      "이상호",
+      "박동주"
+    ],
+    "venue": "데이타베이스연구 35(3):29–39",
+    "venue_short": "데이타베이스연구",
+    "doi": null,
+    "url": null,
+    "kci": "ART002536394",
+    "citations": null,
+    "tags": [
+      "forensics"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": null
+  },
+  {
+    "id": "dbr2019-messenger",
+    "year": 2019,
+    "type": "DJ",
+    "title": "회복 관점에서의 5가지 인스턴트 메신저 분석",
+    "authors": [
+      "정승주",
+      "이상호",
+      "박동주"
+    ],
+    "venue": "데이타베이스연구 35(3):98–108",
+    "venue_short": "데이타베이스연구",
+    "doi": null,
+    "url": null,
+    "kci": "ART002536490",
+    "citations": null,
+    "tags": [
+      "forensics"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": null
+  },
+  {
+    "id": "symmetry2018-wpcb",
+    "year": 2018,
+    "type": "IJ",
+    "title": "WPCB-Tree: A Novel Flash-Aware B-Tree Index Using a Write Pattern Converter",
+    "authors": [
+      "Van Phi Ho",
+      "Dong-Joo Park"
+    ],
+    "venue": "Symmetry 10(1):18",
+    "venue_short": "Symmetry",
+    "doi": "10.3390/sym10010018",
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "flash-ftl",
+      "indexing"
+    ],
+    "award": null,
+    "pdf": "https://www.mdpi.com/2073-8994/10/1/18/pdf",
+    "code": null,
+    "dataset": null,
+    "bibtex": "@article{ho2018wpcb,\n  author  = {Ho, Van Phi and Park, Dong-Joo},\n  title   = {WPCB-Tree: A Novel Flash-Aware B-Tree Index Using a Write Pattern Converter},\n  journal = {Symmetry},\n  volume  = {10},\n  number  = {1},\n  pages   = {18},\n  year    = {2018},\n  doi     = {10.3390/sym10010018}\n}",
+    "review": null
+  },
+  {
+    "id": "ic2016-recovery",
+    "year": 2016,
+    "type": "IC",
+    "title": "AN EFFICIENT RECOVERY SCHEME FOR BUFFER-BASED B-TREE INDEXES ON FLASH MEMORY",
+    "authors": [],
+    "venue": "International conference, Dec 2016",
+    "venue_short": "Intl. conference",
+    "doi": null,
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "indexing",
+      "flash-ftl"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": "authorship incomplete — confirm"
+  },
+  {
+    "id": "ic2016-btree",
+    "year": 2016,
+    "type": "IC",
+    "title": "A NOVEL B-TREE SCHEME FOR FLASH MEMORY",
+    "authors": [],
+    "venue": "International conference, Apr 2016",
+    "venue_short": "Intl. conference",
+    "doi": null,
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "indexing",
+      "flash-ftl"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": "authorship incomplete — confirm"
+  },
+  {
+    "id": "info2015-recommender",
+    "year": 2015,
+    "type": "IJ",
+    "title": "A recommender system for smartphone users",
+    "authors": [
+      "S. Park",
+      "Dong-Joo Park"
+    ],
+    "venue": "Information (Japan) 18(5):1829–1845",
+    "venue_short": "Information (Japan)",
+    "doi": null,
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "systems-other"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": null
+  },
+  {
+    "id": "jcsc2015-ftl",
+    "year": 2015,
+    "type": "IJ",
+    "title": "An Efficient Flash Translation Layer for Large Block NAND Flash Devices",
+    "authors": [
+      "Tae-Sun Chung",
+      "Dong-Joo Park",
+      "Jongik Kim"
+    ],
+    "venue": "Journal of Circuits, Systems and Computers 24(9):1550138",
+    "venue_short": "JCSC",
+    "doi": "10.1142/S0218126615501388",
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "flash-ftl"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": "@article{chung2015efficient,\n  author  = {Chung, Tae-Sun and Park, Dong-Joo and Kim, Jongik},\n  title   = {An Efficient Flash Translation Layer for Large Block NAND Flash Devices},\n  journal = {Journal of Circuits, Systems and Computers},\n  volume  = {24},\n  number  = {9},\n  pages   = {1550138},\n  year    = {2015},\n  doi     = {10.1142/S0218126615501388}\n}",
+    "review": null
+  },
+  {
+    "id": "ktccs2015-trim",
+    "year": 2015,
+    "type": "DJ",
+    "title": "디지털 포렌식 관점에서 SSD TRIM 명령의 선별적 복구",
+    "title_en_note": "Selective Recovery of the SSD TRIM Command in Digital Forensics",
+    "authors": [
+      "황현호",
+      "박동주"
+    ],
+    "venue": "정보처리학회논문지: 컴퓨터 및 통신 시스템 4(9):307–314",
+    "venue_short": "KIPS KTCCS",
+    "doi": "10.3745/KTCCS.2015.4.9.307",
+    "url": null,
+    "kci": "ART002034646",
+    "citations": null,
+    "tags": [
+      "forensics"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": null
+  },
+  {
+    "id": "info2014-lcftl",
+    "year": 2014,
+    "type": "IJ",
+    "title": "Locality competent flash translation layer (LC-FTL) for NAND flash memory",
+    "authors": [
+      "A.B.M.R. Islam",
+      "Dong-Joo Park",
+      "Tae-Sun Chung"
+    ],
+    "venue": "Information (Japan) 17(8):3741–3767",
+    "venue_short": "Information (Japan)",
+    "doi": null,
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "flash-ftl"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": null
+  },
+  {
+    "id": "kiise2014-yaffs2",
+    "year": 2014,
+    "type": "DJ",
+    "title": "YAFFS2 플래시 파일시스템의 효율적인 마운트를 위한 메타데이터 관리기법",
+    "title_en_note": "A Metadata Management Scheme for Efficient Mount on the YAFFS2 Flash File System",
+    "authors": [
+      "서형운",
+      "박동주",
+      "신명섭"
+    ],
+    "venue": "정보과학회논문지: 데이타베이스 41(2):122–131",
+    "venue_short": "정보과학회논문지",
+    "doi": null,
+    "url": null,
+    "kci": "ART001867871",
+    "citations": null,
+    "tags": [
+      "flash-ftl"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": null
+  },
+  {
+    "id": "dc2014-carving",
+    "year": 2014,
+    "type": "DC",
+    "title": "파일 카빙 : 디지털 포렌식을 위한 JPEG 이미지 단편화 지점 감지",
+    "authors": [],
+    "venue": "Domestic conference, Jun 2014",
+    "venue_short": "Domestic conf.",
+    "doi": null,
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "forensics"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": "authors not listed in inventory — confirm"
+  },
+  {
+    "id": "tiis2013-localization",
+    "year": 2013,
+    "type": "IJ",
+    "title": "A Self-Calibrated Localization System using Chirp Spread Spectrum in a Wireless Sensor Network",
+    "authors": [
+      "Seong-Joong Kim",
+      "Dong-Joo Park"
+    ],
+    "venue": "KSII Transactions on Internet and Information Systems 7(2):253–270",
+    "venue_short": "KSII TIIS",
+    "doi": "10.3837/tiis.2013.02.005",
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "systems-other"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": "@article{kim2013self,\n  author  = {Kim, Seong-Joong and Park, Dong-Joo},\n  title   = {A Self-Calibrated Localization System using Chirp Spread Spectrum in a Wireless Sensor Network},\n  journal = {KSII Transactions on Internet and Information Systems},\n  volume  = {7},\n  number  = {2},\n  pages   = {253--270},\n  year    = {2013},\n  doi     = {10.3837/tiis.2013.02.005}\n}",
+    "review": null
+  },
+  {
+    "id": "kiise2012-wiping-recovery",
+    "year": 2012,
+    "type": "DJ",
+    "title": "낸드 플래시 메모리에서 디지털 포렌식을 위한 파일 와이핑 복구 기법",
+    "title_en_note": "A Recovery Technique against File Wiping for Digital Forensic on NAND Flash Memory",
+    "authors": [
+      "임윤빈",
+      "신명섭",
+      "박동주"
+    ],
+    "venue": "정보과학회논문지: 데이타베이스 39(2):100–108",
+    "venue_short": "정보과학회논문지",
+    "doi": null,
+    "url": null,
+    "kci": "ART001652284",
+    "citations": null,
+    "tags": [
+      "forensics"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": null
+  },
+  {
+    "id": "kiise2012-block-substitution",
+    "year": 2012,
+    "type": "DJ",
+    "title": "낸드 플래시 메모리에서 블록치환을 이용한 삭제파일 복구 방지",
+    "authors": [
+      "이상호",
+      "신명섭",
+      "박동주"
+    ],
+    "venue": "정보과학회논문지: 데이타베이스 39(6):372–379",
+    "venue_short": "정보과학회논문지",
+    "doi": null,
+    "url": null,
+    "kci": "ART001718445",
+    "citations": null,
+    "tags": [
+      "forensics"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": "repository's English alt-title field corrupted/misfiled"
+  },
+  {
+    "id": "kiise2012-block-permutation-conf",
+    "year": 2012,
+    "type": "DC",
+    "title": "The Prevention Technique of Wiping File Recovery on NAND Flash Memory Using Block Permutation",
+    "authors": [],
+    "venue": "KIISE Conference, 2012",
+    "venue_short": "KIISE Conf.",
+    "doi": null,
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "forensics"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": "authors not listed in inventory — conference version of KCI ART001718445"
+  },
+  {
+    "id": "kiise2012-wiping-evidence",
+    "year": 2012,
+    "type": "DJ",
+    "title": "플래시 메모리에서 디지털 포렌식을 위한 파일 와이핑 증거 확보 기법",
+    "title_en_note": "Securing Evidence of File Wiping for Digital Forensic on Flash Memory",
+    "authors": [
+      "신명섭",
+      "오지현",
+      "박동주"
+    ],
+    "venue": "정보과학회논문지: 데이타베이스 39(5):271–278",
+    "venue_short": "정보과학회논문지",
+    "doi": null,
+    "url": null,
+    "kci": "ART001704886",
+    "citations": null,
+    "tags": [
+      "forensics"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": null
+  },
+  {
+    "id": "dc2012-yaffs2",
+    "year": 2012,
+    "type": "DC",
+    "title": "YAFFS2 플래시 파일시스템 상에서 효율적인 마운트를 위한 메타데이터 관리기법",
+    "authors": [],
+    "venue": "Domestic conference, Mar 2012",
+    "venue_short": "Domestic conf.",
+    "doi": null,
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "flash-ftl"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": "authors not listed in inventory — confirm"
+  },
+  {
+    "id": "sac2011-lstaff",
+    "year": 2011,
+    "type": "IC",
+    "title": "LSTAFF*: an efficient flash translation layer for large block flash memory",
+    "authors": [
+      "Tae-Sun Chung",
+      "Dong-Joo Park",
+      "Jongik Kim"
+    ],
+    "venue": "ACM SAC 2011, pp. 589–594",
+    "venue_short": "ACM SAC 2011",
+    "doi": "10.1145/1982185.1982311",
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "flash-ftl"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": "@inproceedings{chung2011lstaff,\n  author    = {Chung, Tae-Sun and Park, Dong-Joo and Kim, Jongik},\n  title     = {LSTAFF*: An Efficient Flash Translation Layer for Large Block Flash Memory},\n  booktitle = {Proceedings of the 2011 ACM Symposium on Applied Computing (SAC)},\n  pages     = {589--594},\n  year      = {2011},\n  doi       = {10.1145/1982185.1982311}\n}",
+    "review": null
+  },
+  {
+    "id": "ijseke2011-spytec",
+    "year": 2011,
+    "type": "IJ",
+    "title": "Spy-Tec+ : an Integrated Index Structure for k-Nearest Neighbor Queries with Semantic Predicates in Multimedia Database",
+    "authors": [
+      "Dong-Joo Park",
+      "Dong-Ho Lee"
+    ],
+    "venue": "Int. J. Software Engineering and Knowledge Engineering 21(7):989–1011",
+    "venue_short": "IJSEKE",
+    "doi": "10.1142/S0218194011005529",
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "indexing"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": "@article{park2011spytec,\n  author  = {Park, Dong-Joo and Lee, Dong-Ho},\n  title   = {Spy-Tec+: An Integrated Index Structure for k-Nearest Neighbor Queries with Semantic Predicates in Multimedia Database},\n  journal = {International Journal of Software Engineering and Knowledge Engineering},\n  volume  = {21},\n  number  = {7},\n  pages   = {989--1011},\n  year    = {2011},\n  doi     = {10.1142/S0218194011005529}\n}",
+    "review": null
+  },
+  {
+    "id": "kiise2011-datawipe",
+    "year": 2011,
+    "type": "DC",
+    "title": "Recovering Files Deleted by Data Wipe on NAND Flash Memory",
+    "authors": [],
+    "venue": "KIISE Conference, 2011",
+    "venue_short": "KIISE Conf.",
+    "doi": null,
+    "url": "https://koreascience.kr/article/CFKO201128451825648.page",
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "forensics"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": "authors not listed in inventory — confirm"
+  },
+  {
+    "id": "seus2010-crash",
+    "year": 2010,
+    "type": "IC",
+    "title": "Crash Recovery in FAST FTL",
+    "authors": [
+      "Sungup Moon",
+      "Sang-Phil Lim",
+      "Dong-Joo Park",
+      "Sang-Won Lee"
+    ],
+    "venue": "SEUS 2010 (LNCS 6399), pp. 13–22",
+    "venue_short": "SEUS 2010",
+    "doi": "10.1007/978-3-642-16256-5_4",
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "flash-ftl"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": "@inproceedings{moon2010crash,\n  author    = {Moon, Sungup and Lim, Sang-Phil and Park, Dong-Joo and Lee, Sang-Won},\n  title     = {Crash Recovery in FAST FTL},\n  booktitle = {Software Technologies for Embedded and Ubiquitous Systems (SEUS 2010)},\n  series    = {LNCS},\n  volume    = {6399},\n  publisher = {Springer},\n  pages     = {13--22},\n  year      = {2010},\n  doi       = {10.1007/978-3-642-16256-5_4}\n}",
+    "review": null
+  },
+  {
+    "id": "kiise2010-filerecovery",
+    "year": 2010,
+    "type": "DJ",
+    "title": "NAND 플래시 메모리에서 디지털 포렌식을 위한 파일 복구기법",
+    "title_en_note": "A File Recovery Technique for Digital Forensics on NAND Flash Memory",
+    "authors": [
+      "신명섭",
+      "박동주"
+    ],
+    "venue": "정보과학회논문지: 데이타베이스 37(6):292–299",
+    "venue_short": "정보과학회논문지",
+    "doi": null,
+    "url": null,
+    "kci": "ART001501650",
+    "citations": null,
+    "tags": [
+      "forensics"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": null
+  },
+  {
+    "id": "jsa2009-survey",
+    "year": 2009,
+    "type": "IJ",
+    "title": "A survey of Flash Translation Layer",
+    "authors": [
+      "Tae-Sun Chung",
+      "Dong-Joo Park",
+      "Sangwon Park",
+      "Dong-Ho Lee",
+      "Sang-Won Lee",
+      "Ha-Joo Song"
+    ],
+    "venue": "Journal of Systems Architecture 55(5-6):332–343",
+    "venue_short": "J. Systems Architecture",
+    "doi": "10.1016/j.sysarc.2009.03.005",
+    "url": null,
+    "kci": null,
+    "citations": 267,
+    "tags": [
+      "flash-ftl"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": "@article{chung2009survey,\n  author  = {Chung, Tae-Sun and Park, Dong-Joo and Park, Sangwon and Lee, Dong-Ho and Lee, Sang-Won and Song, Ha-Joo},\n  title   = {A survey of Flash Translation Layer},\n  journal = {Journal of Systems Architecture},\n  volume  = {55},\n  number  = {5--6},\n  pages   = {332--343},\n  year    = {2009},\n  doi     = {10.1016/j.sysarc.2009.03.005}\n}",
+    "review": null
+  },
+  {
+    "id": "kiise2009-hybrid-ftl",
+    "year": 2009,
+    "type": "DJ",
+    "title": "향상된 혼합 사상기법을 이용한 효율적인 대블록 플래시 메모리 변환계층 설계 및 구현",
+    "authors": [
+      "박동주",
+      "곽경훈"
+    ],
+    "venue": "정보과학회 컴퓨팅의 실제 논문지 15(1):1–13",
+    "venue_short": "정보과학회 컴퓨팅의 실제",
+    "doi": null,
+    "url": null,
+    "kci": "ART001312423",
+    "citations": null,
+    "tags": [
+      "flash-ftl"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": null
+  },
+  {
+    "id": "kiise2009-btree-wpc",
+    "year": 2009,
+    "type": "DJ",
+    "title": "낸드 플래시 메모리 상에서 쓰기 패턴 변환을 통한 효율적인 B-트리 관리",
+    "authors": [
+      "박동주",
+      "최해기"
+    ],
+    "venue": "정보과학회논문지: 시스템 및 이론 36(6):521–531",
+    "venue_short": "정보과학회논문지",
+    "doi": null,
+    "url": null,
+    "kci": "ART001396448",
+    "citations": null,
+    "tags": [
+      "indexing",
+      "flash-ftl"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": null
+  },
+  {
+    "id": "kips2008-btree-node",
+    "year": 2008,
+    "type": "DJ",
+    "title": "플래시 메모리 상에서 B+-트리 노드 크기 증가에 따른 성능 평가",
+    "authors": [
+      "박동주",
+      "최해기"
+    ],
+    "venue": "정보처리학회논문지A 15(6):325–334",
+    "venue_short": "정보처리학회논문지A",
+    "doi": null,
+    "url": null,
+    "kci": "ART001308021",
+    "citations": null,
+    "tags": [
+      "indexing",
+      "flash-ftl"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": null
+  },
+  {
+    "id": "tecs2007-fast",
+    "year": 2007,
+    "type": "IJ",
+    "title": "A log buffer-based flash translation layer using fully-associative sector translation",
+    "authors": [
+      "Sang-Won Lee",
+      "Dong-Joo Park",
+      "Tae-Sun Chung",
+      "Dong-Ho Lee",
+      "Sangwon Park",
+      "Ha-Joo Song"
+    ],
+    "venue": "ACM Transactions on Embedded Computing Systems 6(3), Article 18",
+    "venue_short": "ACM TECS",
+    "doi": "10.1145/1275986.1275990",
+    "url": null,
+    "kci": null,
+    "citations": 712,
+    "tags": [
+      "flash-ftl"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": "@article{lee2007log,\n  author    = {Lee, Sang-Won and Park, Dong-Joo and Chung, Tae-Sun and Lee, Dong-Ho and Park, Sangwon and Song, Ha-Joo},\n  title     = {A log buffer-based flash translation layer using fully-associative sector translation},\n  journal   = {ACM Transactions on Embedded Computing Systems},\n  volume    = {6},\n  number    = {3},\n  articleno = {18},\n  year      = {2007},\n  doi       = {10.1145/1275986.1275990}\n}",
+    "review": null
+  },
+  {
+    "id": "kiise2007-buffer",
+    "year": 2007,
+    "type": "DJ",
+    "title": "플래시 메모리상에서 시스템 소프트웨어의 효율적인 버퍼 페이지 교체 기법",
+    "authors": [
+      "박종민",
+      "박동주"
+    ],
+    "venue": "정보과학회논문지: 데이타베이스 34(2):133–140",
+    "venue_short": "정보과학회논문지",
+    "doi": null,
+    "url": null,
+    "kci": "ART001046107",
+    "citations": null,
+    "tags": [
+      "flash-ftl"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": null
+  },
+  {
+    "id": "kiise2007-btree",
+    "year": 2007,
+    "type": "DJ",
+    "title": "플래시 메모리 상에서 B-트리 설계 및 구현",
+    "title_en_note": "Design and Implementation of B-Tree on Flash Memory",
+    "authors": [
+      "남정현",
+      "박동주"
+    ],
+    "venue": "정보과학회논문지: 데이타베이스 34(2):109–118",
+    "venue_short": "정보과학회논문지",
+    "doi": null,
+    "url": null,
+    "kci": "ART001046105",
+    "citations": null,
+    "tags": [
+      "indexing",
+      "flash-ftl"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": null
+  },
+  {
+    "id": "dc2007-btree-wpc",
+    "year": 2007,
+    "type": "DC",
+    "title": "낸드 플래시 메모리상에서 쓰기 패턴 변환을 이용한 효율적인 B-트리 관리",
+    "authors": [],
+    "venue": "Domestic conference, Jun 2007",
+    "venue_short": "Domestic conf.",
+    "doi": null,
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "indexing",
+      "flash-ftl"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": "authors not listed in inventory — confirm"
+  },
+  {
+    "id": "euc2006-fast",
+    "year": 2006,
+    "type": "IC",
+    "title": "FAST: An Efficient Flash Translation Layer for Flash Memory",
+    "authors": [
+      "Sang-Won Lee",
+      "Won-Kyoung Choi",
+      "Dong-Joo Park"
+    ],
+    "venue": "EUC 2006 Workshops (LNCS), pp. 879–887",
+    "venue_short": "EUC 2006 Workshops",
+    "doi": "10.1007/11807964_88",
+    "url": null,
+    "kci": null,
+    "citations": 73,
+    "tags": [
+      "flash-ftl"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": "@inproceedings{lee2006fast,\n  author    = {Lee, Sang-Won and Choi, Won-Kyoung and Park, Dong-Joo},\n  title     = {FAST: An Efficient Flash Translation Layer for Flash Memory},\n  booktitle = {Emerging Directions in Embedded and Ubiquitous Computing (EUC 2006 Workshops)},\n  series    = {LNCS},\n  publisher = {Springer},\n  pages     = {879--887},\n  year      = {2006},\n  doi       = {10.1007/11807964_88}\n}",
+    "review": null
+  },
+  {
+    "id": "euc2006-survey",
+    "year": 2006,
+    "type": "IC",
+    "title": "System Software for Flash Memory: A Survey",
+    "authors": [
+      "Tae-Sun Chung",
+      "Dong-Joo Park",
+      "Sangwon Park",
+      "Dong-Ho Lee",
+      "Sang-Won Lee",
+      "Ha-Joo Song"
+    ],
+    "venue": "EUC 2006 (LNCS), pp. 394–404",
+    "venue_short": "EUC 2006",
+    "doi": "10.1007/11802167_41",
+    "url": null,
+    "kci": null,
+    "citations": 116,
+    "tags": [
+      "flash-ftl"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": "@inproceedings{chung2006system,\n  author    = {Chung, Tae-Sun and Park, Dong-Joo and Park, Sangwon and Lee, Dong-Ho and Lee, Sang-Won and Song, Ha-Joo},\n  title     = {System Software for Flash Memory: A Survey},\n  booktitle = {Embedded and Ubiquitous Computing (EUC 2006)},\n  series    = {LNCS},\n  publisher = {Springer},\n  pages     = {394--404},\n  year      = {2006},\n  doi       = {10.1007/11802167_41}\n}",
+    "review": null
+  },
+  {
+    "id": "dc2006-btree-node",
+    "year": 2006,
+    "type": "DC",
+    "title": "플래시 메모리 상에서 B+트리 노드 크기 증가에 따른 성능 평가",
+    "authors": [],
+    "venue": "Domestic conference, Nov 2006",
+    "venue_short": "Domestic conf.",
+    "doi": null,
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "indexing",
+      "flash-ftl"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": "authors not listed in inventory — confirm"
+  },
+  {
+    "id": "airs2005-knn",
+    "year": 2005,
+    "type": "IC",
+    "title": "An Efficient Incremental Nearest Neighbor Algorithm for Processing k-Nearest Neighbor Queries with Visal and Semantic Predicates in Multimedia Information Retrieval System",
+    "authors": [
+      "Dong-Ho Lee",
+      "Dong-Joo Park"
+    ],
+    "venue": "AIRS 2005, pp. 653–658",
+    "venue_short": "AIRS 2005",
+    "doi": "10.1007/11562382_63",
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "indexing"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": "@inproceedings{lee2005efficient,\n  author    = {Lee, Dong-Ho and Park, Dong-Joo},\n  title     = {An Efficient Incremental Nearest Neighbor Algorithm for Processing k-Nearest Neighbor Queries with Visal and Semantic Predicates in Multimedia Information Retrieval System},\n  booktitle = {Information Retrieval Technology (AIRS 2005)},\n  series    = {LNCS},\n  publisher = {Springer},\n  pages     = {653--658},\n  year      = {2005},\n  doi       = {10.1007/11562382_63}\n}",
+    "review": null
+  },
+  {
+    "id": "kips2005-fast",
+    "year": 2005,
+    "type": "DJ",
+    "title": "FAST : 플래시 메모리 FTL을 위한 완전연관섹터변환에 기반한 로그 버퍼 기법",
+    "title_en_note": "FAST: A Log Buffer Scheme with Fully Associative Sector Translation for Efficient FTL in Flash Memory",
+    "authors": [
+      "박동주",
+      "최원경",
+      "이상원"
+    ],
+    "venue": "정보처리학회논문지A 12A(3):205–214",
+    "venue_short": "정보처리학회논문지A",
+    "doi": null,
+    "url": null,
+    "kci": "ART000966443",
+    "citations": null,
+    "tags": [
+      "flash-ftl"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": null
+  },
+  {
+    "id": "kips2005-distance",
+    "year": 2005,
+    "type": "DJ",
+    "title": "질의 결과를 이용한 거리 브라우징 질의의 처리",
+    "title_en_note": "Distance Browsing Query Processing using Query Result Set",
+    "authors": [
+      "박동주",
+      "박상원",
+      "정태선",
+      "이상원"
+    ],
+    "venue": "정보처리학회논문지D 12(5):673–682",
+    "venue_short": "정보처리학회논문지D",
+    "doi": null,
+    "url": null,
+    "kci": "ART001181468",
+    "citations": null,
+    "tags": [
+      "indexing"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": null
+  },
+  {
+    "id": "dc2005-buffer",
+    "year": 2005,
+    "type": "DC",
+    "title": "플래시 메모리 상에서 효율적인 버퍼 페이지 교체 기법",
+    "authors": [],
+    "venue": "Domestic conference, Nov 2005",
+    "venue_short": "Domestic conf.",
+    "doi": null,
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "flash-ftl"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": "authors not listed in inventory — confirm"
+  },
+  {
+    "id": "dc2005-btree",
+    "year": 2005,
+    "type": "DC",
+    "title": "플래시 메모리 상에서 효율적인 B-트리 설계 및 구현",
+    "authors": [],
+    "venue": "Domestic conference, Nov 2005",
+    "venue_short": "Domestic conf.",
+    "doi": null,
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "indexing",
+      "flash-ftl"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": "authors not listed in inventory — confirm"
+  },
+  {
+    "id": "kips2005-ftl",
+    "year": 2005,
+    "type": "DJ",
+    "title": "대용량 플래시 메모리를 위한 효율적인 플래시 변환 계층 시스템 소프트웨어",
+    "title_en_note": "An Efficient System Software of Flash Translation Layer for Large Block Flash Memory",
+    "authors": [
+      "정태선",
+      "박동주",
+      "조세형"
+    ],
+    "venue": "정보처리학회논문지A 12(7):621–626",
+    "venue_short": "정보처리학회논문지A",
+    "doi": null,
+    "url": null,
+    "kci": "ART001187366",
+    "citations": null,
+    "tags": [
+      "flash-ftl"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": null,
+    "review": null
+  },
+  {
+    "id": "asiasim2004-lstaff",
+    "year": 2004,
+    "type": "IC",
+    "title": "LSTAFF: System Software for Large Block Flash Memory",
+    "authors": [
+      "Tae-Sun Chung",
+      "Dong-Joo Park",
+      "Yeonseung Ryu",
+      "Sugwon Hong"
+    ],
+    "venue": "AsiaSim 2004, pp. 704–712",
+    "venue_short": "AsiaSim 2004",
+    "doi": "10.1007/978-3-540-30585-9_78",
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "flash-ftl"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": "@inproceedings{chung2004lstaff,\n  author    = {Chung, Tae-Sun and Park, Dong-Joo and Ryu, Yeonseung and Hong, Sugwon},\n  title     = {LSTAFF: System Software for Large Block Flash Memory},\n  booktitle = {Systems Modeling and Simulation: Theory and Applications (AsiaSim 2004)},\n  series    = {LNCS},\n  publisher = {Springer},\n  pages     = {704--712},\n  year      = {2004},\n  doi       = {10.1007/978-3-540-30585-9_78}\n}",
+    "review": null
+  },
+  {
+    "id": "mtap2003-knn",
+    "year": 2003,
+    "type": "IJ",
+    "title": "An Enhanced Technique for k-Nearest Neighbor Queries with Non-Spatial Selection Predicates",
+    "authors": [
+      "Dong-Joo Park",
+      "Hyoung-Joo Kim"
+    ],
+    "venue": "Multimedia Tools and Applications 19(1):79–103",
+    "venue_short": "Multimedia Tools Appl.",
+    "doi": "10.1023/A:1021121030238",
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "indexing"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": "@article{park2003enhanced,\n  author  = {Park, Dong-Joo and Kim, Hyoung-Joo},\n  title   = {An Enhanced Technique for k-Nearest Neighbor Queries with Non-Spatial Selection Predicates},\n  journal = {Multimedia Tools and Applications},\n  volume  = {19},\n  number  = {1},\n  pages   = {79--103},\n  year    = {2003},\n  doi     = {10.1023/A:1021121030238}\n}",
+    "review": null
+  },
+  {
+    "id": "ipl2001-rstree",
+    "year": 2001,
+    "type": "IJ",
+    "title": "The RS-tree: An efficient data structure for distance browsing queries",
+    "authors": [
+      "Dong-Joo Park",
+      "Shin Heu",
+      "Hyoung-Joo Kim"
+    ],
+    "venue": "Information Processing Letters 80(4):195–203",
+    "venue_short": "Inf. Process. Lett.",
+    "doi": "10.1016/S0020-0190(01)00163-6",
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "indexing"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": "@article{park2001rstree,\n  author  = {Park, Dong-Joo and Heu, Shin and Kim, Hyoung-Joo},\n  title   = {The RS-tree: An efficient data structure for distance browsing queries},\n  journal = {Information Processing Letters},\n  volume  = {80},\n  number  = {4},\n  pages   = {195--203},\n  year    = {2001},\n  doi     = {10.1016/S0020-0190(01)00163-6}\n}",
+    "review": null
+  },
+  {
+    "id": "dke2001-prefetch",
+    "year": 2001,
+    "type": "IJ",
+    "title": "Prefetch policies for large objects in a Web-enabled GIS application",
+    "authors": [
+      "Dong-Joo Park",
+      "Hyoung-Joo Kim"
+    ],
+    "venue": "Data & Knowledge Engineering 37(1):65–84",
+    "venue_short": "Data & Knowl. Eng.",
+    "doi": "10.1016/S0169-023X(01)00002-7",
+    "url": null,
+    "kci": null,
+    "citations": null,
+    "tags": [
+      "systems-other"
+    ],
+    "award": null,
+    "pdf": null,
+    "code": null,
+    "dataset": null,
+    "bibtex": "@article{park2001prefetch,\n  author  = {Park, Dong-Joo and Kim, Hyoung-Joo},\n  title   = {Prefetch policies for large objects in a Web-enabled GIS application},\n  journal = {Data \\& Knowledge Engineering},\n  volume  = {37},\n  number  = {1},\n  pages   = {65--84},\n  year    = {2001},\n  doi     = {10.1016/S0169-023X(01)00002-7}\n}",
+    "review": null
+  }
+]

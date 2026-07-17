@@ -1,0 +1,341 @@
+---
+/**
+ * Lightbox — shared, accessible click-to-enlarge overlay.
+ * ============================================================
+ * API (generic — People pages and the Gallery both use this):
+ *
+ * 1. Include ONCE per page, anywhere in the page markup:
+ *      import Lightbox from '../components/Lightbox.astro';
+ *      <Lightbox lang={lang} />
+ *    Props: { lang?: 'en' | 'ko' } — localizes the close-button label
+ *    and the dialog's fallback accessible name. Defaults to 'en'.
+ *
+ * 2. Mark any image as enlargeable:
+ *      <img data-lightbox data-full="/assets/photo.jpg" alt="Caption" />
+ *    - data-full        full-size image URL (optional — falls back to
+ *                       the image's currentSrc/src)
+ *    - alt              becomes the overlay caption
+ *    - data-caption     optional caption override (else alt is used)
+ *
+ * 3. For keyboard operability wrap the image in a real button:
+ *      <button type="button" data-lightbox-trigger aria-label="View larger…">
+ *        <img data-lightbox data-full="…" alt="…" />
+ *      </button>
+ *    Any <button> that contains an img[data-lightbox] auto-binds even
+ *    without the data-lightbox-trigger attribute; the attribute
+ *    additionally opts into this component's global trigger reset
+ *    (block, borderless, cursor: zoom-in) — size/round it at the call
+ *    site. Pointer clicks on a bare img[data-lightbox] outside any
+ *    trigger also open the overlay (fallback), but the wrapped-button
+ *    form is the accessible one and should be preferred.
+ *
+ * Behavior: role="dialog" aria-modal, named by the caption; shows the
+ * full uncropped image; focus moves to the close button on open and
+ * returns to the trigger on close; Tab is trapped inside the dialog;
+ * closes via ✕ button, Escape, or backdrop click; body scroll is
+ * locked while open; animation respects prefers-reduced-motion.
+ */
+import { type Lang } from '../i18n/utils';
+
+interface Props {
+  lang?: Lang;
+}
+
+const { lang = 'en' } = Astro.props;
+const ko = lang === 'ko';
+
+const closeLabel = ko ? '닫기' : 'Close';
+const fallbackLabel = ko ? '이미지 크게 보기' : 'Image viewer';
+---
+
+<div class="lb" data-lightbox-root hidden>
+  <div class="lb-backdrop" data-lb-close></div>
+  <div
+    class="lb-dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-label={fallbackLabel}
+    data-fallback-label={fallbackLabel}
+  >
+    <button class="lb-close" type="button" data-lb-close aria-label={closeLabel}>
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          fill="currentColor"
+          d="m6.4 5 12.6 12.6-1.4 1.4L5 6.4 6.4 5Zm12.6 1.4L6.4 19 5 17.6 17.6 5 19 6.4Z"
+        ></path>
+      </svg>
+    </button>
+    <figure class="lb-fig">
+      <img class="lb-img" alt="" decoding="async" />
+      <figcaption class="lb-cap"></figcaption>
+    </figure>
+  </div>
+</div>
+
+<style is:global>
+  /* Trigger reset — pages wrap enlargeable images in
+     <button data-lightbox-trigger> and style the rest themselves. */
+  [data-lightbox-trigger] {
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 0;
+    background: none;
+    cursor: zoom-in;
+  }
+
+  [data-lightbox-trigger] > img {
+    display: block;
+  }
+
+  img[data-lightbox] {
+    cursor: zoom-in;
+  }
+</style>
+
+<style>
+  .lb {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    display: grid;
+    place-items: center;
+    padding: clamp(14px, 3vw, 40px);
+    opacity: 0;
+    transition: opacity 0.18s ease;
+  }
+
+  .lb[data-open] {
+    opacity: 1;
+  }
+
+  .lb[hidden] {
+    display: none;
+  }
+
+  .lb-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(9, 16, 18, 0.74);
+    backdrop-filter: blur(3px);
+    -webkit-backdrop-filter: blur(3px);
+    cursor: zoom-out;
+  }
+
+  .lb-dialog {
+    position: relative;
+    max-width: min(1100px, 100%);
+    max-height: 100%;
+  }
+
+  .lb-fig {
+    margin: 0;
+    display: grid;
+    gap: 12px;
+    justify-items: center;
+  }
+
+  .lb-img {
+    max-width: 100%;
+    max-height: min(80vh, 900px);
+    width: auto;
+    height: auto;
+    border-radius: var(--radius-m);
+    background: var(--card);
+    box-shadow: 0 24px 70px -20px rgba(0, 0, 0, 0.6);
+    transform: scale(0.985);
+    transition: transform 0.18s ease;
+  }
+
+  .lb[data-open] .lb-img {
+    transform: none;
+  }
+
+  /* Backdrop is committed-dark in both themes → fixed light caption. */
+  .lb-cap {
+    color: rgba(235, 244, 245, 0.92);
+    font-size: 15px;
+    line-height: 1.5;
+    text-align: center;
+    max-width: 72ch;
+  }
+
+  .lb-cap:empty {
+    display: none;
+  }
+
+  .lb-close {
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    z-index: 2;
+    width: 38px;
+    height: 38px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    border: 1px solid rgba(235, 244, 245, 0.35);
+    background: rgba(13, 23, 26, 0.85);
+    color: rgba(235, 244, 245, 0.95);
+    cursor: pointer;
+  }
+
+  .lb-close:hover {
+    border-color: rgba(235, 244, 245, 0.7);
+  }
+
+  .lb-close .icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  @media (max-width: 640px) {
+    .lb-close {
+      top: 2px;
+      right: 2px;
+    }
+  }
+
+  /* Global reduced-motion reset in global.css also covers this;
+     explicit guard so the component is safe standalone too. */
+  @media (prefers-reduced-motion: reduce) {
+    .lb,
+    .lb-img {
+      transition: none;
+    }
+
+    .lb-img {
+      transform: none;
+    }
+  }
+</style>
+
+<script>
+  /* One dialog per page (include the component once); listeners are
+     module-scoped, so Astro's per-component script dedupe keeps this
+     from double-binding even if the component is rendered twice. */
+  const root = document.querySelector<HTMLElement>('[data-lightbox-root]');
+  const dialog = root?.querySelector<HTMLElement>('.lb-dialog') ?? null;
+  const imgEl = root?.querySelector<HTMLImageElement>('.lb-img') ?? null;
+  const capEl = root?.querySelector<HTMLElement>('.lb-cap') ?? null;
+  const closeBtn = root?.querySelector<HTMLButtonElement>('.lb-close') ?? null;
+
+  let lastFocus: HTMLElement | null = null;
+  let prevBodyOverflow = '';
+
+  const isOpen = (): boolean => Boolean(root && !root.hidden);
+
+  function onKeydown(e: KeyboardEvent): void {
+    if (!dialog) return;
+
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      close();
+      return;
+    }
+
+    if (e.key === 'Tab') {
+      /* Focus trap — cycle within the dialog's focusable elements. */
+      const focusables = Array.from(
+        dialog.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )
+      );
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      const active = document.activeElement;
+      const inside = active instanceof HTMLElement && dialog.contains(active);
+      if (e.shiftKey && (!inside || active === first)) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && (!inside || active === last)) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+  }
+
+  function open(img: HTMLImageElement, trigger: HTMLElement | null): void {
+    if (!root || !dialog || !imgEl || !capEl || !closeBtn || isOpen()) return;
+
+    lastFocus =
+      trigger ?? (document.activeElement instanceof HTMLElement ? document.activeElement : null);
+
+    const full = img.dataset.full || img.currentSrc || img.src;
+    const caption = img.dataset.caption ?? img.alt ?? '';
+
+    imgEl.src = full;
+    /* Caption carries the description; keep the overlay img silent so
+       screen readers don't announce the same text twice. */
+    imgEl.alt = '';
+    capEl.textContent = caption;
+    dialog.setAttribute('aria-label', caption || dialog.dataset.fallbackLabel || 'Image viewer');
+
+    prevBodyOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+
+    root.hidden = false;
+    requestAnimationFrame(() => root.setAttribute('data-open', ''));
+
+    document.addEventListener('keydown', onKeydown, true);
+    closeBtn.focus();
+  }
+
+  function close(): void {
+    if (!root || !isOpen()) return;
+
+    root.removeAttribute('data-open');
+    root.hidden = true;
+    document.body.style.overflow = prevBodyOverflow;
+    document.removeEventListener('keydown', onKeydown, true);
+
+    lastFocus?.focus();
+    lastFocus = null;
+  }
+
+  /* Open — delegated so triggers added anywhere on the page work.
+     Binds, in order: [data-lightbox-trigger] wrappers, any <button>
+     wrapping an img[data-lightbox] (keyboard-safe auto-bind), and
+     bare img[data-lightbox] clicks (pointer-only fallback). */
+  document.addEventListener('click', (e) => {
+    const target = e.target instanceof Element ? e.target : null;
+    if (!target || isOpen()) return;
+
+    let img: HTMLImageElement | null = null;
+    let source: HTMLElement | null = null;
+
+    const trigger = target.closest<HTMLElement>('[data-lightbox-trigger]');
+    if (trigger) {
+      img = trigger.querySelector<HTMLImageElement>('img[data-lightbox]');
+      source = trigger;
+    }
+
+    if (!img) {
+      const wrapper = target.closest<HTMLElement>('button, [role="button"]');
+      const inner = wrapper?.querySelector<HTMLImageElement>('img[data-lightbox]') ?? null;
+      if (wrapper && inner) {
+        img = inner;
+        source = wrapper;
+      }
+    }
+
+    if (!img) {
+      img = target.closest<HTMLImageElement>('img[data-lightbox]');
+      if (img) source = img.closest<HTMLElement>('button, a');
+    }
+
+    if (img) {
+      e.preventDefault();
+      open(img, source);
+    }
+  });
+
+  /* Close — ✕ button, backdrop, or the empty dialog padding area. */
+  root?.addEventListener('click', (e) => {
+    const target = e.target instanceof Element ? e.target : null;
+    if (!target) return;
+    if (target.closest('[data-lb-close]') || target === dialog) close();
+  });
+</script>

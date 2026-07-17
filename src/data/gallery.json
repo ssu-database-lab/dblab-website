@@ -1,0 +1,101 @@
+[
+  {
+    "id": "iceeecs2026",
+    "date": "2026-07",
+    "title_en": "IC-EEECS 2026",
+    "title_kr": "IC-EEECS 2026",
+    "venue": "",
+    "type": "conference",
+    "note_en": "Two papers accepted — the NER–LLM consolidation pipeline for metadata extraction from Korean public-domain rights documents, and the companion KLUE-BERT B-I-O training-data composition analysis.",
+    "note_kr": "논문 2편 발표 — 한국어 공공저작물 권리문서 메타데이터 추출을 위한 NER–LLM 통합(중재) 파이프라인과 KLUE-BERT B-I-O 학습데이터 구성 분석.",
+    "photos": []
+  },
+  {
+    "id": "kcc2026",
+    "date": "2026-06",
+    "title_en": "KCC 2026 — Korea Computer Congress",
+    "title_kr": "KCC 2026 — 한국컴퓨터종합학술대회",
+    "venue": "",
+    "type": "conference",
+    "note_en": "The lab's annual trip to the Korea Computer Congress.",
+    "note_kr": "연구실의 연례 한국컴퓨터종합학술대회 참가입니다.",
+    "photos": []
+  },
+  {
+    "id": "kcc2025",
+    "date": "2025-06",
+    "title_en": "KCC 2025 — Korea Computer Congress",
+    "title_kr": "KCC 2025 — 한국컴퓨터종합학술대회",
+    "venue": "",
+    "type": "conference",
+    "note_en": "Multimodal audio–text Korean voice-phishing detection, presented with four student co-authors.",
+    "note_kr": "오디오·텍스트 융합 한국어 보이스피싱 다중모달 탐지 연구를 학생 공저자 4명과 함께 발표했습니다.",
+    "photos": []
+  },
+  {
+    "id": "kocca2025",
+    "date": "2025-04",
+    "title_en": "MCST·KOCCA R&D Consortium Presentations",
+    "title_kr": "문화체육관광부·KOCCA R&D 컨소시엄 발표",
+    "venue": "",
+    "type": "lab",
+    "note_en": "Project presentations for the Muhayu-led copyright-metadata AI consortium (with HM Company; demand organizations: Korea Copyright Commission and KCISA).",
+    "note_kr": "무하유 주관 공유저작물 저작권 메타데이터 AI 컨소시엄 과제 발표 (에이치엠컴퍼니 공동, 수요처: 한국저작권위원회·한국문화정보원).",
+    "photos": []
+  },
+  {
+    "id": "kcc2024",
+    "date": "2024-06",
+    "title_en": "KCC 2024 — Korea Computer Congress",
+    "title_kr": "KCC 2024 — 한국컴퓨터종합학술대회",
+    "venue": "",
+    "type": "conference",
+    "note_en": "",
+    "note_kr": "",
+    "photos": []
+  },
+  {
+    "id": "kcc2023",
+    "date": "2023-06",
+    "title_en": "KCC 2023 — Korea Computer Congress",
+    "title_kr": "KCC 2023 — 한국컴퓨터종합학술대회",
+    "venue": "",
+    "type": "conference",
+    "note_en": "Privacy-preserving Korean voice-phishing detection — a federated-learning approach with RoBERTa.",
+    "note_kr": "RoBERTa를 이용한 페더레이션 러닝 기반 프라이버시 보존 한국어 보이스피싱 탐지 연구를 발표했습니다.",
+    "photos": []
+  },
+  {
+    "id": "kcc2022",
+    "date": "2022-06",
+    "title_en": "KCC 2022 — Korea Computer Congress",
+    "title_kr": "KCC 2022 — 한국컴퓨터종합학술대회",
+    "venue": "Jeju",
+    "type": "conference",
+    "note_en": "An attention-based CNN-BiLSTM model for Korean voice-phishing detection, presented in Jeju — Outstanding Paper Award (우수논문상).",
+    "note_kr": "어텐션 기반 CNN-BiLSTM 한국어 보이스피싱 탐지 모델을 제주에서 발표 — 우수논문상 수상.",
+    "photos": []
+  },
+  {
+    "id": "ack2021",
+    "date": "2021-11",
+    "title_en": "ACK 2021 — Encouragement Paper Award",
+    "title_kr": "ACK 2021 — 장려논문상 수상",
+    "venue": "Yeosu",
+    "type": "award",
+    "note_en": "Encouragement Paper Award (장려논문상) at KIPS ACK 2021 for the machine-learning study of Korean voice-phishing text classification.",
+    "note_kr": "머신러닝 기법을 활용한 한국어 보이스피싱 텍스트 분류 연구로 한국정보처리학회 장려논문상을 수상했습니다.",
+    "photos": []
+  },
+  {
+    "id": "kcc2021",
+    "date": "2021-06",
+    "title_en": "KCC 2021 — Korea Computer Congress",
+    "title_kr": "KCC 2021 — 한국컴퓨터종합학술대회",
+    "venue": "Jeju",
+    "type": "conference",
+    "note_en": "The lab's first voice-phishing paper — a real-time AI detection technique — debuts the KorCCVi dataset.",
+    "note_kr": "연구실 최초의 보이스피싱 논문 발표 — 실시간 AI 탐지 기법과 함께 KorCCVi 데이터셋을 처음 공개했습니다.",
+    "photos": []
+  }
+]

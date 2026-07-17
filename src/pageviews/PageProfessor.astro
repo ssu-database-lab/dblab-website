@@ -1,0 +1,898 @@
+---
+/**
+ * Professor page — Database Lab, Soongsil University.
+ * Dedicated profile for Prof. Dong-Joo Park: large portrait at its
+ * NATURAL aspect ratio (max-width constrained, never cropped or
+ * squeezed, click-to-enlarge via Lightbox), name KR/EN, title, and
+ * Links & Contact (kept in the identity block, next to the photo and
+ * name) — then reverse-chronological timeline sections in Proposal B's
+ * visual language (mono when-column, hairline rules): Education
+ * (Ph.D. 2001 → M.S. 1997 → B.S. 1995), Career (current-first),
+ * Academic Service, Research Interests.
+ *
+ * Props: { lang: 'en' | 'ko' } — rendered by /professor and /ko/professor.
+ */
+import Base from '../layouts/Base.astro';
+import Lightbox from '../components/Lightbox.astro';
+import PubEntry from '../components/PubEntry.astro';
+import members from '../data/members.json';
+import publications from '../data/publications.json';
+import courses from '../data/courses.json';
+import { t, localizePath, type Lang } from '../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+
+const { lang } = Astro.props;
+const ko = lang === 'ko';
+const other: Lang = ko ? 'en' : 'ko';
+
+/** Locale-primary pick with cross-language fallback. */
+const pick = (en: string, kr?: string | null): string => (ko && kr ? kr : en);
+
+const prof = members.professor;
+
+const nameMain = pick(prof.name_en, prof.name_kr);
+const nameAlt = ko ? prof.name_en : prof.name_kr;
+
+const photoAlt = ko ? `${nameMain} 교수 사진` : `Portrait of Prof. ${nameMain}`;
+const zoomLabel = ko ? `${nameMain} 교수 사진 크게 보기` : `View larger photo of Prof. ${nameMain}`;
+
+const title = ko ? '박동주 교수' : 'Prof. Dong-Joo Park';
+const description = ko
+  ? '숭실대학교 데이터베이스연구실 박동주 교수 — 학력, 경력, 학술 활동, 연구 관심사, 연락처.'
+  : 'Prof. Dong-Joo Park, director of the Database Lab at Soongsil University — education, career, academic service, research interests, and contact.';
+
+/* Timeline sections, reverse-chronological (data is already ordered
+ * newest-first in members.json). */
+const timelines = [
+  { id: 'education', key: 'people.education', rows: prof.education },
+  { id: 'career', key: 'people.career', rows: prof.career },
+] as const;
+
+/* ---------- publications, auto-filtered by author name ----------
+ * Same match logic as the member detail pages. The list is long
+ * (Prof. Park is an author on most lab papers), so the first few show
+ * and the rest live under a native <details> toggle — still fully in
+ * the HTML (SEO + no-JS friendly), just visually collapsed. */
+const profNeedles = [prof.name_en, prof.name_kr]
+  .filter((n): n is string => Boolean(n))
+  .map((n) => n.trim().toLowerCase());
+
+const profPubs = publications.filter((pub) =>
+  pub.authors.some((author) => {
+    const hay = author.trim().toLowerCase();
+    return profNeedles.some((needle) => hay === needle || hay.includes(needle));
+  })
+);
+
+const pubCount = profPubs.length;
+const VISIBLE_PUBS = 6;
+const firstPubs = profPubs.slice(0, VISIBLE_PUBS);
+const restPubs = profPubs.slice(VISIBLE_PUBS);
+
+const pubCopy = ko
+  ? {
+      note: '연구실 논문 목록에서 저자명 기준으로 자동 추출한 박동주 교수의 논문입니다.',
+      showAll: `나머지 ${restPubs.length}편 더 보기`,
+      showLess: '접기',
+    }
+  : {
+      note: "Auto-listed from the lab's publication index by author name.",
+      showAll: `Show ${restPubs.length} more papers`,
+      showLess: 'Show fewer',
+    };
+
+/* ---------- courses taught (from the department syllabi) ----------
+ * Ordered newest/most-relevant first in courses.json; the database
+ * sequence and graduate topics lead, foundations & design follow. */
+const teachCopy = ko
+  ? {
+      note: '학부·대학원에서 담당한 과목입니다. 데이터베이스와 파일처리는 2008년부터 이어온 대표 강의입니다.',
+      undergrad: '학부',
+      grad: '대학원',
+      text: '교재',
+    }
+  : {
+      note: 'Courses taught at the undergraduate and graduate levels. Databases and File Processing have run since 2008.',
+      undergrad: 'Undergraduate',
+      grad: 'Graduate',
+      text: 'Text',
+    };
+
+/* Person JSON-LD for rich search results. */
+const site = Astro.site ?? new URL('https://db.ssu.ac.kr');
+const personLd = JSON.stringify({
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: prof.name_en,
+  alternateName: prof.name_kr,
+  jobTitle: prof.title_en,
+  email: prof.email,
+  telephone: prof.office ? `+82-2-${prof.office.phone_display.slice(3)}` : undefined,
+  url: new URL('/professor', site).href,
+  image: new URL(prof.photo, site).href,
+  worksFor: {
+    '@type': 'ResearchOrganization',
+    name: 'Database Lab, Soongsil University',
+    url: site.href,
+  },
+  affiliation: { '@type': 'CollegeOrUniversity', name: 'Soongsil University', url: 'https://ssu.ac.kr' },
+  alumniOf: { '@type': 'CollegeOrUniversity', name: 'Seoul National University' },
+  sameAs: [prof.links.orcid, prof.links.dblp, prof.links.scholarworks].filter(Boolean),
+});
+---
+
+<Base title={title} description={description} lang={lang}>
+  <script type="application/ld+json" set:html={personLd} is:inline />
+  <section class="sec" id="professor">
+    <div class="wrap">
+      <nav class="crumbs" aria-label={ko ? '탐색 경로' : 'Breadcrumb'}>
+        <a href={localizePath(lang, '/people')}>← {t(lang, 'section.people.title')}</a>
+      </nav>
+
+      <!-- ============ identity: portrait (natural aspect) · name · title ============ -->
+      <div class="head">
+        <figure class="fig">
+          <button type="button" class="fig-zoom" data-lightbox-trigger aria-label={zoomLabel}>
+            <img
+              src={prof.photo}
+              alt={photoAlt}
+              width="640"
+              height="583"
+              loading="eager"
+              decoding="async"
+              data-lightbox
+              data-full={prof.photo}
+            />
+          </button>
+        </figure>
+
+        <div class="id">
+          <p class="eyebrow">
+            {t(lang, 'people.professor')}<span class="eb-alt" lang={other}
+              >{t(other, 'people.professor')}</span
+            >
+          </p>
+          <h1 class="name">
+            {nameMain}
+            {nameAlt && <span class="name-alt" lang={other}>{nameAlt}</span>}
+          </h1>
+          <p class="role">{pick(prof.title_en, prof.title_kr)}</p>
+          <p class="role-alt" lang={other}>{ko ? prof.title_en : prof.title_kr}</p>
+
+          <!-- Links · Contact — kept next to the photo & name -->
+          <div class="id-contact">
+            <p class="id-contact-t">
+              {t(lang, 'people.links')} · {t(lang, 'footer.contact')}<span class="sec-ko" lang={other}
+                >{t(other, 'people.links')} · {t(other, 'footer.contact')}</span
+              >
+            </p>
+            <div class="badges">
+              <a class="pbadge" href={`mailto:${prof.email}`}>
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    fill="currentColor"
+                    d="M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm1 3.2V17h14V8.2l-7 4.4-7-4.4ZM5.6 7l6.4 4 6.4-4H5.6Z"
+                  ></path>
+                </svg>
+                {prof.email}
+              </a>
+              {
+                prof.links.orcid && (
+                  <a class="pbadge" href={prof.links.orcid} target="_blank" rel="noopener">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        fill="currentColor"
+                        d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16ZM8.2 7.3a.9.9 0 1 1 0 1.8.9.9 0 0 1 0-1.8Zm-.7 3h1.5v6.5H7.5v-6.5Zm3 0h2.9c2.1 0 3.5 1.3 3.5 3.2 0 2-1.4 3.3-3.5 3.3h-2.9v-6.5Zm1.5 1.3v3.9h1.3c1.3 0 2.1-.7 2.1-2 0-1.2-.8-1.9-2.1-1.9H12Z"
+                      />
+                    </svg>
+                    ORCID
+                  </a>
+                )
+              }
+              {
+                prof.links.dblp && (
+                  <a class="pbadge" href={prof.links.dblp} target="_blank" rel="noopener">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        fill="currentColor"
+                        d="M14 4h6v6h-2V7.4l-7.3 7.3-1.4-1.4L16.6 6H14V4ZM5 6h6v2H7v9h9v-4h2v6H5V6Z"
+                      />
+                    </svg>
+                    DBLP
+                  </a>
+                )
+              }
+              {
+                prof.links.scholarworks && (
+                  <a class="pbadge" href={prof.links.scholarworks} target="_blank" rel="noopener">
+                    <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        fill="currentColor"
+                        d="M6 2h9l5 5v15H6V2Zm8 2H8v16h10V9h-4V4Zm2 .8V7h2.2L16 4.8ZM9 12h8v2H9v-2Zm0 4h8v2H9v-2Z"
+                      />
+                    </svg>
+                    ScholarWorks
+                  </a>
+                )
+              }
+            </div>
+
+            {
+              prof.office && (
+                <dl class="id-office">
+                  <div class="of-row">
+                    <dt>{ko ? '연구실' : 'Office'}</dt>
+                    <dd>
+                      {ko
+                        ? `${prof.office.building_kr} ${prof.office.room}호`
+                        : `${prof.office.building_en}, Room ${prof.office.room}`}
+                      {' · '}
+                      <a href={`tel:${prof.office.phone}`}>{prof.office.phone_display}</a>
+                    </dd>
+                  </div>
+                  <div class="of-row">
+                    <dt>{ko ? '학부 사무실' : 'Dept. office'}</dt>
+                    <dd>
+                      <a href={`tel:+82-2-${prof.office.dept_office_phone.slice(3)}`}>
+                        {prof.office.dept_office_phone}
+                      </a>
+                      {' · '}
+                      <a href={`mailto:${prof.office.dept_office_email}`}>
+                        {prof.office.dept_office_email}
+                      </a>
+                    </dd>
+                  </div>
+                  <div class="of-row">
+                    <dt>{ko ? '프로필' : 'Profile'}</dt>
+                    <dd>
+                      <a href={prof.office.faculty_url} target="_blank" rel="noopener">
+                        {ko ? '컴퓨터학부 교수 소개' : 'CSE faculty page'} ↗
+                      </a>
+                    </dd>
+                  </div>
+                </dl>
+              )
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- ============ reverse-chronological timelines ============ -->
+      <div class="cols">
+        {
+          timelines.map((tl) => (
+            <section class="card" id={tl.id} aria-labelledby={`${tl.id}-t`}>
+              <h2 class="card-t" id={`${tl.id}-t`}>
+                {t(lang, tl.key)}
+                <span class="sec-ko" lang={other}>
+                  {t(other, tl.key)}
+                </span>
+              </h2>
+              <ol class="rows">
+                {tl.rows.map((item) => (
+                  <li class="row">
+                    <span class="when">{pick(item.when_en, item.when_kr)}</span>
+                    <p class="body">{pick(item.en, item.kr)}</p>
+                  </li>
+                ))}
+              </ol>
+            </section>
+          ))
+        }
+
+        <section class="card" id="service" aria-labelledby="service-t">
+          <h2 class="card-t" id="service-t">
+            {t(lang, 'people.service')}<span class="sec-ko" lang={other}
+              >{t(other, 'people.service')}</span
+            >
+          </h2>
+          <ul class="rows">
+            {
+              prof.service.map((item) => (
+                <li class="row row-plain">
+                  <p class="body">{pick(item.en, item.kr)}</p>
+                </li>
+              ))
+            }
+          </ul>
+        </section>
+
+        <section class="card" id="interests" aria-labelledby="interests-t">
+          <h2 class="card-t" id="interests-t">
+            {t(lang, 'people.interests')}<span class="sec-ko" lang={other}
+              >{t(other, 'people.interests')}</span
+            >
+          </h2>
+          <p class="prose">{pick(prof.interests_en, prof.interests_kr)}</p>
+        </section>
+      </div>
+
+      <!-- ============ teaching / courses taught (from dept syllabi) ============ -->
+      <section class="teach" id="teaching" aria-labelledby="teach-t">
+        <h2 class="teach-t" id="teach-t">
+          {t(lang, 'section.teaching.title')}
+          <span class="sec-ko" lang={other}>{t(other, 'section.teaching.title')}</span>
+        </h2>
+        <p class="teach-note">{teachCopy.note}</p>
+        <div class="teach-list">
+          {
+            courses.map((course) => (
+              <article class="course">
+                <div class="course-h">
+                  <h3 class="course-t">
+                    {pick(course.name_en, course.name_kr)}
+                    <span class="course-alt" lang={other}>
+                      {ko ? course.name_en : course.name_kr}
+                    </span>
+                  </h3>
+                  <span class={`lvl lvl-${course.level}`}>
+                    {course.level === 'grad' ? teachCopy.grad : teachCopy.undergrad}
+                  </span>
+                </div>
+                <p class="course-term">{pick(course.term_en, course.term_kr)}</p>
+                <p class="course-d">{pick(course.desc_en, course.desc_kr)}</p>
+                {(course.text_en || course.text_kr) && (
+                  <p class="course-x">
+                    <span class="course-x-l">{teachCopy.text}</span>
+                    {pick(course.text_en, course.text_kr)}
+                  </p>
+                )}
+              </article>
+            ))
+          }
+        </div>
+      </section>
+
+      <!-- ============ publications (auto-filtered, toggle for the rest) ============ -->
+      <section class="pubs" id="publications" aria-labelledby="pubs-t">
+        <h2 class="pubs-t" id="pubs-t">
+          {t(lang, 'section.publications.title')} ({pubCount})
+          <span class="sec-ko" lang={other}>{t(other, 'section.publications.title')}</span>
+        </h2>
+        <p class="pubs-note">{pubCopy.note}</p>
+        <div class="pubs-list">
+          {firstPubs.map((pub) => <PubEntry pub={pub} lang={lang} compact />)}
+        </div>
+        {
+          restPubs.length > 0 && (
+            <details class="pubs-more">
+              <summary class="pubs-sum">
+                <span class="sum-show">{pubCopy.showAll}</span>
+                <span class="sum-hide">{pubCopy.showLess}</span>
+              </summary>
+              <div class="pubs-list pubs-list-rest">
+                {restPubs.map((pub) => (
+                  <PubEntry pub={pub} lang={lang} compact />
+                ))}
+              </div>
+            </details>
+          )
+        }
+      </section>
+    </div>
+  </section>
+
+  <Lightbox lang={lang} />
+</Base>
+
+<style>
+  .crumbs {
+    margin-bottom: clamp(16px, 2.5vw, 24px);
+  }
+
+  .crumbs a {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--muted);
+  }
+
+  .crumbs a:hover {
+    color: var(--accent-strong);
+  }
+
+  /* ---------- identity header ---------- */
+  .head {
+    display: grid;
+    grid-template-columns: minmax(220px, 340px) 1fr;
+    gap: clamp(20px, 4vw, 44px);
+    align-items: start;
+    margin-bottom: clamp(24px, 4vw, 40px);
+  }
+
+  .fig {
+    margin: 0;
+  }
+
+  /* Natural aspect ratio — max-width constrained, no crop, no squeeze.
+     The trigger button reset comes from Lightbox.astro. */
+  .fig-zoom {
+    border-radius: var(--radius-l);
+  }
+
+  .fig img {
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-l);
+    background: var(--chip-2);
+    border: 1px solid var(--line);
+  }
+
+  .eb-alt {
+    color: var(--muted);
+    margin-left: 8px;
+    letter-spacing: 0.04em;
+  }
+
+  .name {
+    font-size: var(--fs-h1);
+    font-weight: 800;
+    letter-spacing: -0.025em;
+    margin-top: 8px;
+  }
+
+  .name-alt {
+    font-weight: 550;
+    color: var(--muted);
+    font-size: 0.55em;
+    margin-left: 12px;
+    letter-spacing: 0;
+  }
+
+  .role {
+    font-size: 17px;
+    color: var(--ink);
+    font-weight: 600;
+    margin-top: 10px;
+  }
+
+  .role-alt {
+    font-size: var(--fs-small);
+    color: var(--muted);
+    margin-top: 3px;
+  }
+
+  /* Links · Contact, sitting right under the name & title beside the photo */
+  .id-contact {
+    margin-top: clamp(16px, 2.5vw, 22px);
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+  }
+
+  .id-contact-t {
+    font-family: var(--mono);
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent-strong);
+  }
+
+  .id-contact-t .sec-ko {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: none;
+    color: var(--muted);
+    margin-left: 8px;
+  }
+
+  .id-contact .badges {
+    padding: 10px 0 0;
+  }
+
+  /* office / department contact — compact label→value rows */
+  .id-office {
+    margin-top: 14px;
+    display: grid;
+    gap: 7px;
+  }
+
+  .of-row {
+    display: grid;
+    grid-template-columns: 92px minmax(0, 1fr);
+    gap: 4px 14px;
+    align-items: baseline;
+    font-size: var(--fs-body-s);
+    line-height: 1.5;
+  }
+
+  .of-row dt {
+    font-family: var(--mono);
+    font-size: var(--fs-caption);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .of-row dd {
+    margin: 0;
+    color: var(--ink);
+  }
+
+  .of-row dd a {
+    color: var(--accent-strong);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .of-row dd a:hover {
+    text-decoration: underline;
+  }
+
+  @media (max-width: 480px) {
+    .of-row {
+      grid-template-columns: 1fr;
+      gap: 1px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .head {
+      grid-template-columns: 1fr;
+    }
+
+    .fig {
+      max-width: 300px;
+    }
+  }
+
+  /* ---------- timeline cards ---------- */
+  .cols {
+    display: grid;
+    gap: 14px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 6px 20px 12px;
+  }
+
+  .card-t {
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent-strong);
+    padding: 12px 0 10px;
+    border-bottom: 1px solid var(--line-strong);
+  }
+
+  /* KR/EN aside inside the mono heading — distinct, muted, spaced */
+  .card-t .sec-ko {
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: none;
+  }
+
+  .rows {
+    list-style: none;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 84px minmax(0, 1fr);
+    gap: 2px 16px;
+    padding: 13px 0;
+  }
+
+  .row-plain {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .row + .row {
+    border-top: 1px solid var(--line);
+  }
+
+  .when {
+    font-family: var(--mono);
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    padding-top: 2px;
+  }
+
+  .body {
+    font-size: var(--fs-body-s);
+    line-height: 1.55;
+    color: var(--ink);
+  }
+
+  .prose {
+    font-size: var(--fs-body-s);
+    line-height: 1.7;
+    color: var(--ink);
+    padding: 13px 0 4px;
+  }
+
+  .badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 14px 0 6px;
+  }
+
+  .pbadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: var(--fs-caption);
+    padding: 5px 11px;
+    border-radius: var(--radius-s);
+    border: 1px solid var(--line-strong);
+    color: var(--accent-strong);
+    background: var(--chip);
+  }
+
+  .pbadge:hover {
+    border-color: var(--accent);
+    text-decoration: none;
+    box-shadow: 0 0 0 2px var(--accent-ring);
+  }
+
+  .pbadge .icon {
+    width: 13px;
+    height: 13px;
+    flex: none;
+  }
+
+  /* ---- teaching / courses taught ---- */
+  .teach {
+    margin-top: clamp(28px, 4.5vw, 44px);
+  }
+
+  .teach-t {
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent-strong);
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line-strong);
+  }
+
+  .teach-t .sec-ko {
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: none;
+  }
+
+  .teach-note {
+    font-family: var(--mono);
+    font-size: var(--fs-micro);
+    color: var(--muted);
+    margin-top: 8px;
+  }
+
+  .teach-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .course {
+    border: 1px solid var(--line);
+    border-radius: var(--radius-m);
+    background: var(--card);
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 7px;
+  }
+
+  .course-h {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .course-t {
+    font-size: var(--fs-body-s);
+    font-weight: 700;
+    color: var(--ink);
+    line-height: 1.3;
+    text-wrap: pretty;
+  }
+
+  .course-alt {
+    display: block;
+    font-size: var(--fs-caption);
+    font-weight: 600;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* undergrad / grad level chip */
+  .lvl {
+    flex: none;
+    font-family: var(--mono);
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    white-space: nowrap;
+  }
+
+  .lvl-grad {
+    color: var(--accent-strong);
+    background: var(--chip);
+    border-color: var(--accent);
+  }
+
+  .lvl-undergrad {
+    color: var(--muted);
+    background: var(--chip-2);
+  }
+
+  .course-term {
+    font-family: var(--mono);
+    font-size: var(--fs-micro);
+    color: var(--accent-strong);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .course-d {
+    font-size: var(--fs-body-s);
+    line-height: 1.55;
+    color: var(--ink);
+  }
+
+  .course-x {
+    font-size: var(--fs-caption);
+    line-height: 1.45;
+    color: var(--muted);
+    margin-top: auto;
+    padding-top: 4px;
+  }
+
+  .course-x-l {
+    font-family: var(--mono);
+    font-size: var(--fs-micro);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-right: 6px;
+  }
+
+  @media (max-width: 640px) {
+    .teach-list {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* ---- publications (auto-listed from the lab index by author) ---- */
+  .pubs {
+    grid-column: 1 / -1;
+    margin-top: clamp(28px, 4.5vw, 44px);
+  }
+
+  .pubs-t {
+    font-family: var(--mono);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent-strong);
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line-strong);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .pubs-t .sec-ko {
+    font-size: 12.5px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: none;
+  }
+
+  .pubs-note {
+    font-family: var(--mono);
+    font-size: var(--fs-micro);
+    color: var(--muted);
+    margin-top: 8px;
+  }
+
+  .pubs-list {
+    display: grid;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  /* native disclosure — no JS, keyboard-accessible */
+  .pubs-more {
+    margin-top: 10px;
+  }
+
+  .pubs-list-rest {
+    margin-top: 12px;
+  }
+
+  .pubs-sum {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-family: var(--mono);
+    font-size: var(--fs-caption);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    color: var(--accent-strong);
+    padding: 9px 14px;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-s);
+    background: var(--chip);
+    list-style: none;
+    user-select: none;
+    width: fit-content;
+  }
+
+  .pubs-sum::-webkit-details-marker {
+    display: none;
+  }
+
+  .pubs-sum::after {
+    content: '▾';
+    font-size: 11px;
+    transition: transform 0.18s ease;
+  }
+
+  .pubs-more[open] .pubs-sum::after {
+    transform: rotate(180deg);
+  }
+
+  .pubs-sum:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent-ring);
+  }
+
+  /* swap the summary label depending on open state */
+  .pubs-more .sum-hide {
+    display: none;
+  }
+
+  .pubs-more[open] .sum-show {
+    display: none;
+  }
+
+  .pubs-more[open] .sum-hide {
+    display: inline;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pubs-sum::after {
+      transition: none;
+    }
+  }
+
+  /* single-column collapse for narrow phones */
+  @media (max-width: 480px) {
+    .card {
+      padding: 4px 14px 10px;
+    }
+
+    .row {
+      grid-template-columns: 1fr;
+      gap: 1px;
+    }
+
+    .when {
+      padding-top: 0;
+    }
+  }
+</style>

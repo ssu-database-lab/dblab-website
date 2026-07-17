@@ -1,0 +1,844 @@
+---
+/**
+ * /console — easter-egg SQL console (Proposal C port).
+ * Dark-committed, self-contained page (own <head>; scoped console tokens,
+ * NOT the site theme — this page is always ink/indigo with amber+cyan).
+ * Linked from the Footer's `SELECT * FROM lab;` egg; links back to `/`.
+ * EN-primary, noindex, no /ko counterpart.
+ *
+ * Result rows are derived at BUILD TIME from src/data/*.json and inlined
+ * as a JSON <script> payload (small, well under 40 KB).
+ */
+import publications from '../data/publications.json';
+import members from '../data/members.json';
+import projects from '../data/projects.json';
+import alumni from '../data/alumni.json';
+import software from '../data/software.json';
+
+interface Result {
+  cols: string[];
+  rows: string[][];
+  extra?: string;
+}
+
+/** Same normalization the client uses — keys must match chip text. */
+const norm = (q: string): string =>
+  q.toLowerCase().replace(/[‘’“”]/g, "'").replace(/\s+/g, '').replace(/;+$/, '');
+
+/* ---------- publications WHERE year >= 2024 ---------- */
+function pubStatus(type: string, venue: string | null): string {
+  if (type === 'DS') return 'dataset';
+  const v = (venue ?? '').toLowerCase();
+  if (v.includes('to appear')) return 'to appear';
+  if (v.includes('revise')) return 'revise & resubmit';
+  if (v.includes('preparation')) return 'in preparation';
+  if (v.includes('submitted')) return 'submitted';
+  if (type === 'UR') return 'under review';
+  return 'published';
+}
+
+const recentPubs: Result = {
+  cols: ['year', 'title', 'venue', 'status'],
+  rows: publications
+    .filter((p) => p.year >= 2024)
+    .map((p) => [
+      String(p.year),
+      p.title,
+      (p.type === 'IJ' ? p.venue : (p.venue_short ?? p.venue)) ?? '—',
+      pubStatus(p.type, p.venue),
+    ]),
+  extra: 'rows since 2024 — the full archive goes back to 2001 (/publications)',
+};
+
+/* ---------- members ---------- */
+const fullName = (en: string, kr: string | null): string => (kr ? `${en} ${kr}` : en);
+
+const memberRows: Result = {
+  cols: ['name', 'role'],
+  rows: [
+    [fullName(members.professor.name_en, members.professor.name_kr), 'professor · lab director'],
+    ...members.current.map((m) => [fullName(m.name_en, m.name_kr), m.role_en.toLowerCase()]),
+  ],
+  extra: 'full profiles at /people',
+};
+
+/* ---------- projects ---------- */
+const projectRows: Result = {
+  cols: ['title', 'agency', 'status'],
+  rows: projects.map((p) => [
+    p.title_en,
+    p.agency_en + (p.grant_no ? ` · grant ${p.grant_no}` : ''),
+    p.status + (p.footnote ? ` (${p.footnote})` : ''),
+  ]),
+  extra: 'details at /research',
+};
+
+/* ---------- alumni ---------- */
+const phd = alumni.filter((a) => a.degree === 'PhD');
+const ms = alumni.filter((a) => a.degree === 'MS');
+
+const phdRows: Result = {
+  cols: ['name', 'thesis', 'year'],
+  rows: phd.map((a) => [
+    fullName(a.name_en, a.name_kr) + (a.now ? ` — now ${a.now}` : ''),
+    a.thesis_en ?? a.thesis_kr,
+    String(a.year),
+  ]),
+  extra: `plus ${ms.length} M.S. alumni — try SELECT COUNT(*) FROM alumni;`,
+};
+
+const alumniCount: Result = {
+  cols: ['count(*)', 'ph.d.', 'm.s.'],
+  rows: [[String(alumni.length), String(phd.length), String(ms.length)]],
+};
+
+/* ---------- datasets ---------- */
+const datasetRows: Result = {
+  cols: ['name', 'contents', 'meta'],
+  rows: software.filter((s) => s.kind === 'dataset').map((s) => [s.name, s.desc_en, s.meta]),
+  extra: 'code lives in the Korean_Voice_Phishing_Detection repo — see /software',
+};
+
+/* ---------- mission ---------- */
+const mission: Result = {
+  cols: ['mission_kr', 'mission_en'],
+  rows: [
+    [
+      '데이터를 저장하는 시스템부터 언어를 이해하는 AI까지 — 세상에 배포되는 연구',
+      'from systems that store data to AI that understands language — research that ships',
+    ],
+  ],
+};
+
+/* ---------- \dt ---------- */
+const relations: Result = {
+  cols: ['schema', 'name', 'type', 'owner'],
+  rows: [
+    ['public', 'publications', 'table', 'dblab'],
+    ['public', 'members', 'table', 'dblab'],
+    ['public', 'projects', 'table', 'dblab'],
+    ['public', 'alumni', 'table', 'dblab'],
+    ['public', 'datasets', 'table', 'dblab'],
+    ['public', 'dblab', 'table', 'dblab'],
+  ],
+};
+
+/* ---------- the six canned queries (chip text = lookup key) ---------- */
+const CHIPS = [
+  'SELECT * FROM publications WHERE year >= 2024;',
+  'SELECT name, role FROM members;',
+  'SELECT title, agency, status FROM projects;',
+  "SELECT name, thesis, year FROM alumni WHERE degree='PhD';",
+  'SELECT * FROM datasets;',
+  'SELECT mission FROM dblab;',
+];
+
+const DB: Record<string, Result> = {
+  [norm(CHIPS[0])]: recentPubs,
+  [norm(CHIPS[1])]: memberRows,
+  [norm(CHIPS[2])]: projectRows,
+  [norm(CHIPS[3])]: phdRows,
+  [norm(CHIPS[4])]: datasetRows,
+  [norm(CHIPS[5])]: mission,
+  // friendly aliases
+  [norm('SELECT * FROM lab;')]: mission,
+  [norm("SELECT mission FROM dblab WHERE university='SSU';")]: mission,
+  [norm('SELECT COUNT(*) FROM alumni;')]: alumniCount,
+  [norm('SELECT * FROM alumni;')]: phdRows,
+  [norm('SELECT * FROM members;')]: memberRows,
+  [norm('SELECT * FROM projects;')]: projectRows,
+  [norm('SELECT * FROM publications;')]: recentPubs,
+  '\\dt': relations,
+};
+
+/* `<` escaped so "</script>" can never occur inside the JSON payload */
+const payload = JSON.stringify(DB).replace(/</g, '\\u003c');
+const year = new Date().getFullYear();
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Console · Database Lab · Soongsil University</title>
+    <meta
+      name="description"
+      content="The Database Lab website as a queryable database — an easter-egg SQL console."
+    />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#0a0d1c" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  </head>
+  <body>
+    <a class="skip" href="#console">Skip to console</a>
+
+    <header>
+      <div class="wrap hwrap">
+        <a class="brand" href="/console">dblab<span class="at">@ssu</span><span class="bu" aria-hidden="true">_</span></a>
+        <a class="back" href="/">&larr; back to the human interface</a>
+      </div>
+    </header>
+
+    <main id="console">
+      <div class="wrap">
+        <p class="eyebrow">-- easter egg &middot; 콘솔</p>
+        <h1>The lab console</h1>
+        <p class="sub">This site is a database. Click a query — or type your own.</p>
+
+        <div class="term">
+          <div class="tbar">
+            <span class="dot d1"></span><span class="dot d2"></span><span class="dot"></span>
+            <span class="ttl">dblab — psql-flavored &middot; visitor@web &middot; read-only</span>
+          </div>
+          <div class="tbody">
+            <p class="banner" aria-hidden="true">
+              connected to database "dblab" as visitor@web<br />
+              type <b>\dt</b> to list relations; end queries with <b>;</b>
+            </p>
+
+            <div class="chips" role="group" aria-label="Canned queries">
+              {CHIPS.map((q) => <button type="button" class="chip">{q}</button>)}
+            </div>
+
+            <div id="qout" aria-live="polite"></div>
+
+            <form id="qform" class="qrow">
+              <span class="prompt" aria-hidden="true">dblab=#</span>
+              <span class="cursor" id="qcur" aria-hidden="true"></span>
+              <input
+                id="qin"
+                autocomplete="off"
+                autocapitalize="off"
+                spellcheck="false"
+                placeholder="type a query&hellip;"
+                aria-label="SQL query"
+              />
+              <button type="submit" class="runbtn">&#9654; run</button>
+            </form>
+
+            <p class="hint">
+              hint: try <code>DROP TABLE publications;</code> and see how a forensics lab responds.
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="wrap">
+        <p>
+          &copy; {year} Database Lab &middot; Soongsil University &middot;
+          <a href="/">humans live here</a> &middot; read-only connection — no rows were harmed
+        </p>
+      </div>
+    </footer>
+
+    <script type="application/json" id="db-json" set:html={payload} />
+
+    <script>
+      const dataEl = document.getElementById('db-json');
+      const qout = document.getElementById('qout');
+      const qin = document.getElementById('qin') as HTMLInputElement | null;
+      const qcur = document.getElementById('qcur');
+      const qform = document.getElementById('qform');
+
+      const DB: Record<string, { cols: string[]; rows: string[][]; extra?: string }> = dataEl
+        ? JSON.parse(dataEl.textContent || '{}')
+        : {};
+
+      const reduced = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+      const TABLES = 'publications · members · projects · alumni · datasets · dblab';
+
+      function norm(q: string): string {
+        return q
+          .toLowerCase()
+          .replace(/[‘’“”]/g, "'")
+          .replace(/\s+/g, '')
+          .replace(/;+$/, '');
+      }
+
+      function esc(s: unknown): string {
+        return String(s)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function renderTable(r: { cols: string[]; rows: string[][]; extra?: string }): string {
+        let h =
+          '<div class="tablewrap" tabindex="0" role="region" aria-label="Query result"><table class="rtable"><thead><tr>';
+        for (const c of r.cols) h += '<th scope="col">' + esc(c) + '</th>';
+        h += '</tr></thead><tbody>';
+        for (const row of r.rows) {
+          h += '<tr>';
+          for (const cell of row) {
+            const s = String(cell);
+            const num = /^[0-9][0-9.,\s()–-]*$/.test(s) ? ' class="num"' : '';
+            h += '<td' + num + '>' + esc(s) + '</td>';
+          }
+          h += '</tr>';
+        }
+        h += '</tbody></table></div>';
+        const n = r.rows.length;
+        let note = n + ' row' + (n === 1 ? '' : 's') + ' in set (' + (0.004 + n * 0.002).toFixed(3) + ' sec)';
+        if (r.extra) note += ' — ' + r.extra;
+        h += '<p class="rnote">' + esc(note) + '</p>';
+        return h;
+      }
+
+      function errBlock(raw: string, key: string): string {
+        let m: RegExpMatchArray | null;
+        if (/^insert/.test(key)) {
+          return (
+            '<p class="err">ERROR:  permission denied for table members\n' +
+            'HINT:  INSERT requires role \'lab_member\' — to actually join the lab, email djpark@ssu.ac.kr</p>'
+          );
+        }
+        if ((m = key.match(/^(drop|delete|truncate|alter|update|grant|revoke)/))) {
+          const t = key.match(/(?:table|from|into)([a-z_][a-z0-9_]*)/);
+          return (
+            '<p class="err">ERROR:  permission denied for table ' +
+            esc(t ? t[1] : 'publications') +
+            ' (' +
+            m[1].toUpperCase() +
+            ' as visitor@web)\n' +
+            "HINT:  around here we *recover* deleted data — we don't make more of it (digital forensics, 2010–2020)</p>"
+          );
+        }
+        if (/^select/.test(key) && (m = key.match(/from([a-z_][a-z0-9_]*)/))) {
+          return (
+            '<p class="err">ERROR:  relation "' +
+            esc(m[1]) +
+            '" does not exist\n' +
+            'HINT:  known relations: ' +
+            TABLES +
+            ' — or click a canned query above.</p>'
+          );
+        }
+        const token = raw.split(/\s+/)[0] || raw;
+        const line = raw.length > 48 ? raw.slice(0, 48) + '…' : raw;
+        return (
+          '<p class="err">ERROR:  syntax error at or near "' +
+          esc(token.slice(0, 24)) +
+          '"\nLINE 1: ' +
+          esc(line) +
+          '\n        ^\n' +
+          'HINT:  this console speaks a very small dialect — try one of the canned queries above.</p>'
+        );
+      }
+
+      function renderResult(raw: string, key: string): void {
+        if (!qout) return;
+        const box = document.createElement('div');
+        box.className = 'term-result show';
+        /* own-property lookup only: DB is JSON.parse'd, so inherited keys
+         * like "constructor" would otherwise pass the truthiness check
+         * and crash renderTable instead of hitting the error easter egg */
+        const r = Object.prototype.hasOwnProperty.call(DB, key) ? DB[key] : undefined;
+        box.innerHTML = r ? renderTable(r) : errBlock(raw, key);
+        qout.appendChild(box);
+      }
+
+      let typeTimer: number | null = null;
+      let revealTimer: number | null = null;
+      let bootTimer: number | null = null;
+
+      function cancelTyping(): void {
+        if (typeTimer !== null) {
+          window.clearInterval(typeTimer);
+          typeTimer = null;
+        }
+        if (revealTimer !== null) {
+          window.clearTimeout(revealTimer);
+          revealTimer = null;
+        }
+      }
+
+      function exec(input: string, animate: boolean): void {
+        const raw = String(input).trim();
+        if (!raw || !qout) return;
+        /* a user-initiated query cancels the pending auto-run demo so it
+         * can't wipe their output 350 ms after page load */
+        if (bootTimer !== null) {
+          window.clearTimeout(bootTimer);
+          bootTimer = null;
+        }
+        cancelTyping();
+        const key = norm(raw);
+
+        if (!animate || reduced.matches) {
+          qout.innerHTML =
+            '<p class="echo"><span class="prompt">dblab=#</span> ' + esc(raw) + '</p>';
+          renderResult(raw, key);
+          return;
+        }
+
+        /* typing effect: replay the query character by character, then reveal */
+        qout.innerHTML = '';
+        const line = document.createElement('p');
+        line.className = 'echo';
+        line.setAttribute('aria-hidden', 'true');
+        line.innerHTML =
+          '<span class="prompt">dblab=#</span> <span class="typed"></span><span class="cursor"></span>';
+        qout.appendChild(line);
+        const typed = line.querySelector('.typed');
+        if (!typed) return;
+        let i = 0;
+        typeTimer = window.setInterval(() => {
+          i++;
+          typed.textContent = raw.slice(0, i);
+          if (i >= raw.length) {
+            if (typeTimer !== null) window.clearInterval(typeTimer);
+            typeTimer = null;
+            revealTimer = window.setTimeout(() => {
+              revealTimer = null;
+              const c = line.querySelector('.cursor');
+              if (c) c.remove();
+              line.removeAttribute('aria-hidden');
+              renderResult(raw, key);
+            }, 240);
+          }
+        }, 22);
+      }
+
+      /* idle block cursor on the prompt line — hidden while typing or focused */
+      function syncCursor(): void {
+        if (!qcur || !qin) return;
+        qcur.style.display = document.activeElement === qin || qin.value ? 'none' : '';
+      }
+
+      if (qin) {
+        qin.addEventListener('focus', syncCursor);
+        qin.addEventListener('blur', syncCursor);
+        qin.addEventListener('input', syncCursor);
+        syncCursor();
+      }
+
+      if (qform) {
+        qform.addEventListener('submit', (e) => {
+          e.preventDefault();
+          if (qin) exec(qin.value, false);
+        });
+      }
+
+      document.querySelectorAll<HTMLButtonElement>('.chip').forEach((ch) => {
+        ch.addEventListener('click', () => {
+          const q = ch.textContent ? ch.textContent.trim() : '';
+          if (qin) {
+            qin.value = q;
+            syncCursor();
+          }
+          exec(q, true);
+        });
+      });
+
+      /* auto-run the mission query on load (instant under reduced motion);
+       * cancelled by any earlier user-initiated exec() */
+      bootTimer = window.setTimeout(() => {
+        bootTimer = null;
+        exec('SELECT mission FROM dblab;', true);
+      }, 350);
+    </script>
+
+    <style is:global>
+      /* Scoped console tokens (Proposal C) — this page is dark-committed
+         on purpose and does NOT consume the site theme. */
+      :root {
+        --bg0: #0a0d1c;
+        --bg1: #0e1226;
+        --panel: #121735;
+        --panel2: #0c1024;
+        --well: #0a0e20;
+        --line: #252b4e;
+        --line2: #39406e;
+        --text: #e2e6f5;
+        --muted: #9aa2c4;
+        /* dim carries real copy (banner, echoes, row-count notes) — must stay
+           >= 4.5:1 against the lightest panel bg #111634 (this is ~4.95:1) */
+        --dim: #7e86ab;
+        --amber: #ffb454;
+        --amber-dim: rgba(255, 180, 84, 0.13);
+        --cyan: #53d9ec;
+        --cyan-dim: rgba(83, 217, 236, 0.11);
+        --sans: 'Pretendard Variable', Pretendard, 'Apple SD Gothic Neo', 'Noto Sans KR',
+          'Malgun Gothic', 'Segoe UI', system-ui, sans-serif;
+        --mono: ui-monospace, 'Cascadia Code', Consolas, 'Nanum Gothic Coding', monospace;
+        --maxw: 940px;
+        --r: 14px;
+        color-scheme: dark;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+      }
+      body {
+        background: var(--bg0);
+        color: var(--text);
+        font: 17.5px/1.65 var(--sans);
+        overflow-x: clip;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        background-image: radial-gradient(1100px 520px at 75% -8%, rgba(83, 217, 236, 0.07), transparent 60%),
+          radial-gradient(900px 460px at 8% 4%, rgba(255, 180, 84, 0.05), transparent 60%);
+      }
+      main {
+        flex: 1;
+      }
+      h1 {
+        margin: 0;
+        line-height: 1.18;
+        letter-spacing: -0.02em;
+        font-weight: 800;
+        font-size: clamp(31px, 5.4vw, 49px);
+      }
+      p {
+        margin: 0;
+      }
+      a {
+        color: var(--cyan);
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      button {
+        font: inherit;
+        cursor: pointer;
+      }
+      :focus-visible {
+        outline: 2px solid var(--cyan);
+        outline-offset: 2px;
+        border-radius: 4px;
+      }
+      ::selection {
+        background: rgba(83, 217, 236, 0.32);
+      }
+      .wrap {
+        max-width: var(--maxw);
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+      .skip {
+        position: absolute;
+        left: -9999px;
+        top: 0;
+        background: var(--amber);
+        color: #161000;
+        padding: 10px 16px;
+        border-radius: 0 0 10px 0;
+        z-index: 99;
+        font-weight: 600;
+      }
+      .skip:focus {
+        left: 0;
+      }
+
+      /* header */
+      header {
+        border-bottom: 1px solid var(--line);
+        background: rgba(10, 13, 28, 0.82);
+      }
+      .hwrap {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px 18px;
+        flex-wrap: wrap;
+        padding-top: 12px;
+        padding-bottom: 12px;
+      }
+      .brand {
+        font: 700 17px var(--mono);
+        color: var(--text);
+      }
+      .brand:hover {
+        text-decoration: none;
+      }
+      .brand .at {
+        color: var(--dim);
+        font-weight: 400;
+      }
+      .bu {
+        color: var(--cyan);
+        animation: blink 1.1s steps(1) infinite;
+      }
+      .back {
+        font: 500 15px var(--mono);
+        color: var(--muted);
+      }
+      .back:hover {
+        color: var(--text);
+      }
+
+      /* intro */
+      main .wrap {
+        padding-top: clamp(44px, 7vw, 80px);
+        padding-bottom: clamp(56px, 8vw, 96px);
+      }
+      .eyebrow {
+        font: 600 14.5px var(--mono);
+        color: var(--cyan);
+        letter-spacing: 0.07em;
+        margin-bottom: 16px;
+      }
+      .sub {
+        margin-top: 14px;
+        max-width: 640px;
+        color: var(--muted);
+        font-size: 18.5px;
+        line-height: 1.65;
+      }
+
+      /* terminal window */
+      .term {
+        margin-top: 34px;
+        border: 1px solid var(--line2);
+        border-radius: var(--r);
+        background: linear-gradient(180deg, #111634, #0b0f22);
+        box-shadow: 0 24px 70px rgba(0, 0, 0, 0.5);
+      }
+      .tbar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--line);
+      }
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #3a4270;
+        flex: none;
+      }
+      .dot.d1 {
+        background: #5a4a7a;
+      }
+      .dot.d2 {
+        background: #46507f;
+      }
+      .ttl {
+        flex: 1;
+        min-width: 0;
+        font: 13.5px var(--mono);
+        color: var(--dim);
+        margin-left: 6px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .tbody {
+        padding: 16px 18px 18px;
+        font: 15px/1.75 var(--mono);
+      }
+      .banner {
+        color: var(--dim);
+        font: 14px/1.8 var(--mono);
+        margin-bottom: 14px;
+      }
+      .banner b {
+        color: var(--muted);
+        font-weight: 600;
+      }
+
+      /* canned-query chips */
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 14px;
+      }
+      .chip {
+        font: 600 13.5px var(--mono);
+        color: var(--cyan);
+        background: var(--cyan-dim);
+        border: 1px solid rgba(83, 217, 236, 0.35);
+        border-radius: 999px;
+        padding: 6px 12px;
+        text-align: left;
+      }
+      .chip:hover {
+        background: rgba(83, 217, 236, 0.2);
+      }
+
+      /* output */
+      #qout {
+        min-height: 24px;
+        margin-bottom: 14px;
+      }
+      .echo {
+        color: var(--dim);
+        font: 14px/1.75 var(--mono);
+        margin-bottom: 10px;
+        overflow-wrap: anywhere;
+      }
+      .echo .typed {
+        color: var(--muted);
+      }
+      .prompt {
+        color: var(--cyan);
+        user-select: none;
+      }
+      .cursor {
+        display: inline-block;
+        width: 8px;
+        height: 17px;
+        background: var(--cyan);
+        vertical-align: -3px;
+        margin-left: 2px;
+        animation: blink 1.05s steps(1) infinite;
+      }
+      @keyframes blink {
+        50% {
+          opacity: 0;
+        }
+      }
+      .term-result.show {
+        animation: fadeup 0.45s ease;
+      }
+      @keyframes fadeup {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+      }
+      .tablewrap {
+        overflow-x: auto;
+        max-width: 100%;
+      }
+      .rtable {
+        border-collapse: collapse;
+        font: 15px/1.6 var(--mono);
+        font-variant-numeric: tabular-nums;
+        min-width: 460px;
+      }
+      .rtable th {
+        color: var(--cyan);
+        text-align: left;
+        font-weight: 600;
+        border-bottom: 1px solid var(--line2);
+        padding: 6px 22px 6px 0;
+        white-space: nowrap;
+      }
+      .rtable td {
+        padding: 9px 22px 9px 0;
+        border-bottom: 1px dashed var(--line);
+        color: var(--text);
+        vertical-align: top;
+        max-width: 56ch;
+      }
+      .rtable td.num {
+        white-space: nowrap;
+      }
+      .rnote {
+        color: var(--dim);
+        margin-top: 9px;
+        font: 13.5px var(--mono);
+      }
+      .err {
+        color: var(--amber);
+        font: 14.5px/1.7 var(--mono);
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+      }
+
+      /* prompt row */
+      .qrow {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        border: 1px solid var(--line2);
+        border-radius: 10px;
+        padding: 8px 12px;
+        background: var(--well);
+      }
+      .qrow .prompt {
+        font: 15px var(--mono);
+        flex: none;
+      }
+      .qrow .cursor {
+        flex: none;
+        margin-left: -4px;
+      }
+      /* visible focus cue for the query field (#qin itself is outline:none) */
+      .qrow:focus-within {
+        border-color: var(--cyan);
+        box-shadow: 0 0 0 3px var(--cyan-dim);
+      }
+      #qin {
+        flex: 1;
+        min-width: 0;
+        background: none;
+        border: none;
+        color: var(--text);
+        font: 15.5px var(--mono);
+        outline: none;
+      }
+      #qin::placeholder {
+        color: var(--dim);
+      }
+      .runbtn {
+        flex: none;
+        font: 600 13.5px var(--mono);
+        color: var(--amber);
+        background: none;
+        border: 1px solid rgba(255, 180, 84, 0.45);
+        border-radius: 999px;
+        padding: 4px 13px;
+      }
+      .runbtn:hover {
+        background: var(--amber-dim);
+      }
+      .hint {
+        margin-top: 14px;
+        font: 13.5px var(--mono);
+        color: var(--dim);
+      }
+      .hint code {
+        color: var(--muted);
+      }
+
+      /* footer */
+      footer {
+        border-top: 1px solid var(--line);
+        padding: 26px 0 40px;
+      }
+      footer p {
+        font: 14px/1.8 var(--mono);
+        color: var(--dim);
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+        }
+        .cursor,
+        .bu {
+          animation: none;
+        }
+      }
+      @media (max-width: 520px) {
+        .tbody {
+          padding: 14px 12px 16px;
+        }
+        .chip {
+          font-size: 13px;
+        }
+        .qrow {
+          gap: 8px;
+          padding: 8px 10px;
+        }
+      }
+    </style>
+  </body>
+</html>

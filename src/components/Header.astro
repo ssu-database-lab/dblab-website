@@ -1,0 +1,809 @@
+---
+/**
+ * Sticky site header — brand mark, 8-item nav with active state
+ * (People is a link + disclosure-button hybrid revealing a
+ * Professor / Members / Alumni submenu — hover, focus, click and
+ * touch all work; CSS :hover/:focus-within keeps it reachable
+ * without JS), KR/EN segmented language toggle (links to the
+ * mirrored route), theme toggle (aria-pressed), accessible mobile
+ * disclosure menu (submenu renders inline, indented).
+ * Visual design ported from mockups/mockup_b.html.
+ */
+import { t, localizePath, stripLocale, type Lang } from '../i18n/utils';
+
+interface Props {
+  lang: Lang;
+}
+
+interface NavItem {
+  route: string;
+  key: string;
+  /** Sibling routes that light this item up with the quiet "section
+   *  current" tint (no aria-current — the href is a different page). */
+  match?: string[];
+  children?: { route: string; key: string }[];
+}
+
+const { lang } = Astro.props;
+
+const route = stripLocale(Astro.url.pathname);
+
+const items: NavItem[] = [
+  { route: '/', key: 'nav.home' },
+  {
+    route: '/people',
+    key: 'nav.people',
+    children: [
+      { route: '/professor', key: 'nav.professor' },
+      { route: '/members', key: 'nav.members' },
+      { route: '/alumni', key: 'nav.alumni' },
+    ],
+  },
+  { route: '/research', key: 'nav.research' },
+  { route: '/publications', key: 'nav.publications' },
+  /* "Software & Patents" covers two tabbed routes; /patents tints it */
+  { route: '/software', key: 'nav.software', match: ['/patents'] },
+  { route: '/news', key: 'nav.news' },
+  { route: '/gallery', key: 'nav.gallery' },
+  { route: '/join', key: 'nav.join' },
+];
+
+/* Language toggle: same route, other locale. The 404 page has no /ko
+ * counterpart, so its toggle points at the locale homes instead.
+ * Query/hash (e.g. /publications?tag=…) can't be known at static build
+ * time — the client script below re-appends location.search + hash. */
+const toggleRoute = route === '/404' ? '/' : route;
+const enHref = toggleRoute;
+const koHref = localizePath('ko', toggleRoute);
+---
+
+<header class="hdr">
+  <div class="hdr-in">
+    <a class="brand" href={localizePath(lang, '/')} aria-label={t(lang, 'a11y.home')}>
+      <svg class="logo icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path
+          fill="currentColor"
+          d="M12 2C7.6 2 4 3.6 4 5.6v12.8C4 20.4 7.6 22 12 22s8-1.6 8-3.6V5.6C20 3.6 16.4 2 12 2Zm0 2c3.9 0 6 1.3 6 1.6 0 .3-2.1 1.6-6 1.6S6 5.9 6 5.6C6 5.3 8.1 4 12 4Zm6 14.4c0 .3-2.1 1.6-6 1.6s-6-1.3-6-1.6v-2.9c1.5.9 3.7 1.3 6 1.3s4.5-.4 6-1.3v2.9Zm0-6.4c0 .3-2.1 1.6-6 1.6S6 12.3 6 12V9.1c1.5.9 3.7 1.3 6 1.3s4.5-.4 6-1.3V12Z"
+        ></path>
+      </svg>
+      <span class="brand-t">DB Lab<span class="brand-s">{t(lang, 'site.brandSub')}</span></span>
+    </a>
+
+    <nav class="nav" id="site-nav" aria-label={t(lang, 'a11y.mainNav')}>
+      {
+        items.map((item) =>
+          item.children ? (
+            <div class="nav-group">
+              <a
+                href={localizePath(lang, item.route)}
+                class:list={{ 'on-child': item.children.some((c) => c.route === route) }}
+                aria-current={route === item.route ? 'page' : undefined}
+              >
+                {t(lang, item.key)}
+              </a>
+              <button
+                class="sub-toggle"
+                type="button"
+                aria-expanded="false"
+                aria-controls="people-submenu"
+                aria-label={t(lang, 'a11y.peopleSubmenu')}
+              >
+                <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                  <path fill="currentColor" d="M12 15.6 5.6 9.2l1.4-1.4 5 5 5-5 1.4 1.4-6.4 6.4Z" />
+                </svg>
+              </button>
+              <ul class="submenu" id="people-submenu">
+                {item.children.map((child) => (
+                  <li>
+                    <a
+                      href={localizePath(lang, child.route)}
+                      aria-current={route === child.route ? 'page' : undefined}
+                    >
+                      {t(lang, child.key)}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : (
+            <a
+              href={localizePath(lang, item.route)}
+              class:list={{
+                'nav-join': item.route === '/join',
+                'on-child': item.match?.includes(route) ?? false,
+              }}
+              aria-current={route === item.route ? 'page' : undefined}
+            >
+              {t(lang, item.key)}
+            </a>
+          )
+        )
+      }
+    </nav>
+
+    <div class="hdr-tools">
+      <div class="seg" role="group" aria-label={t(lang, 'a11y.langToggle')}>
+        <a
+          class:list={['seg-opt', { on: lang === 'en' }]}
+          href={enHref}
+          hreflang="en"
+          lang="en"
+          aria-current={lang === 'en' ? 'true' : undefined}>EN</a
+        >
+        <a
+          class:list={['seg-opt', { on: lang === 'ko' }]}
+          href={koHref}
+          hreflang="ko"
+          lang="ko"
+          aria-current={lang === 'ko' ? 'true' : undefined}>KR</a
+        >
+      </div>
+
+      <button
+        class="tool-btn"
+        id="theme-toggle"
+        type="button"
+        aria-pressed="false"
+        aria-label={t(lang, 'a11y.themeToggle')}
+      >
+        <svg class="icon i-moon" viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            fill="currentColor"
+            d="M21 14.5A8.5 8.5 0 0 1 9.5 3 8.5 8.5 0 1 0 21 14.5Zm-8.5 5.4A6.5 6.5 0 0 1 8 7.3a10.6 10.6 0 0 0 8.7 8.7 6.6 6.6 0 0 1-4.2 3.9Z"
+          ></path>
+        </svg>
+        <svg class="icon i-sun" viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            fill="currentColor"
+            d="M12 17a5 5 0 1 1 0-10 5 5 0 0 1 0 10Zm0-2a3 3 0 1 0 0-6 3 3 0 0 0 0 6Zm-1-13h2v3h-2V2Zm0 17h2v3h-2v-3ZM2 11h3v2H2v-2Zm17 0h3v2h-3v-2ZM4.2 5.6 5.6 4.2l2.2 2.1-1.5 1.5-2.1-2.2Zm12 12.1 1.5-1.5 2.1 2.2-1.4 1.4-2.2-2.1Zm2.2-13.5 1.4 1.4-2.1 2.2-1.5-1.5 2.2-2.1ZM6.3 16.2l1.5 1.5-2.2 2.1-1.4-1.4 2.1-2.2Z"
+          ></path>
+        </svg>
+      </button>
+
+      <button
+        class="tool-btn menu-btn"
+        id="menu-toggle"
+        type="button"
+        aria-expanded="false"
+        aria-controls="site-nav"
+        aria-label={t(lang, 'a11y.menuOpen')}
+        data-label-open={t(lang, 'a11y.menuOpen')}
+        data-label-close={t(lang, 'a11y.menuClose')}
+      >
+        <svg class="icon i-open" viewBox="0 0 24 24" aria-hidden="true">
+          <path fill="currentColor" d="M3 6h18v2H3V6Zm0 5h18v2H3v-2Zm0 5h18v2H3v-2Z"></path>
+        </svg>
+        <svg class="icon i-close" viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            fill="currentColor"
+            d="m6.4 5 12.6 12.6-1.4 1.4L5 6.4 6.4 5Zm12.6 1.4L6.4 19 5 17.6 17.6 5 19 6.4Z"
+          ></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  {/* No-JS fallback: the hamburger button needs the script, so with
+      scripting unavailable the nav is simply shown inline (stacked)
+      instead of being trapped behind display:none. */}
+  <noscript>
+    <style is:inline>
+      @media (max-width: 920px) {
+        .hdr .menu-btn {
+          display: none;
+        }
+        .hdr .hdr-in {
+          height: auto;
+          flex-wrap: wrap;
+          padding-top: 12px;
+          padding-bottom: 12px;
+        }
+        .hdr .hdr-tools {
+          margin-left: auto;
+        }
+        .hdr .nav {
+          display: flex;
+          position: static;
+          order: 4;
+          width: 100%;
+          flex-direction: column;
+          align-items: stretch;
+          background: none;
+          border-bottom: 0;
+          box-shadow: none;
+          padding: 6px 0 0;
+          margin-left: 0;
+        }
+      }
+    </style>
+  </noscript>
+</header>
+
+<style>
+  .hdr {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--header-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .hdr-in {
+    max-width: var(--maxw);
+    margin: 0 auto;
+    padding: 0 clamp(16px, 4vw, 32px);
+    height: 60px;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--ink) !important;
+    font-weight: 750;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+  }
+
+  .brand:hover {
+    text-decoration: none;
+  }
+
+  .brand .logo {
+    width: 26px;
+    height: 26px;
+    color: var(--accent);
+    flex: none;
+  }
+
+  .brand-t {
+    line-height: 1.15;
+    font-size: 17px;
+  }
+
+  .brand-s {
+    display: block;
+    font-size: 11.5px;
+    font-weight: 550;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    line-height: 1.1;
+  }
+
+  .nav {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-left: auto;
+  }
+
+  .nav a {
+    color: var(--ink);
+    font-size: 15px;
+    font-weight: 560;
+    padding: 7px 8px;
+    border-radius: 8px;
+    white-space: nowrap;
+  }
+
+  .nav a:hover {
+    background: var(--accent-soft);
+    text-decoration: none;
+    color: var(--accent-strong);
+  }
+
+  .nav a[aria-current='page'] {
+    color: var(--accent-strong);
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 6px;
+  }
+
+  .nav a[aria-current='page']:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 6px;
+  }
+
+  .nav .nav-join {
+    color: var(--accent-strong);
+    border: 1px solid var(--line-strong);
+    margin-left: 6px;
+  }
+
+  .nav .nav-join:hover {
+    box-shadow: 0 0 0 3px var(--accent-ring);
+    border-color: var(--accent);
+  }
+
+  /* ---------- People submenu (disclosure) ---------- */
+  .nav-group {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  /* quiet active tint when a child/sibling route is current — the
+     People submenu pages, and /patents under "Software & Patents" */
+  .nav a.on-child {
+    color: var(--accent-strong);
+  }
+
+  .sub-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 28px;
+    margin-left: -6px;
+    border-radius: 8px;
+    color: var(--muted);
+  }
+
+  .sub-toggle:hover {
+    color: var(--accent-strong);
+    background: var(--accent-soft);
+  }
+
+  .sub-toggle .icon {
+    width: 14px;
+    height: 14px;
+    transition: transform 0.15s ease;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sub-toggle .icon {
+      transition: none;
+    }
+  }
+
+  .submenu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: 20;
+    min-width: 184px;
+    flex-direction: column;
+    gap: 2px;
+    padding: 6px;
+    margin: 0;
+    list-style: none;
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-m);
+    box-shadow: var(--shadow);
+  }
+
+  /* invisible bridge over the 6px gap so hover doesn't drop
+     while the pointer travels from the trigger to the panel */
+  .submenu::before {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 0;
+    right: 0;
+    height: 8px;
+  }
+
+  .submenu a {
+    display: block;
+  }
+
+  /* open states: [data-open] is set by the script; :focus-within is
+     the no-JS keyboard fallback (the script stamps [data-js] to hand
+     control over, so a scripted close isn't fought by lingering focus);
+     :hover covers no-JS mouse use and doubles the scripted hover-open */
+  .nav-group[data-open] .submenu,
+  .nav-group:not([data-js]):focus-within .submenu {
+    display: flex;
+  }
+
+  @media (hover: hover) {
+    .nav-group:hover .submenu {
+      display: flex;
+    }
+  }
+
+  .nav-group[data-open] .sub-toggle .icon,
+  .nav-group:not([data-js]):focus-within .sub-toggle .icon {
+    transform: rotate(180deg);
+  }
+
+  .hdr-tools {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 2px;
+  }
+
+  .seg {
+    display: inline-flex;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    padding: 2px;
+    background: var(--chip);
+  }
+
+  .seg-opt {
+    font-family: var(--mono);
+    font-size: 12.5px;
+    padding: 3px 8px;
+    border-radius: 999px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+
+  .seg-opt:hover {
+    text-decoration: none;
+    color: var(--accent-strong);
+  }
+
+  .seg-opt.on {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .seg-opt.on:hover {
+    color: var(--accent-ink);
+  }
+
+  .tool-btn {
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--chip);
+    color: var(--muted);
+  }
+
+  .tool-btn:hover {
+    color: var(--accent-strong);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-ring);
+  }
+
+  .tool-btn .icon {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* theme icon swap: moon by default, sun when the page is dark */
+  .i-sun {
+    display: none;
+  }
+
+  :global(html[data-theme='dark']) .i-sun {
+    display: block;
+  }
+
+  :global(html[data-theme='dark']) .i-moon {
+    display: none;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :global(html:not([data-theme='light'])) .i-sun {
+      display: block;
+    }
+
+    :global(html:not([data-theme='light'])) .i-moon {
+      display: none;
+    }
+  }
+
+  /* mobile disclosure menu */
+  .menu-btn {
+    display: none;
+  }
+
+  .i-close {
+    display: none;
+  }
+
+  .hdr[data-open] .i-close {
+    display: block;
+  }
+
+  .hdr[data-open] .i-open {
+    display: none;
+  }
+
+  /* 8 top-level items: tighten the rail between the mobile
+     breakpoint and the full-width layout so nothing wraps or
+     overflows the viewport — with the "Software & Patents" label the
+     full-size nav needs ~1275px, so this tier runs up to 1280px.
+     Lower bound 920px meets the mobile query's max-width: 920px with
+     no gap — fractional widths in (920px, 920.02px) at odd zoom
+     levels land here instead of falling through to the full-size nav.
+     At exactly 920px both queries match; the mobile block is later in
+     this stylesheet, so its rules win the shared point. */
+  @media (min-width: 920px) and (max-width: 1280px) {
+    .hdr-in {
+      gap: 8px;
+    }
+
+    .brand-s {
+      display: none;
+    }
+
+    .nav {
+      gap: 0;
+    }
+
+    .nav a {
+      font-size: 14px;
+      padding: 6px 5px;
+    }
+
+    .nav .nav-join {
+      margin-left: 4px;
+    }
+
+    .sub-toggle {
+      margin-left: -4px;
+    }
+
+    .hdr-tools {
+      gap: 6px;
+    }
+
+    .seg-opt {
+      padding: 3px 6px;
+    }
+  }
+
+  @media (max-width: 920px) {
+    .menu-btn {
+      display: inline-flex;
+    }
+
+    .nav {
+      display: none;
+      position: absolute;
+      top: 60px;
+      left: 0;
+      right: 0;
+      background: var(--card);
+      border-bottom: 1px solid var(--line);
+      flex-direction: column;
+      align-items: stretch;
+      padding: 10px clamp(16px, 4vw, 32px) 16px;
+      gap: 4px;
+      box-shadow: var(--shadow);
+      /* the panel hangs off the sticky header — on short (landscape
+         phone) viewports it must scroll itself, since page scroll can
+         never reveal items below the fold (60px = header height) */
+      max-height: calc(100vh - 60px);
+      max-height: calc(100dvh - 60px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+    }
+
+    .nav a {
+      padding: 10px 12px;
+      font-size: 16.5px;
+    }
+
+    .nav .nav-join {
+      margin-left: 0;
+      text-align: center;
+    }
+
+    /* submenu is always expanded inline in the panel: items indented
+       under People behind a hairline, no toggle needed on mobile */
+    .nav-group {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .sub-toggle {
+      display: none;
+    }
+
+    .submenu {
+      display: flex;
+      position: static;
+      min-width: 0;
+      gap: 2px;
+      margin: 2px 0 4px 14px;
+      padding: 0 0 0 10px;
+      background: none;
+      border: 0;
+      border-left: 2px solid var(--line);
+      border-radius: 0;
+      box-shadow: none;
+    }
+
+    .submenu::before {
+      display: none;
+    }
+
+    .hdr[data-open] .nav {
+      display: flex;
+    }
+
+    .brand-s {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  const root = document.documentElement;
+  const mq = window.matchMedia('(prefers-color-scheme: dark)');
+
+  /* ---------- theme toggle ---------- */
+  const themeBtn = document.getElementById('theme-toggle');
+
+  const isDark = (): boolean =>
+    root.dataset.theme === 'dark' || (root.dataset.theme !== 'light' && mq.matches);
+
+  const syncPressed = (): void => {
+    themeBtn?.setAttribute('aria-pressed', String(isDark()));
+  };
+
+  /* Keep mobile browser chrome in sync with a manually forced theme —
+   * the meta[media] pair only tracks the OS scheme on its own. */
+  const syncThemeColor = (theme: 'dark' | 'light'): void => {
+    const color = theme === 'dark' ? '#0b1417' : '#f3f6f7';
+    document
+      .querySelectorAll('meta[name="theme-color"]')
+      .forEach((m) => m.setAttribute('content', color));
+  };
+
+  themeBtn?.addEventListener('click', () => {
+    const next = isDark() ? 'light' : 'dark';
+    root.dataset.theme = next;
+    try {
+      localStorage.setItem('theme', next);
+    } catch {
+      /* storage unavailable — theme still applies for this page */
+    }
+    syncThemeColor(next);
+    syncPressed();
+  });
+
+  if (typeof mq.addEventListener === 'function') {
+    mq.addEventListener('change', syncPressed);
+  }
+  syncPressed();
+
+  /* ---------- mobile menu ---------- */
+  const menuBtn = document.getElementById('menu-toggle');
+  const header = menuBtn?.closest('header');
+
+  const setMenu = (open: boolean): void => {
+    if (!header || !menuBtn) return;
+    header.toggleAttribute('data-open', open);
+    menuBtn.setAttribute('aria-expanded', String(open));
+    const label = open ? menuBtn.dataset.labelClose : menuBtn.dataset.labelOpen;
+    if (label) menuBtn.setAttribute('aria-label', label);
+  };
+
+  menuBtn?.addEventListener('click', () => {
+    setMenu(!header?.hasAttribute('data-open'));
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && header?.hasAttribute('data-open')) {
+      setMenu(false);
+      menuBtn?.focus();
+    }
+  });
+
+  document.querySelectorAll('#site-nav a').forEach((a) => {
+    a.addEventListener('click', () => setMenu(false));
+  });
+
+  /* ---------- People submenu (disclosure) ----------
+   * Link+button hybrid: the "People" link navigates to the hub, the
+   * chevron button toggles the submenu (aria-expanded). Hover opens
+   * for mouse users, Escape closes and refocuses the toggle, arrow
+   * keys walk the items, and focus/pointer leaving the group closes
+   * it. On mobile ( ≤920px ) the submenu is statically expanded, so
+   * everything here is a harmless no-op there. */
+  const group = document.querySelector<HTMLElement>('.nav-group');
+  const subToggle = group?.querySelector<HTMLButtonElement>('.sub-toggle');
+  const submenu = group?.querySelector<HTMLElement>('.submenu');
+
+  if (group && subToggle && submenu) {
+    /* the script owns open/close now — switch off the CSS
+       :focus-within fallback so a scripted close sticks */
+    group.dataset.js = '';
+
+    const subLinks = Array.from(submenu.querySelectorAll<HTMLAnchorElement>('a'));
+
+    const setSub = (open: boolean): void => {
+      group.toggleAttribute('data-open', open);
+      subToggle.setAttribute('aria-expanded', String(open));
+    };
+
+    subToggle.addEventListener('click', () => {
+      setSub(!group.hasAttribute('data-open'));
+    });
+
+    /* hover open/close for mouse pointers (touch taps the button) */
+    group.addEventListener('pointerenter', (e) => {
+      if (e.pointerType === 'mouse') setSub(true);
+    });
+    group.addEventListener('pointerleave', (e) => {
+      if (e.pointerType === 'mouse') setSub(false);
+    });
+
+    group.addEventListener('keydown', (e) => {
+      const open = group.hasAttribute('data-open');
+
+      if (e.key === 'Escape') {
+        if (open) {
+          /* handled here — don't let the document listener also
+             close the mobile panel underneath */
+          e.stopPropagation();
+          setSub(false);
+          subToggle.focus();
+        }
+        return;
+      }
+
+      if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+
+      if (!open) {
+        if (e.target === subToggle && e.key === 'ArrowDown') {
+          e.preventDefault();
+          setSub(true);
+          subLinks[0]?.focus();
+        }
+        return;
+      }
+
+      e.preventDefault();
+      const i = subLinks.indexOf(e.target as HTMLAnchorElement);
+      if (e.key === 'ArrowDown') {
+        (subLinks[i + 1] ?? subLinks[0])?.focus();
+      } else if (i <= 0) {
+        subToggle.focus();
+      } else {
+        subLinks[i - 1]?.focus();
+      }
+    });
+
+    /* tabbing out of the group closes it (relatedTarget is null when
+       a click steals focus in Safari — the pointerdown handler below
+       covers that case without killing the in-flight link click) */
+    group.addEventListener('focusout', (e) => {
+      const next = e.relatedTarget as Node | null;
+      if (next && !group.contains(next)) setSub(false);
+    });
+
+    document.addEventListener('pointerdown', (e) => {
+      if (group.hasAttribute('data-open') && !group.contains(e.target as Node)) setSub(false);
+    });
+  }
+
+  /* ---------- language toggle: preserve query + hash ----------
+   * Static build-time hrefs can't carry runtime state like
+   * /publications?tag=vishing (the filter script keeps the URL in
+   * sync via replaceState), so re-append it just before use. */
+  document.querySelectorAll<HTMLAnchorElement>('.seg-opt').forEach((a) => {
+    const sync = (): void => {
+      const base = a.dataset.baseHref ?? a.getAttribute('href') ?? '/';
+      a.dataset.baseHref = base;
+      a.href = base + location.search + location.hash;
+    };
+    sync();
+    /* re-sync right before activation — covers filters applied after load */
+    a.addEventListener('pointerdown', sync);
+    a.addEventListener('focus', sync);
+    a.addEventListener('click', sync);
+  });
+</script>

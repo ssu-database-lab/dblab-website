@@ -1,0 +1,136 @@
+---
+/**
+ * Badge — mono pill for publication types, awards, and project status.
+ * Visual design ported from mockups/mockup_b.html (.ptag / .paward).
+ *
+ * Props: { kind: 'IJ'|'IC'|'DJ'|'DC'|'DS'|'UR'|'award'|'active'|
+ *                 'completed'|'proposal'|'unverified'; label?: string }
+ *
+ * `label` overrides the default text (pass a t() string for localized
+ * status labels — defaults are English).
+ */
+/* prettier-ignore -- must stay on one line: the Astro compiler hoists
+   `export type` declarations line-by-line and breaks multi-line unions. */
+export type BadgeKind = 'IJ' | 'IC' | 'DJ' | 'DC' | 'DS' | 'UR' | 'award' | 'active' | 'completed' | 'proposal' | 'unverified';
+
+interface Props {
+  kind: BadgeKind;
+  label?: string;
+}
+
+const { kind, label } = Astro.props;
+
+const defaultLabels: Record<BadgeKind, string> = {
+  IJ: 'IJ',
+  IC: 'IC',
+  DJ: 'DJ',
+  DC: 'DC',
+  DS: 'DS',
+  UR: 'UR',
+  award: 'Award',
+  active: 'Active',
+  completed: 'Completed',
+  proposal: 'Proposal',
+  unverified: 'Unverified',
+};
+
+/* Long-form expansions surfaced as a tooltip on the terse type codes.
+ * Only attached when the badge shows the default code: a custom `label`
+ * means the kind was borrowed for its visual style (e.g. the gallery's
+ * "Conference" badge reuses IC), so the code's expansion would be a
+ * wrong — and wrong-language — tooltip. */
+const titles: Partial<Record<BadgeKind, string>> = {
+  IJ: 'International journal',
+  IC: 'International conference',
+  DJ: 'Domestic journal',
+  DC: 'Domestic conference',
+  DS: 'Dataset',
+  UR: 'Under review / in preparation',
+};
+
+const text = label ?? defaultLabels[kind];
+---
+
+<span
+  class:list={['badge', `k-${kind}`]}
+  title={label ? undefined : titles[kind]}
+  aria-label={label ? undefined : titles[kind] && `${text} — ${titles[kind]}`}>{text}</span
+>
+
+<style>
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    font-family: var(--mono);
+    font-size: 12.5px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    min-width: 34px;
+    height: 24px;
+    padding: 0 7px;
+    border-radius: var(--radius-s);
+    border: 1px solid transparent;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  /* publication types */
+  .k-IJ,
+  .k-IC {
+    background: var(--ink);
+    color: var(--paper);
+  }
+
+  .k-DJ,
+  .k-DC {
+    background: none;
+    border-color: var(--line-strong);
+    color: var(--muted);
+  }
+
+  .k-DS {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  .k-UR {
+    background: none;
+    border-style: dashed;
+    border-color: var(--line-strong);
+    color: var(--muted);
+  }
+
+  /* awards */
+  .k-award {
+    background: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  /* project status */
+  .k-active {
+    background: none;
+    border-color: var(--ok);
+    color: var(--ok);
+  }
+
+  .k-completed {
+    background: var(--chip-2);
+    color: var(--muted);
+  }
+
+  .k-proposal {
+    background: none;
+    border-color: var(--line-strong);
+    color: var(--muted);
+  }
+
+  /* content flagged ⚠ in the inventory */
+  .k-unverified {
+    background: none;
+    border-style: dashed;
+    border-color: var(--line-strong);
+    color: var(--muted);
+  }
+</style>

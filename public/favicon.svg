@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  <!-- DB Lab · SSU — database-cylinder mark (matches the header brand glyph). -->
+  <style>
+    path { fill: #00707d; }
+    @media (prefers-color-scheme: dark) {
+      path { fill: #3fd9d0; }
+    }
+  </style>
+  <path d="M12 2C7.6 2 4 3.6 4 5.6v12.8C4 20.4 7.6 22 12 22s8-1.6 8-3.6V5.6C20 3.6 16.4 2 12 2Zm0 2c3.9 0 6 1.3 6 1.6 0 .3-2.1 1.6-6 1.6S6 5.9 6 5.6C6 5.3 8.1 4 12 4Zm6 14.4c0 .3-2.1 1.6-6 1.6s-6-1.3-6-1.6v-2.9c1.5.9 3.7 1.3 6 1.3s4.5-.4 6-1.3v2.9Zm0-6.4c0 .3-2.1 1.6-6 1.6S6 12.3 6 12V9.1c1.5.9 3.7 1.3 6 1.3s4.5-.4 6-1.3V12Z"/>
+</svg>

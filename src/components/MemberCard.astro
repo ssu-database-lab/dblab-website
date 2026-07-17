@@ -1,0 +1,505 @@
+---
+/**
+ * Member card — Database Lab, Soongsil University.
+ * Vertical profile card: the FULL portrait on top (shown whole, never
+ * cropped — natural aspect ratio, edge-to-edge under the card's rounded
+ * top) or a palette-consistent SVG-initials avatar, then the details
+ * stacked below (bilingual name/role, interests, labelled link badges,
+ * and a subtle "roster confirmation pending" mark for ⚠-flagged members).
+ *
+ * When the member has a `slug`, the portrait/avatar AND the name link
+ * to the detail page (/members/<slug>), and a quiet "View profile →"
+ * affordance closes the card. The click-to-enlarge Lightbox now lives
+ * on the DETAIL page, not here — no Lightbox include is needed on
+ * pages rendering this card.
+ *
+ * Props: { member: Member; lang: 'en' | 'ko' }
+ * `member` follows the src/data/members.json `current[]` schema.
+ */
+import { t, localizePath, type Lang } from '../i18n/utils';
+
+export interface MemberLinks {
+  github?: string | null;
+  orcid?: string | null;
+  dblp?: string | null;
+  linkedin?: string | null;
+}
+
+export interface Member {
+  /** Detail-page slug (/members/<slug>); card degrades to non-linked when absent. */
+  slug?: string | null;
+  name_en: string;
+  name_kr?: string | null;
+  role_en: string;
+  role_kr?: string | null;
+  photo?: string | null;
+  /** Natural pixel dimensions of `photo` — set the img aspect ratio so the
+   *  full portrait shows undistorted with no layout shift. */
+  photo_w?: number | null;
+  photo_h?: number | null;
+  email?: string | null;
+  interests_en?: string | null;
+  interests_kr?: string | null;
+  links?: MemberLinks | null;
+  unverified?: boolean;
+}
+
+interface Props {
+  member: Member;
+  lang: Lang;
+  /** Heading level for the member name (default 3). PageMembers passes 2
+   *  so the outline reads h1 → h2 with no skipped level. */
+  headingLevel?: 2 | 3;
+}
+
+const { member, lang, headingLevel = 3 } = Astro.props;
+const ko = lang === 'ko';
+const other = ko ? 'en' : 'ko';
+
+/* Bilingual name/role: locale-primary, other language as a muted aside. */
+const nameMain = ko && member.name_kr ? member.name_kr : member.name_en;
+const nameAlt = ko ? (member.name_kr ? member.name_en : null) : (member.name_kr ?? null);
+
+const roleMain = ko ? (member.role_kr ?? member.role_en) : member.role_en;
+const roleAlt = ko ? member.role_en : member.role_kr;
+
+const interests = ko && member.interests_kr ? member.interests_kr : member.interests_en;
+
+const photoAlt = ko ? `${nameMain} 사진` : `Portrait of ${nameMain}`;
+const avatarLabel = ko ? `${nameMain} 아바타` : `Avatar of ${nameMain}`;
+
+/* Detail-page link (photo + name + "View profile →" all point here).
+ * Inline bilingual copy — new UI strings do not go through ui.ts. */
+const profileHref = member.slug ? localizePath(lang, `/members/${member.slug}`) : null;
+const viewProfile = ko ? '프로필 보기' : 'View profile';
+
+/* ------------------------------------------------------------------
+   Generated avatar (used when photo is null): mono initials inside a
+   ring, plus one schema-graph edge whose orientation is derived
+   deterministically from the name — same visual language as the hero
+   schema canvas and mockup B's hand-placed avatars.
+   ------------------------------------------------------------------ */
+function initials(name: string): string {
+  const words = name.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return '·';
+  if (words.length === 1) return words[0].slice(0, 2).toUpperCase();
+  return (words[0].charAt(0) + words[words.length - 1].charAt(0)).toUpperCase();
+}
+
+function nameHash(s: string): number {
+  let h = 0;
+  for (const ch of s) h = (h * 31 + (ch.codePointAt(0) ?? 0)) >>> 0;
+  return h;
+}
+
+const EDGES = [
+  { x1: 12, y1: 82, x2: 63, y2: 18 }, // diagonal ↗
+  { x1: 12, y1: 18, x2: 63, y2: 82 }, // diagonal ↘
+  { x1: 8, y1: 50, x2: 67, y2: 50 }, // horizontal
+  { x1: 37.5, y1: 12, x2: 37.5, y2: 88 }, // vertical
+] as const;
+
+const edge = EDGES[nameHash(member.name_en) % EDGES.length];
+const avatarInitials = initials(member.name_en);
+
+const links = member.links ?? {};
+const hasLinks = Boolean(
+  member.email || links.github || links.orcid || links.dblp || links.linkedin
+);
+---
+
+<article class="person">
+  <div class="p-media">
+    {
+      /* Photo (or avatar) navigates to the detail page — the Lightbox
+         enlargement lives there now. Redundant with the name link, so
+         this one is skipped by keyboard/SR (tabindex=-1, aria-hidden). */
+      member.photo ? (
+        profileHref ? (
+          <a class="p-go" href={profileHref} tabindex="-1" aria-hidden="true">
+            <img
+              class="pphoto"
+              src={member.photo}
+              alt={photoAlt}
+              width={member.photo_w ?? undefined}
+              height={member.photo_h ?? undefined}
+              loading="lazy"
+              decoding="async"
+            />
+          </a>
+        ) : (
+          <img
+            class="pphoto"
+            src={member.photo}
+            alt={photoAlt}
+            width={member.photo_w ?? undefined}
+            height={member.photo_h ?? undefined}
+            loading="lazy"
+            decoding="async"
+          />
+        )
+      ) : profileHref ? (
+        <a class="p-go" href={profileHref} tabindex="-1" aria-hidden="true">
+          <svg class="avatar" viewBox="0 0 75 100" role="img" aria-label={avatarLabel}>
+            <line class="av-edge" x1={edge.x1} y1={edge.y1} x2={edge.x2} y2={edge.y2} />
+            <circle class="av-dot" cx={edge.x1} cy={edge.y1} r="3" />
+            <circle class="av-dot" cx={edge.x2} cy={edge.y2} r="3" />
+            <circle class="av-ring" cx="37.5" cy="50" r="21" fill="none" stroke-width="1.5" />
+            <text x="37.5" y="57" text-anchor="middle" font-size="18">
+              {avatarInitials}
+            </text>
+          </svg>
+        </a>
+      ) : (
+        <svg class="avatar" viewBox="0 0 75 100" role="img" aria-label={avatarLabel}>
+          <line class="av-edge" x1={edge.x1} y1={edge.y1} x2={edge.x2} y2={edge.y2} />
+          <circle class="av-dot" cx={edge.x1} cy={edge.y1} r="3" />
+          <circle class="av-dot" cx={edge.x2} cy={edge.y2} r="3" />
+          <circle class="av-ring" cx="37.5" cy="50" r="21" fill="none" stroke-width="1.5" />
+          <text x="37.5" y="57" text-anchor="middle" font-size="18">
+            {avatarInitials}
+          </text>
+        </svg>
+      )
+    }
+  </div>
+
+  <div class="p-body">
+    <p class="prole">
+      {roleMain}
+      {
+        roleAlt && roleAlt !== roleMain && (
+          <span class="prole-alt" lang={other}>
+            {roleAlt}
+          </span>
+        )
+      }
+    </p>
+    {
+      /* conditional (not a dynamic tag) so Astro's scoped styles
+         reliably reach both variants; the name links to the detail page */
+      headingLevel === 2 ? (
+        <h2 class="pname">
+          {profileHref ? <a class="pname-a" href={profileHref}>{nameMain}</a> : nameMain}
+          {nameAlt && (
+            <span class="pname-alt" lang={other}>
+              {nameAlt}
+            </span>
+          )}
+        </h2>
+      ) : (
+        <h3 class="pname">
+          {profileHref ? <a class="pname-a" href={profileHref}>{nameMain}</a> : nameMain}
+          {nameAlt && (
+            <span class="pname-alt" lang={other}>
+              {nameAlt}
+            </span>
+          )}
+        </h3>
+      )
+    }
+    {interests && <p class="pint">{interests}</p>}
+
+    {
+      member.unverified && (
+        <p class="pveri">
+          <span aria-hidden="true">⚠</span> {t(lang, 'people.memberUnverified')}
+        </p>
+      )
+    }
+
+    {
+      hasLinks && (
+        <div class="plinks">
+          {member.email && (
+            <a class="plink" href={`mailto:${member.email}`}>
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm1 3.2V17h14V8.2l-7 4.4-7-4.4ZM5.6 7l6.4 4 6.4-4H5.6Z"
+                />
+              </svg>
+              <span class="plink-t">{member.email}</span>
+            </a>
+          )}
+          {links.github && (
+            <a class="plink" href={links.github} target="_blank" rel="noopener">
+              <svg class="icon" viewBox="0 0 16 16" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"
+                />
+              </svg>
+              <span class="plink-t">GitHub</span>
+            </a>
+          )}
+          {links.orcid && (
+            <a class="plink" href={links.orcid} target="_blank" rel="noopener">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16ZM8.2 7.3a.9.9 0 1 1 0 1.8.9.9 0 0 1 0-1.8Zm-.7 3h1.5v6.5H7.5v-6.5Zm3 0h2.9c2.1 0 3.5 1.3 3.5 3.2 0 2-1.4 3.3-3.5 3.3h-2.9v-6.5Zm1.5 1.3v3.9h1.3c1.3 0 2.1-.7 2.1-2 0-1.2-.8-1.9-2.1-1.9H12Z"
+                />
+              </svg>
+              <span class="plink-t">ORCID</span>
+            </a>
+          )}
+          {links.dblp && (
+            <a class="plink" href={links.dblp} target="_blank" rel="noopener">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M14 4h6v6h-2V7.4l-7.3 7.3-1.4-1.4L16.6 6H14V4ZM5 6h6v2H7v9h9v-4h2v6H5V6Z"
+                />
+              </svg>
+              <span class="plink-t">DBLP</span>
+            </a>
+          )}
+          {links.linkedin && (
+            <a class="plink" href={links.linkedin} target="_blank" rel="noopener">
+              <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+                <path
+                  fill="currentColor"
+                  d="M20.45 20.45h-3.55v-5.57c0-1.33-.03-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.36V9h3.41v1.56h.05c.47-.9 1.63-1.85 3.36-1.85 3.6 0 4.27 2.37 4.27 5.45v6.29ZM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12ZM7.12 20.45H3.56V9h3.56v11.45ZM22.22 0H1.77C.79 0 0 .77 0 1.72v20.55c0 .95.79 1.73 1.77 1.73h20.45c.98 0 1.78-.78 1.78-1.73V1.72C24 .77 23.2 0 22.22 0Z"
+                />
+              </svg>
+              <span class="plink-t">LinkedIn</span>
+            </a>
+          )}
+        </div>
+      )
+    }
+
+    {
+      profileHref && (
+        <p class="pmore">
+          <a href={profileHref}>
+            {viewProfile} <span class="pmore-ar" aria-hidden="true">→</span>
+          </a>
+        </p>
+      )
+    }
+  </div>
+</article>
+
+<style>
+  .person {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-l);
+    display: flex;
+    flex-direction: column;
+    transition:
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+
+  .person:hover {
+    border-color: var(--line-strong);
+    box-shadow: var(--shadow);
+  }
+
+  /* modest centered portrait at the top of the card */
+  .p-media {
+    display: flex;
+    justify-content: center;
+    padding: clamp(22px, 3vw, 28px) clamp(20px, 3vw, 26px) 0;
+  }
+
+  /* photo/avatar → detail-page link */
+  .p-go {
+    display: block;
+    width: 100%;
+    max-width: 170px;
+  }
+
+  .p-go:hover .pphoto,
+  .p-go:hover .avatar {
+    opacity: 0.92;
+  }
+
+  /* the FULL photo — natural aspect ratio, never cropped, ~170px wide */
+  .pphoto {
+    display: block;
+    width: 100%;
+    max-width: 170px;
+    height: auto;
+    border-radius: var(--radius-m);
+    background: var(--chip-2);
+  }
+
+  /* generated avatar (no photo) — keeps a 3:4 portrait footprint */
+  .avatar {
+    display: block;
+    width: 100%;
+    max-width: 170px;
+    height: auto;
+    aspect-ratio: 3 / 4;
+    border-radius: var(--radius-m);
+    background: var(--chip-2);
+  }
+
+  .avatar text {
+    font-family: var(--mono);
+    font-weight: 700;
+    fill: var(--accent-strong);
+  }
+
+  .av-ring {
+    stroke: var(--accent);
+    opacity: 0.5;
+  }
+
+  .av-dot {
+    fill: var(--accent);
+    opacity: 0.55;
+  }
+
+  .av-edge {
+    stroke: var(--line-strong);
+  }
+
+  .p-body {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+    padding: clamp(18px, 2.6vw, 26px);
+  }
+
+  .prole {
+    font-family: var(--mono);
+    font-size: var(--fs-micro);
+    color: var(--accent-strong);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .prole-alt {
+    color: var(--muted);
+    margin-left: 8px;
+    letter-spacing: 0.02em;
+  }
+
+  .pname {
+    font-size: clamp(19px, 2.2vw, 22px);
+    font-weight: 750;
+    letter-spacing: -0.015em;
+    line-height: 1.3;
+  }
+
+  .pname-a {
+    color: inherit;
+  }
+
+  .pname-a:hover {
+    color: var(--accent-strong);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .pname-alt {
+    font-weight: 550;
+    color: var(--muted);
+    font-size: 0.72em;
+    margin-left: 8px;
+    letter-spacing: 0;
+  }
+
+  .pint {
+    font-size: var(--fs-small);
+    color: var(--muted);
+    line-height: 1.6;
+    max-width: 52ch;
+  }
+
+  /* subtle mark for ⚠ roster-unverified members */
+  .pveri {
+    align-self: flex-start;
+    font-family: var(--mono);
+    font-size: 11.5px;
+    line-height: 1.4;
+    color: var(--muted);
+    border: 1px dashed var(--line-strong);
+    border-radius: var(--radius-s);
+    padding: 2px 7px;
+  }
+
+  .plinks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 8px;
+  }
+
+  .plink {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--mono);
+    font-size: var(--fs-caption);
+    padding: 5px 11px;
+    border-radius: var(--radius-s);
+    border: 1px solid var(--line-strong);
+    color: var(--accent-strong);
+    background: var(--chip);
+    max-width: 100%;
+  }
+
+  .plink:hover {
+    border-color: var(--accent);
+    text-decoration: none;
+    box-shadow: 0 0 0 2px var(--accent-ring);
+  }
+
+  .plink .icon {
+    width: 13px;
+    height: 13px;
+    flex: none;
+  }
+
+  .plink-t {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* quiet "View profile →" affordance */
+  .pmore {
+    margin-top: 2px;
+    font-family: var(--mono);
+    font-size: var(--fs-caption);
+  }
+
+  .pmore a {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--muted);
+  }
+
+  .pmore a:hover {
+    color: var(--accent-strong);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .pmore-ar {
+    transition: transform 0.15s ease;
+  }
+
+  .pmore a:hover .pmore-ar {
+    transform: translateX(3px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pmore-ar {
+      transition: none;
+    }
+
+    .pmore a:hover .pmore-ar {
+      transform: none;
+    }
+  }
+</style>
