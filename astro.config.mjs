@@ -2,7 +2,7 @@ import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
 
 // Production URL — db.ssu.ac.kr granted by the university (2026-07).
-// DNS: ask SSU 정보화팀 for a CNAME record db.ssu.ac.kr → <org>.github.io,
+// DNS: ask SSU 정보화팀 for a CNAME record db.ssu.ac.kr → ssu-database-lab.github.io,
 // then set the same custom domain in the GitHub Pages settings.
 export default defineConfig({
   site: 'https://db.ssu.ac.kr',

@@ -4,8 +4,8 @@
 #   The university granted db.ssu.ac.kr and public/CNAME already contains it,
 #   so the first successful deploy registers that custom domain on the repo.
 #   NOTE: until SSU's DNS admin points db.ssu.ac.kr at GitHub Pages (CNAME
-#   record → <user>.github.io), the site is NOT publicly reachable through
-#   GitHub — the <user>.github.io/<repo> URL redirects to the dead domain.
+#   record → ssu-database-lab.github.io), the site is NOT publicly reachable through
+#   GitHub — the github.io project URL redirects to the dead domain.
 #   Use the lab's VPS preview during that window. Once DNS resolves, enable
 #   "Enforce HTTPS" in Settings → Pages (certificate issues automatically).
 
