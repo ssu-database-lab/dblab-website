@@ -48,6 +48,16 @@ export interface ResearchArea {
   tags: string[];
   links: AreaLink[];
   glyph: string;
+  /** Illustrative figure from the lab's own papers/proposals (public/assets/research/). */
+  image?: {
+    src: string;
+    w: number;
+    h: number;
+    alt_en: string;
+    alt_kr: string;
+    cap_en: string;
+    cap_kr: string;
+  };
 }
 
 export const researchAreas: ResearchArea[] = [
@@ -71,6 +81,15 @@ export const researchAreas: ResearchArea[] = [
     ],
     tags: ['nlp-metadata'],
     links: [],
+    image: {
+      src: '/assets/research/nlp-metadata.png',
+      w: 1280,
+      h: 518,
+      alt_en: 'Architecture diagram: OCR feeds concurrent LLM extraction and Korean NER, an LLM arbiter consolidates both into a unified 67-field metadata schema',
+      alt_kr: '아키텍처 다이어그램: OCR 결과를 LLM 추출과 한국어 NER가 동시에 처리하고, LLM 중재자가 67개 필드 통합 메타데이터로 통합',
+      cap_en: 'NER–LLM consolidation architecture for rights-metadata extraction (deployed pipeline)',
+      cap_kr: '권리 메타데이터 추출을 위한 NER–LLM 통합(중재) 아키텍처 — 실제 배포 파이프라인',
+    },
     glyph:
       '<path d="M6 2.5h10l4 4v17H6z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M16 2.5v4h4M9 11h8M9 14.5h8M9 18h5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>',
   },
@@ -105,6 +124,15 @@ export const researchAreas: ResearchArea[] = [
         icon: 'dataset',
       },
     ],
+    image: {
+      src: '/assets/research/vishing.png',
+      w: 1280,
+      h: 507,
+      alt_en: 'Pipeline diagram: input audio stream through preprocessing, eGeMAPS/MFCC/Wav2Vec2.0 feature extraction, a lightweight MLP classifier, and EMA call-level aggregation to a vishing alert — fully on-device',
+      alt_kr: '파이프라인 다이어그램: 입력 음성이 전처리, eGeMAPS/MFCC/Wav2Vec2.0 특징 추출, 경량 MLP 분류기, EMA 통화 단위 집계를 거쳐 보이스피싱 경보로 — 완전 온디바이스',
+      cap_en: 'On-device, privacy-preserving detection pipeline — acoustic features to a call-level alert (IEEE Access line)',
+      cap_kr: '온디바이스 프라이버시 보존 탐지 파이프라인 — 음향 특징에서 통화 단위 경보까지 (IEEE Access 라인)',
+    },
     glyph:
       '<path d="M2 13h3l2.5-6 4 12 3-9 2 3H23" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" stroke-linecap="round"/>',
   },
@@ -126,6 +154,15 @@ export const researchAreas: ResearchArea[] = [
     ],
     tags: ['forensics'],
     links: [],
+    image: {
+      src: '/assets/research/forensics.png',
+      w: 1280,
+      h: 923,
+      alt_en: 'Diagram of block-mapping and log-page-mapping tables being restored from map blocks and pruned by a consistency check after a crash',
+      alt_kr: '크래시 이후 맵 블록에서 블록 매핑·로그 페이지 매핑 테이블을 복원하고 일관성 검사로 정리하는 다이어그램',
+      cap_en: 'Mapping-table restoration and consistency check after power failure (Electronics 2021)',
+      cap_kr: '전원 장애 이후 매핑 테이블 복원과 일관성 검사 (Electronics 2021)',
+    },
     glyph:
       '<circle cx="11" cy="11" r="7.5" stroke="currentColor" stroke-width="1.5"/><path d="M16.5 16.5 23 23" stroke="currentColor" stroke-width="1.5"/><path d="M8 11a3 3 0 0 1 6 0" stroke="currentColor" stroke-width="1.5"/>',
   },
@@ -153,6 +190,15 @@ export const researchAreas: ResearchArea[] = [
         icon: 'doi',
       },
     ],
+    image: {
+      src: '/assets/research/flash-ftl.png',
+      w: 1280,
+      h: 1304,
+      alt_en: 'Architecture diagram of the WPCB-tree: a B+-tree module whose random writes pass through a transit buffer and write-pattern converter into sequential writes over the FTL and flash memory',
+      alt_kr: 'WPCB-tree 아키텍처 다이어그램: B+-트리의 랜덤 쓰기가 버퍼와 쓰기 패턴 변환기를 거쳐 순차 쓰기로 FTL·플래시 메모리에 전달',
+      cap_en: 'WPCB-tree — a flash-aware B-tree over the FTL (Symmetry 2018)',
+      cap_kr: 'WPCB-tree — FTL 위의 플래시 인지 B-트리 (Symmetry 2018)',
+    },
     glyph:
       '<rect x="5" y="5" width="16" height="16" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M9 1.5v3M13 1.5v3M17 1.5v3M9 21.5v3M13 21.5v3M17 21.5v3M1.5 9h3M1.5 13h3M1.5 17h3M21.5 9h3M21.5 13h3M21.5 17h3" stroke="currentColor" stroke-width="1.5"/>',
   },

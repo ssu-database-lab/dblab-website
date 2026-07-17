@@ -15,6 +15,7 @@
  * <main id="main">.
  */
 import Base from '../layouts/Base.astro';
+import Lightbox from '../components/Lightbox.astro';
 import ProjectsTable from '../components/ProjectsTable.astro';
 import { researchAreas } from '../data/research';
 import { t, localizePath, type Lang } from '../i18n/utils';
@@ -44,7 +45,11 @@ const areas = researchAreas.map((area) => ({
   era: ko ? area.era_kr : area.era_en,
   flag: ko ? area.flag_kr : area.flag_en,
   descs: ko ? area.desc_kr : area.desc_en,
+  figAlt: area.image ? (ko ? area.image.alt_kr : area.image.alt_en) : '',
+  figCap: area.image ? (ko ? area.image.cap_kr : area.image.cap_en) : '',
 }));
+
+const zoomHint = ko ? '그림 크게 보기' : 'View figure larger';
 
 /* Small inline icon set (subset of mockup B's symbols). */
 const ICON_PATHS: Record<string, string> = {
@@ -118,6 +123,28 @@ const iconViewBox = (icon: string): string => (icon === 'github' ? '0 0 16 16' :
             {area.descs.map((paragraph) => (
               <p class="area-p" set:html={paragraph} />
             ))}
+            {area.image && (
+              <figure class="area-fig">
+                <button
+                  type="button"
+                  class="fig-zoom"
+                  data-lightbox-trigger
+                  aria-label={`${zoomHint}: ${area.figCap}`}
+                >
+                  <img
+                    src={area.image.src}
+                    width={area.image.w}
+                    height={area.image.h}
+                    alt={area.figAlt}
+                    loading="lazy"
+                    decoding="async"
+                    data-lightbox
+                    data-full={area.image.src}
+                  />
+                </button>
+                <figcaption class="fig-cap mono">{area.figCap}</figcaption>
+              </figure>
+            )}
             <div class="area-links">
               <span class="links-lbl mono">{t(lang, 'research.relatedPapers')}</span>
               {area.tags.map((tag) => (
@@ -159,6 +186,7 @@ const iconViewBox = (icon: string): string => (icon === 'github' ? '0 0 16 16' :
       <ProjectsTable lang={lang} />
     </div>
   </section>
+  <Lightbox lang={lang} />
 </Base>
 
 <style>
@@ -360,4 +388,46 @@ const iconViewBox = (icon: string): string => (icon === 'github' ? '0 0 16 16' :
       height: 22px;
     }
   }
+
+  /* ---------- area figures (paper/proposal diagrams) ---------- */
+  .area-fig {
+    margin: 18px 0 4px;
+  }
+
+  /* diagrams are white-background line art — keep them on a white chip
+     so they stay legible in the dark theme too (same device as .ssu-chip) */
+  .fig-zoom {
+    display: block;
+    width: 100%;
+    padding: clamp(10px, 1.6vw, 18px);
+    background: #ffffff;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-m);
+    cursor: zoom-in;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .fig-zoom:hover {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-ring);
+  }
+
+  .fig-zoom img {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  /* the tall flash-ftl diagram: cap the height, keep aspect via contain */
+  #flash-ftl .fig-zoom img {
+    max-height: 460px;
+    object-fit: contain;
+  }
+
+  .fig-cap {
+    margin-top: 8px;
+    font-size: var(--fs-micro);
+    color: var(--muted);
+  }
+
 </style>
