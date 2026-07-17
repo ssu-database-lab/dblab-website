@@ -670,7 +670,8 @@ const title = ko
 <script>
   /* ---------- hero schema-graph canvas (ported from mockup B) ----------
    * Drifting nodes/edges suggesting a database schema diagram.
-   *   - static single frame under prefers-reduced-motion
+   *   - runs regardless of prefers-reduced-motion (owner's decision:
+ *     it is the page's signature visual; drift is slow and low-contrast)
    *   - theme-aware colors, re-read on <html data-theme> mutation
    *     and on OS color-scheme change (covers the no-attribute case)
    *   - animation pauses while the tab is hidden
@@ -680,7 +681,6 @@ const title = ko
   const ctx = canvas?.getContext('2d') ?? null;
 
   if (canvas && hero && ctx) {
-    const reducedMq = window.matchMedia('(prefers-reduced-motion: reduce)');
     const darkMq = window.matchMedia('(prefers-color-scheme: dark)');
 
     type SchemaNode = { x: number; y: number; vx: number; vy: number; r: number; tbl: boolean };
@@ -803,7 +803,7 @@ const title = ko
     };
 
     const start = (): void => {
-      if (!running && !reducedMq.matches && !document.hidden) {
+      if (!running && !document.hidden) {
         running = true;
         rafId = requestAnimationFrame(tick);
       }
@@ -845,16 +845,5 @@ const title = ko
       darkMq.addEventListener('change', repaint);
     }
 
-    /* honor live changes to the reduced-motion preference */
-    if (typeof reducedMq.addEventListener === 'function') {
-      reducedMq.addEventListener('change', () => {
-        if (reducedMq.matches) {
-          stop();
-          draw(); /* leave a static frame */
-        } else {
-          start();
-        }
-      });
-    }
   }
 </script>
