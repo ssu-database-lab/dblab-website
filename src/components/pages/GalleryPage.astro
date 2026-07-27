@@ -24,13 +24,13 @@
  *
  * Rendered by the /gallery and /ko/gallery wrappers.
  */
-import Base from '../layouts/Base.astro';
-import Badge from '../components/Badge.astro';
-import type { BadgeKind } from '../components/Badge.astro';
-import Lightbox from '../components/Lightbox.astro';
-import { type Lang } from '../i18n/utils';
-import { formatDate } from '../lib/format';
-import gallery from '../data/gallery.json';
+import Base from '../../layouts/BaseLayout.astro';
+import Badge from '../Badge.astro';
+import type { BadgeKind } from '../Badge.astro';
+import Lightbox from '../Lightbox.astro';
+import { type Lang } from '../../i18n/utils';
+import { formatDate } from '../../lib/format';
+import gallery from '../../data/gallery.json';
 
 interface Props {
   lang: Lang;

@@ -7,7 +7,7 @@
  * EN-primary, noindex, no /ko counterpart.
  *
  * Result rows are derived at BUILD TIME from src/data/*.json and inlined
- * as a JSON <script> payload (small, well under 40 KB).
+ * as an inline JSON data block (small, well under 40 KB).
  */
 import publications from '../data/publications.json';
 import members from '../data/members.json';
@@ -151,7 +151,7 @@ const DB: Record<string, Result> = {
   '\\dt': relations,
 };
 
-/* `<` escaped so "</script>" can never occur inside the JSON payload */
+/* Escape `<` so the JSON payload cannot terminate its data script element. */
 const payload = JSON.stringify(DB).replace(/</g, '\\u003c');
 const year = new Date().getFullYear();
 ---

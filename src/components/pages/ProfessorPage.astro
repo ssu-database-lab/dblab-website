@@ -12,13 +12,13 @@
  *
  * Props: { lang: 'en' | 'ko' } — rendered by /professor and /ko/professor.
  */
-import Base from '../layouts/Base.astro';
-import Lightbox from '../components/Lightbox.astro';
-import PubEntry from '../components/PubEntry.astro';
-import members from '../data/members.json';
-import publications from '../data/publications.json';
-import courses from '../data/courses.json';
-import { t, localizePath, type Lang } from '../i18n/utils';
+import Base from '../../layouts/BaseLayout.astro';
+import Lightbox from '../Lightbox.astro';
+import PubEntry from '../PubEntry.astro';
+import members from '../../data/members.json';
+import publications from '../../data/publications.json';
+import courses from '../../data/courses.json';
+import { t, localizePath, type Lang } from '../../i18n/utils';
 
 interface Props {
   lang: Lang;

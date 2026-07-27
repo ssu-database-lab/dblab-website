@@ -9,10 +9,10 @@
  *
  * Props: { lang: 'en' | 'ko' } — rendered by /members and /ko/members.
  */
-import Base from '../layouts/Base.astro';
-import MemberCard from '../components/MemberCard.astro';
-import members from '../data/members.json';
-import { t, localizePath, type Lang } from '../i18n/utils';
+import Base from '../../layouts/BaseLayout.astro';
+import MemberCard from '../MemberCard.astro';
+import members from '../../data/members.json';
+import { t, localizePath, type Lang } from '../../i18n/utils';
 
 interface Props {
   lang: Lang;

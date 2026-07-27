@@ -4,7 +4,7 @@
  * Static paths come from members.json `current[]` (the professor keeps
  * his own page at /ko/professor and is deliberately NOT included here).
  */
-import MemberDetail from '../../../pageviews/MemberDetail.astro';
+import MemberDetailPage from '../../../components/pages/MemberDetailPage.astro';
 import members from '../../../data/members.json';
 
 export function getStaticPaths() {
@@ -17,4 +17,4 @@ export function getStaticPaths() {
 const { member } = Astro.props;
 ---
 
-<MemberDetail lang="ko" member={member} />
+<MemberDetailPage lang="ko" member={member} />

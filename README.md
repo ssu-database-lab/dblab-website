@@ -35,27 +35,30 @@ Node 20+ recommended (CI builds on Node 22).
 │   ├── robots.txt
 │   └── assets/              # photos, SSU logo (local files only)
 ├── src/
-│   ├── styles/              # tokens.css (design tokens), global.css
-│   ├── layouts/Base.astro   # <head>, header, footer, theme boot
-│   ├── components/          # Header, Footer, SectionHeading, Badge, StatTile, …
-│   ├── i18n/                # ui.ts (string tables), utils.ts (t() helper)
-│   ├── lib/format.ts        # author bolding, date formatting
+│   ├── assets/              # source images processed by Astro/Vite
+│   ├── components/          # reusable Astro UI components
+│   │   └── pages/           # shared, lang-aware page components
 │   ├── data/                # ← content lives here (see CONTRIBUTING.md)
 │   │   ├── publications.json
 │   │   ├── members.json / alumni.json
 │   │   ├── projects.json / news.json / software.json / courses.json
 │   │   └── research.ts      # the four research-area blurbs
-│   ├── pageviews/           # Page<Name>.astro — one shared view per page, lang-aware
-│   └── pages/               # thin route wrappers
-│       ├── index.astro, people.astro, research.astro, publications.astro,
-│       │   software.astro, news.astro, join.astro, console.astro, 404.astro
-│       └── ko/              # Korean wrappers for the same routes
+│   ├── i18n/                # ui.ts (string tables), utils.ts (t() helper)
+│   ├── layouts/
+│   │   └── BaseLayout.astro # <head>, header, footer, theme boot
+│   ├── lib/format.ts        # author bolding, date formatting
+│   ├── pages/               # Astro file-based routes
+│   │   ├── index.astro, people.astro, research.astro, publications.astro,
+│   │   │   software.astro, news.astro, join.astro, console.astro, 404.astro
+│   │   └── ko/              # Korean routes for the shared page components
+│   └── styles/              # tokens.css (design tokens), global.css
 └── scripts/postbuild.mjs    # de-collides file+directory routes after `astro build`
 ```
 
-Every public page is a shared component in `src/pageviews/` that takes `{ lang: 'en' | 'ko' }`;
-the files in `src/pages/` and `src/pages/ko/` are thin wrappers around it. Content is data-driven:
-to change what the site says, edit `src/data/*.json` — not the page templates.
+Every public page is a shared component in `src/components/pages/` that takes
+`{ lang: 'en' | 'ko' }`; `src/pages/` remains responsible for Astro routing and
+locale-specific entry points. Content is data-driven: to change what the site says,
+edit `src/data/*.json` — not the page templates.
 
 ## Updating content
 

@@ -1,5 +1,5 @@
 ---
-import Base from '../layouts/Base.astro';
+import Base from '../layouts/BaseLayout.astro';
 ---
 <Base
   title="404 · Page not found — DB Lab · SSU"
@@ -7,7 +7,7 @@ import Base from '../layouts/Base.astro';
   lang="en"
   noindex
 >
-  {/* Base.astro already renders <main id="main"> around the slot — plain div here. */}
+  {/* BaseLayout.astro already renders <main id="main"> around the slot — plain div here. */}
   <div class="nf">
     <div class="nf-in">
       <p class="nf-eyebrow" aria-hidden="true">query failed</p>

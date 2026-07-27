@@ -10,10 +10,10 @@
  *
  * Props: { lang: 'en' | 'ko' } — rendered by /people and /ko/people.
  */
-import Base from '../layouts/Base.astro';
-import members from '../data/members.json';
-import alumni from '../data/alumni.json';
-import { t, localizePath, type Lang } from '../i18n/utils';
+import Base from '../../layouts/BaseLayout.astro';
+import members from '../../data/members.json';
+import alumni from '../../data/alumni.json';
+import { t, localizePath, type Lang } from '../../i18n/utils';
 
 interface Props {
   lang: Lang;

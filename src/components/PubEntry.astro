@@ -16,7 +16,7 @@
  *   - BibTeX copy button when `bibtex` is non-null (clipboard API with
  *     textarea fallback, "Copied" state — one delegated listener page-wide)
  *
- * Filtering hooks for PagePublications (data attributes):
+ * Filtering hooks for PublicationsPage (data attributes):
  *   data-type  publication type code (IJ/IC/DJ/DC/DS/UR)
  *   data-tags  space-joined topic slugs
  *   data-hay   lowercased search haystack (title + authors + venue + year)
@@ -264,7 +264,7 @@ const hay = [
     padding: 14px 16px;
   }
 
-  /* filtering (PagePublications) toggles the hidden attribute */
+  /* filtering (PublicationsPage) toggles the hidden attribute */
   .pub[hidden] {
     display: none;
   }

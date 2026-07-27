@@ -10,7 +10,7 @@
  *   A → flash-ftl      (era 2004–present; §3C multimedia-indexing
  *                       heritage folded into the second paragraph)
  *
- * Consumed by src/pageviews/PageResearch.astro (anchor ids = slugs)
+ * Consumed by src/components/pages/ResearchPage.astro (anchor ids = slugs)
  * and free for other pages to import (e.g. home research cards).
  *
  * Field notes

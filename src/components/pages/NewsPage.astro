@@ -8,10 +8,10 @@
  * .news-d, .news-k; year rail from .ygroup/.y).
  * Rendered by the /news and /ko/news wrappers.
  */
-import Base from '../layouts/Base.astro';
-import { t, type Lang } from '../i18n/utils';
-import { formatDate } from '../lib/format';
-import news from '../data/news.json';
+import Base from '../../layouts/BaseLayout.astro';
+import { t, type Lang } from '../../i18n/utils';
+import { formatDate } from '../../lib/format';
+import news from '../../data/news.json';
 
 interface Props {
   lang: Lang;

@@ -3,7 +3,7 @@
  * Member detail page — Database Lab, Soongsil University.
  * AICA-style member profile rendered in OUR design language (Proposal B
  * tokens, mono when-columns, hairline rules — same visual system as
- * PageProfessor): portrait at its NATURAL aspect ratio (click-to-enlarge
+ * ProfessorPage): portrait at its NATURAL aspect ratio (click-to-enlarge
  * via Lightbox) or the SVG-initials avatar, bilingual name/role, and
  * Links & Contact (kept in the identity block, right under the name —
  * same as the professor page); then bio, research-interest chips,
@@ -15,13 +15,13 @@
  * dynamic routes /members/[slug] and /ko/members/[slug].
  *
  * i18n note: new strings live in the inline `copy` object below
- * (PageNews precedent); t() is only used for keys that already exist.
+ * (NewsPage precedent); t() is only used for keys that already exist.
  */
-import Base from '../layouts/Base.astro';
-import Lightbox from '../components/Lightbox.astro';
-import PubEntry from '../components/PubEntry.astro';
-import publications from '../data/publications.json';
-import { t, localizePath, type Lang } from '../i18n/utils';
+import Base from '../../layouts/BaseLayout.astro';
+import Lightbox from '../Lightbox.astro';
+import PubEntry from '../PubEntry.astro';
+import publications from '../../data/publications.json';
+import { t, localizePath, type Lang } from '../../i18n/utils';
 
 export interface TimelineRow {
   when_en: string;
@@ -426,7 +426,7 @@ const avatarInitials = initials(member.name_en);
     color: var(--accent-strong);
   }
 
-  /* ---------- identity header (PageProfessor's language) ---------- */
+  /* ---------- identity header (ProfessorPage's language) ---------- */
   .head {
     display: grid;
     grid-template-columns: minmax(180px, 260px) 1fr;

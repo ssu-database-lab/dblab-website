@@ -7,13 +7,13 @@
  * Visual design ported from mockups/mockup_b.html (#software: .sgrid,
  * .scard, .vchip). Rendered by the /software and /ko/software wrappers.
  *
- * Shares the "Software & Patents" nav area with PagePatents — the
+ * Shares the "Software & Patents" nav area with PatentsPage — the
  * SectionTabs bar under the page header switches between the two routes.
  */
-import Base from '../layouts/Base.astro';
-import SectionTabs from '../components/SectionTabs.astro';
-import { t, localizePath, type Lang } from '../i18n/utils';
-import software from '../data/software.json';
+import Base from '../../layouts/BaseLayout.astro';
+import SectionTabs from '../SectionTabs.astro';
+import { t, localizePath, type Lang } from '../../i18n/utils';
+import software from '../../data/software.json';
 
 interface Props {
   lang: Lang;

@@ -1,6 +1,6 @@
 ---
 /**
- * PagePublications — the full publications explorer.
+ * PublicationsPage — the full publications explorer.
  * Design ported from mockups/mockup_b.html (#publications section).
  *
  * SEO: the COMPLETE list is server-rendered, grouped by year descending —
@@ -12,12 +12,12 @@
  * URL state: ?tag=<topic>&type=<IJ…UR>&q=<text> — read on load, written
  * back via history.replaceState while filtering.
  *
- * Patents live on their own page now — see PagePatents.astro (/patents).
+ * Patents live on their own page now — see PatentsPage.astro (/patents).
  */
-import Base from '../layouts/Base.astro';
-import PubEntry from '../components/PubEntry.astro';
-import publications from '../data/publications.json';
-import { t, type Lang } from '../i18n/utils';
+import Base from '../../layouts/BaseLayout.astro';
+import PubEntry from '../PubEntry.astro';
+import publications from '../../data/publications.json';
+import { t, type Lang } from '../../i18n/utils';
 
 interface Props {
   lang: Lang;

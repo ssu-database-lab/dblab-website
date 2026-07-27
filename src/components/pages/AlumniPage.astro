@@ -8,10 +8,10 @@
  *
  * Props: { lang: 'en' | 'ko' } — rendered by /alumni and /ko/alumni.
  */
-import Base from '../layouts/Base.astro';
-import Lightbox from '../components/Lightbox.astro';
-import alumni from '../data/alumni.json';
-import { t, localizePath, type Lang } from '../i18n/utils';
+import Base from '../../layouts/BaseLayout.astro';
+import Lightbox from '../Lightbox.astro';
+import alumni from '../../data/alumni.json';
+import { t, localizePath, type Lang } from '../../i18n/utils';
 
 interface Props {
   lang: Lang;

@@ -13,8 +13,9 @@
  */
 import { readdirSync, statSync, existsSync, copyFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const DIST = new URL('../dist', import.meta.url).pathname;
+const DIST = fileURLToPath(new URL('../dist', import.meta.url));
 
 let copies = 0;
 const walk = (dir) => {

@@ -11,14 +11,14 @@
  *   → Funded Projects: sortable table (ProjectsTable, from Proposal A
  *     restyled to B tokens).
  *
- * NOTE: no <main> here — Base.astro already wraps the slot in
+ * NOTE: no <main> here — BaseLayout.astro already wraps the slot in
  * <main id="main">.
  */
-import Base from '../layouts/Base.astro';
-import Lightbox from '../components/Lightbox.astro';
-import ProjectsTable from '../components/ProjectsTable.astro';
-import { researchAreas } from '../data/research';
-import { t, localizePath, type Lang } from '../i18n/utils';
+import Base from '../../layouts/BaseLayout.astro';
+import Lightbox from '../Lightbox.astro';
+import ProjectsTable from '../ProjectsTable.astro';
+import { researchAreas } from '../../data/research';
+import { t, localizePath, type Lang } from '../../i18n/utils';
 
 interface Props {
   lang: Lang;

@@ -13,16 +13,16 @@
  *   selected  6 curated publications (PubEntry compact variant)
  *   join      recruiting banner
  */
-import Base from '../layouts/Base.astro';
-import StatTile from '../components/StatTile.astro';
-import PubEntry from '../components/PubEntry.astro';
-import { t, localizePath, type Lang } from '../i18n/utils';
-import { formatDate } from '../lib/format';
-import publications from '../data/publications.json';
-import patents from '../data/patents.json';
-import alumni from '../data/alumni.json';
-import news from '../data/news.json';
-import { researchAreas } from '../data/research';
+import Base from '../../layouts/BaseLayout.astro';
+import StatTile from '../StatTile.astro';
+import PubEntry from '../PubEntry.astro';
+import { t, localizePath, type Lang } from '../../i18n/utils';
+import { formatDate } from '../../lib/format';
+import publications from '../../data/publications.json';
+import patents from '../../data/patents.json';
+import alumni from '../../data/alumni.json';
+import news from '../../data/news.json';
+import { researchAreas } from '../../data/research';
 
 interface Props {
   lang: Lang;
@@ -163,7 +163,7 @@ const SELECTED_IDS = [
 const pubById = new Map(publications.map((p) => [p.id, p]));
 const selectedPubs = SELECTED_IDS.map((id) => {
   const pub = pubById.get(id);
-  if (!pub) throw new Error(`PageHome: publication id "${id}" not found in publications.json`);
+  if (!pub) throw new Error(`HomePage: publication id "${id}" not found in publications.json`);
   return pub;
 });
 

@@ -9,10 +9,10 @@
  * cards from .tcard/.rcard; chips from .chip/.vchip).
  * Rendered by the /join and /ko/join wrappers.
  */
-import Base from '../layouts/Base.astro';
-import Badge from '../components/Badge.astro';
-import { t, localizePath, type Lang } from '../i18n/utils';
-import courses from '../data/courses.json';
+import Base from '../../layouts/BaseLayout.astro';
+import Badge from '../Badge.astro';
+import { t, localizePath, type Lang } from '../../i18n/utils';
+import courses from '../../data/courses.json';
 
 interface Props {
   lang: Lang;

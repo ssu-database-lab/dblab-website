@@ -20,7 +20,7 @@
 
    Theming: light on :root; dark on :root[data-theme="dark"] AND via
    the OS media query when no explicit [data-theme="light"] is set.
-   The theme boot script in Base.astro sets data-theme before paint.
+   The theme boot script in BaseLayout.astro sets data-theme before paint.
    ============================================================ */
 
 :root {
