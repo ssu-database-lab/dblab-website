@@ -1,0 +1,38 @@
+---
+import Base from '../../layouts/Base.astro';
+import { strings, langPaths, type Lang } from '../../i18n';
+import { formatDay } from '../../format';
+import patents from '../../data/patents.json';
+
+export const getStaticPaths = langPaths;
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const t = strings(lang).patents;
+---
+
+<Base lang={lang} title={t.title} description={t.description}>
+  <h1>{t.title}</h1>
+
+  <ol class="mt-10 space-y-6">
+    {
+      patents.map((p) => (
+        <li>
+          <p class="font-semibold leading-snug">{p.title}</p>
+          <p class="mt-1 text-[15px] text-base-content/80">{p.inventors.join(', ')}</p>
+          <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-base-content/70">
+            <span class:list={['badge badge-sm', p.status === 'granted' ? 'badge-primary' : 'badge-ghost']}>
+              {p.status === 'granted' ? t.granted : t.pending}
+            </span>
+            {p.number_reg
+              ? `${t.registered} ${p.number_reg} (${formatDay(p.registered!, lang)})`
+              : `${t.filed} ${p.number_app} (${formatDay(p.filed, lang)})`}
+            <a class="link link-primary" href={p.link}>Google Patents</a>
+          </p>
+        </li>
+      ))
+    }
+  </ol>
+</Base>

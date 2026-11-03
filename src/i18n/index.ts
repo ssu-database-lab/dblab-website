@@ -16,10 +16,12 @@ export const fmt = (text: string, vars: Record<string, string>): string =>
   text.replace(/\{(\w+)\}/g, (_, key) => vars[key] ?? `{${key}}`);
 
 export const nav: { route: string; key: keyof Dict['nav'] }[] = [
-  { route: '/', key: 'home' },
+  { route: '/professor', key: 'professor' },
   { route: '/members', key: 'members' },
   { route: '/research', key: 'research' },
   { route: '/publications', key: 'publications' },
+  { route: '/patents', key: 'patents' },
+  { route: '/gallery', key: 'gallery' },
 ];
 
 /** getStaticPaths for pages in src/pages/[...lang]/: English at /…, Korean at /ko/…. */

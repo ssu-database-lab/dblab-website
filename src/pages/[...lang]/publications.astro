@@ -1,10 +1,9 @@
 ---
 import Base from '../../layouts/Base.astro';
 import { strings, langPaths, type Lang } from '../../i18n';
-import { formatAuthors, formatDay } from '../../format';
+import { formatAuthors } from '../../format';
 import { parseBib, toPublication } from '../../bib';
 import bib from '../../data/publications.bib?raw';
-import patents from '../../data/patents.json';
 
 export const getStaticPaths = langPaths;
 
@@ -51,26 +50,4 @@ const byYear = years.map((y) => ({ year: y, pubs: publications.filter((p) => p.y
     ))
   }
 
-  <section class="mt-12">
-    <h2 class="section-title">{t.patents}</h2>
-    <ol class="space-y-6">
-      {
-        patents.map((p) => (
-          <li>
-            <p class="font-semibold leading-snug">{p.title}</p>
-            <p class="mt-1 text-[15px] text-base-content/80">{p.inventors.join(', ')}</p>
-            <p class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-base-content/70">
-              <span class:list={['badge badge-sm', p.status === 'granted' ? 'badge-primary' : 'badge-ghost']}>
-                {p.status === 'granted' ? t.granted : t.pending}
-              </span>
-              {p.number_reg
-                ? `${t.registered} ${p.number_reg} (${formatDay(p.registered!, lang)})`
-                : `${t.filed} ${p.number_app} (${formatDay(p.filed, lang)})`}
-              <a class="link link-primary" href={p.link}>Google Patents</a>
-            </p>
-          </li>
-        ))
-      }
-    </ol>
-  </section>
 </Base>

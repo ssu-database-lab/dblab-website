@@ -4,6 +4,7 @@ import { strings, langPaths, type Lang } from '../../i18n';
 import { formatMonth } from '../../format';
 import { researchAreas } from '../../data/research';
 import projects from '../../data/projects.json';
+import software from '../../data/software.json';
 
 export const getStaticPaths = langPaths;
 
@@ -65,12 +66,39 @@ const period = (p: (typeof projects)[number]) =>
     ))
   }
 
+  <section id="software" class="mt-14 scroll-mt-24">
+    <h2 class="section-title">{t.software}</h2>
+    <ul class="grid gap-4 md:grid-cols-3">
+      {
+        software.map((s) => (
+          <li class="card liquid-glass">
+            <div class="card-body gap-2 p-5">
+              <div class="flex items-start justify-between gap-2">
+                <h3 class="font-semibold leading-snug">{s.name}</h3>
+                <span class="badge badge-ghost badge-sm shrink-0">{s.kind === 'dataset' ? t.dataset : t.code}</span>
+              </div>
+              <p class="text-sm text-base-content/80">{ko ? s.desc_kr : s.desc_en}</p>
+              {s.meta && <p class="text-xs text-base-content/50">{s.meta}</p>}
+              <div class="card-actions mt-auto pt-2">
+                {s.links.map((l) => (
+                  <a class="btn btn-outline btn-xs" href={l.url}>
+                    {l.label}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
   <section class="mt-14">
     <h2 class="section-title">{t.projects}</h2>
     <ul class="space-y-4">
       {
         listed.map((p) => (
-          <li class="card card-border bg-base-100">
+          <li class="card liquid-glass">
             <div class="card-body gap-1 p-5">
               <div class="flex flex-wrap items-start justify-between gap-2">
                 <h3 class="font-semibold leading-snug">{ko ? p.title_kr : p.title_en}</h3>

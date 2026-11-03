@@ -6,14 +6,11 @@ import tailwindcss from '@tailwindcss/vite';
 // Each gets an EN and a /ko redirect so old links keep working.
 const moved = {
   people: 'members',
-  professor: 'members',
   'members/milandu-boussougou': 'members',
   'members/seonghun-hwang': 'members',
   alumni: 'members',
   news: '',
-  gallery: '',
   software: 'research',
-  patents: 'publications',
   join: '',
 };
 const redirects = Object.fromEntries(

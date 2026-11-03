@@ -36,7 +36,7 @@ const latestNews = [...news].sort((a, b) => b.date.localeCompare(a.date)).slice(
         researchAreas.map((area) => (
           <a
             href={`${localize(lang, '/research')}#${area.slug}`}
-            class="card card-border bg-base-100 transition-colors hover:border-primary"
+            class="card liquid-glass transition-shadow hover:shadow-lg"
           >
             {area.image && (
               <figure class="h-44 border-b border-base-300 bg-white">

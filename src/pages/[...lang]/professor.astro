@@ -1,0 +1,119 @@
+---
+import Base from '../../layouts/Base.astro';
+import { strings, fmt, langPaths, type Lang } from '../../i18n';
+import members from '../../data/members.json';
+import courses from '../../data/courses.json';
+
+export const getStaticPaths = langPaths;
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const ko = lang === 'ko';
+const t = strings(lang).professor;
+const prof = members.professor;
+
+const links = [
+  { label: t.facultyPage, href: prof.office.faculty_url },
+  { label: 'ORCID', href: prof.links.orcid },
+  { label: 'DBLP', href: prof.links.dblp },
+  { label: 'ScholarWorks', href: prof.links.scholarworks },
+];
+
+const timelines = [
+  { head: t.education, rows: prof.education },
+  { head: t.career, rows: prof.career },
+];
+
+const teaching = [
+  { head: t.undergrad, list: courses.filter((c) => c.level === 'undergrad') },
+  { head: t.grad, list: courses.filter((c) => c.level === 'grad') },
+];
+---
+
+<Base lang={lang} title={t.title} description={t.description}>
+  <h1>{t.title}</h1>
+
+  <section class="card liquid-glass mt-10">
+    <div class="card-body flex-col gap-6 sm:flex-row">
+      <img
+        src={prof.photo}
+        alt={ko ? prof.name_kr : prof.name_en}
+        width="96"
+        height="96"
+        class="h-24 w-24 shrink-0 rounded-box object-cover object-top"
+      />
+      <div class="min-w-0 space-y-2">
+        <h2 class="text-2xl font-bold">
+          {fmt(t.profName, { name: ko ? prof.name_kr : prof.name_en })}
+          <span class="ml-1 text-base font-normal text-base-content/50">{ko ? prof.name_en : prof.name_kr}</span>
+        </h2>
+        <p class="text-base-content/70">{ko ? prof.title_kr : prof.title_en}</p>
+        <p class="text-[15px]">
+          <a class="link link-primary" href={`mailto:${prof.email}`}>{prof.email}</a>
+          <span class="text-base-content/50"> · </span>
+          {t.office}: {ko ? prof.office.building_kr : prof.office.building_en} {prof.office.room}
+          <span class="text-base-content/50"> · </span>
+          <a class="link link-hover" href={`tel:${prof.office.phone}`}>
+            {ko ? prof.office.phone_display : prof.office.phone}
+          </a>
+        </p>
+        <div class="flex flex-wrap gap-2 pt-1">
+          {links.map((l) => <a class="btn btn-outline btn-xs" href={l.href}>{l.label}</a>)}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="mt-12">
+    <h2 class="section-title">{t.interests}</h2>
+    <p class="text-[16px] leading-relaxed">{ko ? prof.interests_kr : prof.interests_en}</p>
+  </section>
+
+  <div class="mt-12 grid gap-12 md:grid-cols-2">
+    {
+      timelines.map(({ head, rows }) => (
+        <section>
+          <h2 class="section-title">{head}</h2>
+          <ul class="space-y-2 text-[15px]">
+            {rows.map((r) => (
+              <li class="flex gap-4">
+                <span class="w-16 shrink-0 text-base-content/50 tabular-nums">{ko ? r.when_kr : r.when_en}</span>
+                <span>{ko ? r.kr : r.en}</span>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))
+    }
+  </div>
+
+  <section class="mt-12">
+    <h2 class="section-title">{t.service}</h2>
+    <ul class="list-disc space-y-1 pl-5 text-[15px]">
+      {prof.service.map((s) => <li>{ko ? s.kr : s.en}</li>)}
+    </ul>
+  </section>
+
+  <section class="mt-12">
+    <h2 class="section-title">{t.teaching}</h2>
+    <div class="grid gap-10 md:grid-cols-2">
+      {
+        teaching.map(({ head, list }) => (
+          <div>
+            <h3 class="mb-2 font-semibold">{head}</h3>
+            <ul class="divide-y divide-base-300 text-[15px]">
+              {list.map((c) => (
+                <li class="py-2">
+                  <span class="font-medium">{ko ? c.name_kr : c.name_en}</span>
+                  <span class="block text-sm text-base-content/60">{ko ? c.term_kr : c.term_en}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+</Base>

@@ -1,0 +1,69 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import { strings, langPaths, type Lang } from '../../i18n';
+import { formatMonth } from '../../format';
+import gallery from '../../data/gallery.json';
+
+export const getStaticPaths = langPaths;
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const ko = lang === 'ko';
+const t = strings(lang).gallery;
+
+// Photos live in src/assets/gallery/<event id>/ and are picked up automatically.
+const files = import.meta.glob<ImageMetadata>('../../assets/gallery/*/*.{jpg,jpeg,png,webp}', {
+  eager: true,
+  import: 'default',
+});
+const photosOf = (id: string) =>
+  Object.entries(files)
+    .filter(([path]) => path.split('/').at(-2) === id)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([, img]) => img);
+
+const events = [...gallery].sort((a, b) => b.date.localeCompare(a.date));
+const EMPTY_SLOTS = 4;
+---
+
+<Base lang={lang} title={t.title} description={t.description}>
+  <h1>{t.title}</h1>
+
+  {
+    events.map((e) => {
+      const title = ko ? e.title_kr : e.title_en;
+      const photos = photosOf(e.id);
+      return (
+        <section class="mt-12">
+          <h2 class="section-title flex flex-wrap items-baseline gap-x-3">
+            {title}
+            <span class="text-sm font-normal text-base-content/50">{formatMonth(e.date, lang)}</span>
+          </h2>
+          <div class="grid grid-cols-2 gap-3 md:grid-cols-4">
+            {photos.length > 0
+              ? photos.map((img) => (
+                  <a href={img.src}>
+                    <Image
+                      src={img}
+                      alt={title}
+                      widths={[320, 640]}
+                      sizes="(min-width: 768px) 25vw, 50vw"
+                      loading="lazy"
+                      class="aspect-4/3 w-full rounded-box object-cover"
+                    />
+                  </a>
+                ))
+              : Array.from({ length: EMPTY_SLOTS }, () => (
+                  <div class="flex aspect-4/3 items-center justify-center rounded-box border border-dashed border-base-300 bg-base-100/50 text-sm text-base-content/40">
+                    {t.empty}
+                  </div>
+                ))}
+          </div>
+        </section>
+      );
+    })
+  }
+</Base>

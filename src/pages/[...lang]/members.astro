@@ -1,6 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
-import { strings, fmt, langPaths, type Lang } from '../../i18n';
+import { strings, langPaths, type Lang } from '../../i18n';
 import members from '../../data/members.json';
 import alumni from '../../data/alumni.json';
 
@@ -12,14 +12,6 @@ interface Props {
 const { lang } = Astro.props;
 const ko = lang === 'ko';
 const t = strings(lang).members;
-const prof = members.professor;
-
-const profLinks = [
-  { label: t.facultyPage, href: prof.office.faculty_url },
-  { label: 'ORCID', href: prof.links.orcid },
-  { label: 'DBLP', href: prof.links.dblp },
-  { label: 'ScholarWorks', href: prof.links.scholarworks },
-];
 
 const memberLinks = (links: Record<string, string | null>) =>
   (
@@ -43,66 +35,11 @@ const alumniGroups = [
   <h1>{t.title}</h1>
 
   <section class="mt-10">
-    <h2 class="section-title">{t.faculty}</h2>
-    <div class="card card-border bg-base-100">
-      <div class="card-body flex-col gap-5 sm:flex-row">
-        <img
-          src={prof.photo}
-          alt={ko ? prof.name_kr : prof.name_en}
-          width="96"
-          height="96"
-          class="h-24 w-24 shrink-0 rounded-box object-cover object-top"
-        />
-        <div class="flex min-w-0 flex-1 flex-col gap-3">
-          <div>
-            <h3 class="text-xl font-bold">
-              {fmt(t.profName, { name: ko ? prof.name_kr : prof.name_en })}
-              <span class="ml-1 text-base font-normal text-base-content/50">{ko ? prof.name_en : prof.name_kr}</span>
-            </h3>
-            <p class="text-base-content/70">{ko ? prof.title_kr : prof.title_en}</p>
-          </div>
-          <p class="text-[15px]">
-            <a class="link link-primary" href={`mailto:${prof.email}`}>{prof.email}</a>
-            <span class="text-base-content/50"> · </span>
-            {t.office}: {ko ? prof.office.building_kr : prof.office.building_en} {prof.office.room}
-            <span class="text-base-content/50"> · </span>
-            <a class="link link-hover" href={`tel:${prof.office.phone}`}>{prof.office.phone_display}</a>
-          </p>
-          <p class="text-[15px] text-base-content/80">{ko ? prof.interests_kr : prof.interests_en}</p>
-          <div class="grid gap-4 text-sm sm:grid-cols-2">
-            {
-              [
-                { head: t.education, rows: prof.education },
-                { head: t.career, rows: prof.career },
-              ].map(({ head, rows }) => (
-                <div>
-                  <h4 class="mb-1 font-semibold">{head}</h4>
-                  <ul class="space-y-1">
-                    {rows.map((r) => (
-                      <li class="flex gap-3">
-                        <span class="w-14 shrink-0 text-base-content/50 tabular-nums">{ko ? r.when_kr : r.when_en}</span>
-                        <span>{ko ? r.kr : r.en}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))
-            }
-          </div>
-          <div class="flex flex-wrap gap-2">
-            {profLinks.map((l) => <a class="btn btn-outline btn-xs" href={l.href}>{l.label}</a>)}
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <section class="mt-14">
     <h2 class="section-title">{t.students}</h2>
     <div class="grid gap-6 md:grid-cols-2">
       {
         members.current.map((m) => (
-          <article class="card card-border bg-base-100">
+          <article class="card liquid-glass">
             <div class="card-body gap-3 p-5">
               <div class="flex gap-4">
                 <img

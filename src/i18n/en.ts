@@ -1,7 +1,7 @@
 /* English UI text, grouped by page. ko.ts must have exactly the same keys:
  * the editor flags a mismatch, and the build fails on one (see index.ts).
- * {name}-style placeholders are filled in with fmt(). Members, papers, and
- * news live in src/data/, not here. */
+ * {name}-style placeholders are filled in with fmt(). Members, papers,
+ * courses, and news live in src/data/, not here. */
 
 const en = {
   site: {
@@ -10,14 +10,17 @@ const en = {
     fullName: 'DBLab, Soongsil University',
     address: 'Room 326, Information Science Building, Soongsil University, 369 Sangdo-ro, Dongjak-gu, Seoul 06978, Korea',
     menu: 'Menu',
+    theme: 'Switch light/dark mode',
     switchLang: '한국어',
   },
 
   nav: {
-    home: 'Home',
+    professor: 'Professor',
     members: 'Members',
     research: 'Research',
     publications: 'Publications',
+    patents: 'Patents',
+    gallery: 'Gallery',
   },
 
   home: {
@@ -32,17 +35,26 @@ const en = {
     news: 'Recent News',
   },
 
-  members: {
-    title: 'Members',
-    description: 'Faculty, students, and alumni of DBLab at Soongsil University.',
-    faculty: 'Faculty',
-    students: 'Students',
-    alumni: 'Alumni',
+  professor: {
+    title: 'Professor',
+    description: 'Prof. Dong-Joo Park, School of Computer Science and Engineering, Soongsil University.',
     profName: 'Prof. {name}',
-    education: 'Education',
-    career: 'Career',
     office: 'Office',
     facultyPage: 'Faculty page',
+    interests: 'Research Interests',
+    education: 'Education',
+    career: 'Career',
+    service: 'Service',
+    teaching: 'Teaching',
+    undergrad: 'Undergraduate',
+    grad: 'Graduate',
+  },
+
+  members: {
+    title: 'Members',
+    description: 'Students and alumni of DBLab at Soongsil University.',
+    students: 'Students',
+    alumni: 'Alumni',
     phd: 'Ph.D.',
     ms: 'M.S.',
     now: 'Now',
@@ -52,6 +64,9 @@ const en = {
     title: 'Research',
     description:
       'Research areas of DBLab at Soongsil University: rights-metadata extraction, voice-phishing detection, digital forensics, and flash storage.',
+    software: 'Datasets & Code',
+    dataset: 'Dataset',
+    code: 'Code',
     projects: 'Projects',
     active: 'Active',
     completed: 'Completed',
@@ -59,12 +74,22 @@ const en = {
 
   publications: {
     title: 'Publications',
-    description: 'Journal and conference papers, datasets, and patents from DBLab at Soongsil University.',
-    patents: 'Patents',
+    description: 'Journal and conference papers and datasets from DBLab at Soongsil University.',
+  },
+
+  patents: {
+    title: 'Patents',
+    description: 'Patents from DBLab at Soongsil University.',
     granted: 'Granted',
     pending: 'Filed',
     registered: 'Reg.',
     filed: 'App.',
+  },
+
+  gallery: {
+    title: 'Gallery',
+    description: 'Conferences, awards, and lab events of DBLab at Soongsil University.',
+    empty: 'Photo coming soon',
   },
 };
 

@@ -1,0 +1,32 @@
+[
+  {
+    "name": "KorCCVi — Korean Call Content Vishing",
+    "kind": "dataset",
+    "desc_en": "The first labeled Korean voice-phishing transcript dataset, grown across versions from v1.3 to v3; the multimodal line adds a call-audio corpus of 1,417 calls (706 vishing / 711 non-vishing) with 39,429 utterance segments — 66.9 hours at 16 kHz mono.",
+    "desc_kr": "국내 최초의 레이블링된 한국어 보이스피싱 통화내용(전사) 데이터셋으로, v1.3부터 v3까지 버전을 거듭하며 확장되었습니다. 다중모달 연구를 위해 1,417건의 통화(보이스피싱 706 / 정상 711), 39,429개 발화 세그먼트, 총 66.9시간(16 kHz 모노) 분량의 오디오 코퍼스를 추가로 구축했습니다.",
+    "meta": "v1.3 ~6,005 rows · v2.1 ~20,857 rows · v3 ~18,646 rows · audio 1,417 calls / 66.9 h",
+    "links": [
+      { "label": "GitHub", "url": "https://github.com/selfcontrol7/Korean_Voice_Phishing_Detection" }
+    ]
+  },
+  {
+    "name": "Augmented Vishing Dataset",
+    "kind": "dataset",
+    "desc_en": "KorCCVi with multilingual back-translation and SMOTE augmentations — 2,927 original samples (695 vishing / 2,232 non-vishing) plus ~3,502 augmented samples, released on IEEE DataPort in November 2024.",
+    "desc_kr": "KorCCVi에 다국어 역번역과 SMOTE 증강을 적용한 데이터셋 — 원본 2,927건(보이스피싱 695 / 정상 2,232)과 약 3,502건의 증강 샘플로 구성되며, 2024년 11월 IEEE DataPort에 공개되었습니다.",
+    "meta": "DOI 10.21227/163c-0542 · CC BY-NC-SA 4.0 · 216 MB",
+    "links": [
+      { "label": "IEEE DataPort", "url": "https://doi.org/10.21227/163c-0542" }
+    ]
+  },
+  {
+    "name": "Korean_Voice_Phishing_Detection",
+    "kind": "code",
+    "desc_en": "Open code for the vishing paper series — ML/DL text classifiers, KoBERT, attention CNN-BiLSTM, federated learning, and multimodal audio–text fusion.",
+    "desc_kr": "보이스피싱 논문 시리즈의 공개 코드 — ML/DL 텍스트 분류기, KoBERT, 어텐션 CNN-BiLSTM, 연합학습, 오디오·텍스트 다중모달 융합 모델을 포함합니다.",
+    "meta": "public repo · 24 stars · Python/PyTorch",
+    "links": [
+      { "label": "GitHub", "url": "https://github.com/selfcontrol7/Korean_Voice_Phishing_Detection" }
+    ]
+  }
+]
