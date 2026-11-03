@@ -1,0 +1,79 @@
+---
+import Base from '../../layouts/Base.astro';
+import { strings, localize, langPaths, type Lang } from '../../i18n';
+import { formatMonth } from '../../format';
+import { researchAreas } from '../../data/research';
+import news from '../../data/news.json';
+
+export const getStaticPaths = langPaths;
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const ko = lang === 'ko';
+const t = strings(lang).home;
+
+const latestNews = [...news].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 6);
+---
+
+<Base lang={lang} description={t.description}>
+  <section class="max-w-3xl">
+    <h1>{t.title}</h1>
+    <p class="mt-2 text-lg text-base-content/60">{t.sub}</p>
+    <p class="mt-6 text-[17px] leading-relaxed">{t.intro}</p>
+  </section>
+
+  <section class="mt-14">
+    <div class="section-title flex items-baseline justify-between">
+      <h2>{t.research}</h2>
+      <a class="link link-hover text-sm font-normal text-base-content/60" href={localize(lang, '/research')}>
+        {t.allResearch} →
+      </a>
+    </div>
+    <div class="grid gap-6 sm:grid-cols-2">
+      {
+        researchAreas.map((area) => (
+          <a
+            href={`${localize(lang, '/research')}#${area.slug}`}
+            class="card card-border bg-base-100 transition-colors hover:border-primary"
+          >
+            {area.image && (
+              <figure class="h-44 border-b border-base-300 bg-white">
+                <img
+                  src={area.image.src}
+                  alt=""
+                  width={area.image.w}
+                  height={area.image.h}
+                  loading="lazy"
+                  class="h-full w-full object-contain p-3"
+                />
+              </figure>
+            )}
+            <div class="card-body gap-1 p-5">
+              <h3 class="card-title text-lg">{ko ? area.title_kr : area.title_en}</h3>
+              <p class="text-sm text-base-content/50">{ko ? area.era_kr : area.era_en}</p>
+              <p class="mt-1 text-[15px] text-base-content/80">{ko ? area.summary_kr : area.summary_en}</p>
+            </div>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="mt-14">
+    <h2 class="section-title">{t.news}</h2>
+    <ul class="divide-y divide-base-300">
+      {
+        latestNews.map((item) => (
+          <li class="flex flex-col gap-1 py-3 sm:flex-row sm:gap-6">
+            <time datetime={item.date} class="shrink-0 text-sm text-base-content/50 tabular-nums sm:w-24 sm:pt-0.5">
+              {formatMonth(item.date, lang)}
+            </time>
+            <span class="text-[15px]">{ko ? item.text_kr : item.text_en}</span>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</Base>

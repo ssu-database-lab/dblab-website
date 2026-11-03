@@ -1,0 +1,131 @@
+---
+import '../styles/site.css';
+import { strings, nav, localize, routeOf, type Lang } from '../i18n';
+import members from '../data/members.json';
+
+interface Props {
+  lang: Lang;
+  /** Page name; omitted on the home page. */
+  title?: string;
+  description: string;
+  noindex?: boolean;
+}
+
+const { lang, title, description, noindex = false } = Astro.props;
+const t = strings(lang);
+
+const fullTitle = title ? `${title} · ${t.site.fullName}` : t.site.fullName;
+
+const site = Astro.site!;
+const route = routeOf(Astro.url.pathname);
+// The 404 page has no Korean twin, so its language switch goes home.
+const switchRoute = route === '/404' ? '/' : route;
+const other: Lang = lang === 'en' ? 'ko' : 'en';
+const canonical = new URL(localize(lang, route), site).href;
+const year = new Date().getFullYear();
+const office = { email: members.professor.email, ...members.professor.office };
+---
+
+<!doctype html>
+<html lang={lang} data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
+    {
+      !noindex && (
+        <>
+          <link rel="canonical" href={canonical} />
+          <link rel="alternate" hreflang="en" href={new URL(switchRoute, site).href} />
+          <link rel="alternate" hreflang="ko" href={new URL(localize('ko', switchRoute), site).href} />
+          <link rel="alternate" hreflang="x-default" href={new URL(switchRoute, site).href} />
+        </>
+      )
+    }
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={new URL('/assets/og-card.png', site).href} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#ffffff" />
+  </head>
+  <body class="flex min-h-screen flex-col">
+    <header class="sticky top-0 z-20 border-b border-base-300 bg-base-100">
+      <div class="navbar mx-auto max-w-6xl gap-2 px-4">
+        <a href={localize(lang, '/')} class="mr-auto flex items-center gap-3">
+          <svg viewBox="0 0 24 24" class="h-9 w-9 text-primary" aria-hidden="true">
+            <path
+              fill="currentColor"
+              d="M12 2C7.6 2 4 3.6 4 5.6v12.8C4 20.4 7.6 22 12 22s8-1.6 8-3.6V5.6C20 3.6 16.4 2 12 2Zm0 2c3.9 0 6 1.3 6 1.6 0 .3-2.1 1.6-6 1.6S6 5.9 6 5.6C6 5.3 8.1 4 12 4Zm6 14.4c0 .3-2.1 1.6-6 1.6s-6-1.3-6-1.6v-2.9c1.5.9 3.7 1.3 6 1.3s4.5-.4 6-1.3v2.9Zm0-6.4c0 .3-2.1 1.6-6 1.6S6 12.3 6 12V9.1c1.5.9 3.7 1.3 6 1.3s4.5-.4 6-1.3V12Z"
+            ></path>
+          </svg>
+          <span class="leading-tight">
+            <span class="block text-lg font-bold">{t.site.name}</span>
+            <span class="block text-xs text-base-content/60">{t.site.school}</span>
+          </span>
+        </a>
+
+        <nav class="hidden items-center gap-1 text-[15px] lg:flex">
+          {
+            nav.map((item) => (
+              <a
+                href={localize(lang, item.route)}
+                aria-current={route === item.route ? 'page' : undefined}
+                class:list={[
+                  'rounded-field px-3 py-2 hover:bg-base-200',
+                  route === item.route && 'font-semibold text-primary',
+                ]}
+              >
+                {t.nav[item.key]}
+              </a>
+            ))
+          }
+        </nav>
+
+        <a href={localize(other, switchRoute)} hreflang={other} lang={other} class="btn btn-ghost btn-sm">
+          {t.site.switchLang}
+        </a>
+
+        <details class="dropdown dropdown-end lg:hidden">
+          <summary class="btn btn-ghost btn-square btn-sm" aria-label={t.site.menu}>
+            <svg viewBox="0 0 24 24" class="h-5 w-5" aria-hidden="true">
+              <path fill="currentColor" d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z" />
+            </svg>
+          </summary>
+          <ul class="menu dropdown-content z-30 mt-2 w-48 rounded-box border border-base-300 bg-base-100 p-2 shadow-lg">
+            {
+              nav.map((item) => (
+                <li>
+                  <a href={localize(lang, item.route)} aria-current={route === item.route ? 'page' : undefined}>
+                    {t.nav[item.key]}
+                  </a>
+                </li>
+              ))
+            }
+          </ul>
+        </details>
+      </div>
+    </header>
+
+    <main class="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:py-14">
+      <slot />
+    </main>
+
+    <footer class="border-t border-base-300 bg-base-200">
+      <div class="mx-auto max-w-6xl space-y-1 px-4 py-10 text-sm text-base-content/70">
+        <p class="text-base font-semibold text-base-content">{t.site.fullName}</p>
+        <p>{t.site.address}</p>
+        <p>
+          <a class="link link-hover" href={`mailto:${office.email}`}>{office.email}</a>
+          · {lang === 'ko' ? office.phone_display : office.phone}
+        </p>
+        <p class="pt-2">© {year} {t.site.fullName}</p>
+      </div>
+    </footer>
+  </body>
+</html>

@@ -1,32 +1,41 @@
 import { defineConfig } from 'astro/config';
 import sitemap from '@astrojs/sitemap';
+import tailwindcss from '@tailwindcss/vite';
 
-// Production URL — db.ssu.ac.kr granted by the university (2026-07).
-// DNS: ask SSU 정보화팀 for a CNAME record db.ssu.ac.kr → ssu-database-lab.github.io,
-// then set the same custom domain in the GitHub Pages settings.
+// Pages removed in the 2026-11 redesign → where their content lives now.
+// Each gets an EN and a /ko redirect so old links keep working.
+const moved = {
+  people: 'members',
+  professor: 'members',
+  'members/milandu-boussougou': 'members',
+  'members/seonghun-hwang': 'members',
+  alumni: 'members',
+  news: '',
+  gallery: '',
+  software: 'research',
+  patents: 'publications',
+  join: '',
+};
+const redirects = Object.fromEntries(
+  Object.entries(moved).flatMap(([from, to]) => [
+    [`/${from}`, `/${to}`],
+    [`/ko/${from}`, to ? `/ko/${to}` : '/ko'],
+  ]),
+);
+
 export default defineConfig({
+  // db.ssu.ac.kr is a CNAME to ssu-database-lab.github.io (public/CNAME).
   site: 'https://db.ssu.ac.kr',
   trailingSlash: 'never',
-  // 'file' emits dist/people.html (served at /people) instead of
-  // dist/people/index.html (which GitHub Pages would 301 to /people/).
-  // Keeps canonical/hreflang URLs identical to the finally-served URLs.
-  // NOTE: routes that ALSO have a same-named directory (members/, ko/) get a
-  // defensive X/index.html copy from scripts/postbuild.mjs so any host
-  // resolution order serves them.
+  // 'file' emits dist/members.html, served at /members without a 301 to /members/.
+  // scripts/postbuild.mjs handles the X.html + X/ collisions this creates.
   build: { format: 'file' },
+  redirects,
+  vite: { plugins: [tailwindcss()] },
   integrations: [
     sitemap({
-      // the SQL-console easter egg stays out of search
-      filter: (page) => !page.includes('/console'),
-      i18n: {
-        defaultLocale: 'en',
-        locales: { en: 'en', ko: 'ko' },
-      },
+      filter: (page) => !Object.keys(redirects).some((from) => page.endsWith(from)),
+      i18n: { defaultLocale: 'en', locales: { en: 'en', ko: 'ko' } },
     }),
   ],
-  i18n: {
-    defaultLocale: 'en',
-    locales: ['en', 'ko'],
-    routing: { prefixDefaultLocale: false },
-  },
 });

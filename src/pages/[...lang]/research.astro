@@ -1,0 +1,91 @@
+---
+import Base from '../../layouts/Base.astro';
+import { strings, langPaths, type Lang } from '../../i18n';
+import { formatMonth } from '../../format';
+import { researchAreas } from '../../data/research';
+import projects from '../../data/projects.json';
+
+export const getStaticPaths = langPaths;
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+const ko = lang === 'ko';
+const t = strings(lang).research;
+
+// Proposals are not funded awards, so only active and completed projects are listed.
+const listed = projects.filter((p) => p.status === 'active' || p.status === 'completed');
+const period = (p: (typeof projects)[number]) =>
+  p.period.start ? `${formatMonth(p.period.start, lang)} – ${p.period.end ? formatMonth(p.period.end, lang) : ''}` : null;
+---
+
+<Base lang={lang} title={t.title} description={t.description}>
+  <h1>{t.title}</h1>
+
+  {
+    researchAreas.map((area) => (
+      <section id={area.slug} class="mt-14 scroll-mt-24">
+        <h2 class="section-title flex flex-wrap items-baseline gap-x-3">
+          {ko ? area.title_kr : area.title_en}
+          <span class="text-sm font-normal text-base-content/50">{ko ? area.era_kr : area.era_en}</span>
+        </h2>
+        <div class="grid gap-8 lg:grid-cols-5">
+          <div class="space-y-4 text-[16px] leading-relaxed lg:col-span-3">
+            {(ko ? area.desc_kr : area.desc_en).map((para) => (
+              <p set:html={para} />
+            ))}
+            {area.links.length > 0 && (
+              <div class="flex flex-wrap gap-2 pt-1">
+                {area.links.map((l) => (
+                  <a class="btn btn-outline btn-sm" href={l.href}>
+                    {l.label}
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+          {area.image && (
+            <figure class="lg:col-span-2">
+              <img
+                src={area.image.src}
+                alt={ko ? area.image.alt_kr : area.image.alt_en}
+                width={area.image.w}
+                height={area.image.h}
+                loading="lazy"
+                class="max-h-112 w-full rounded-box border border-base-300 bg-white object-contain p-2"
+              />
+              <figcaption class="mt-2 text-sm text-base-content/60">
+                {ko ? area.image.cap_kr : area.image.cap_en}
+              </figcaption>
+            </figure>
+          )}
+        </div>
+      </section>
+    ))
+  }
+
+  <section class="mt-14">
+    <h2 class="section-title">{t.projects}</h2>
+    <ul class="space-y-4">
+      {
+        listed.map((p) => (
+          <li class="card card-border bg-base-100">
+            <div class="card-body gap-1 p-5">
+              <div class="flex flex-wrap items-start justify-between gap-2">
+                <h3 class="font-semibold leading-snug">{ko ? p.title_kr : p.title_en}</h3>
+                <span class:list={['badge badge-sm', p.status === 'active' ? 'badge-primary' : 'badge-ghost']}>
+                  {p.status === 'active' ? t.active : t.completed}
+                </span>
+              </div>
+              <p class="text-sm text-base-content/60">
+                {ko ? p.agency_kr : p.agency_en}
+                {period(p) && ` · ${period(p)}`}
+              </p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+</Base>

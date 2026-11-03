@@ -1,105 +1,58 @@
-# DB Lab · Soongsil University — Website
+# DBLab · Soongsil University — Website
 
-Official website of the **Database Lab** (Prof. Dong-Joo Park, 박동주), School of Computer
-Science & Engineering, Soongsil University. The lab researches flash-memory storage systems
-and FTLs, database forensics, and AI-based data intelligence (Korean voice-phishing
-detection, copyright-metadata extraction).
+Website of DBLab (Prof. Dong-Joo Park), School of Computer Science and
+Engineering, Soongsil University. Static site, English at `/…` and Korean at `/ko/…`,
+deployed to GitHub Pages at <https://db.ssu.ac.kr> on every push to `main`.
 
-The site is fully static and bilingual: English at `/…`, Korean at `/ko/…`.
-
-## Stack
-
-- [Astro 5](https://astro.build) static site — zero UI frameworks, zero runtime dependencies.
-- Vanilla `<script>` for all client interactivity (theme toggle, publication filters, console page).
-- No external requests at runtime: system font stacks, no CDNs, no analytics, no remote images.
-- Light/dark theming via CSS custom properties (`src/styles/tokens.css`) with an inline
-  boot script that respects `localStorage.theme` and falls back to the OS preference.
-
-## Development
+Built with [Astro 5](https://astro.build), [Tailwind CSS 4](https://tailwindcss.com),
+and [DaisyUI 5](https://daisyui.com). No client-side JavaScript.
 
 ```bash
-npm install        # once
-npm run dev        # local dev server at http://localhost:4321
-npm run build      # production build into dist/
-npm run preview    # serve the production build locally
+npm install
+npm run dev      # http://localhost:4321
+npm run build    # into dist/
 ```
 
-Node 20+ recommended (CI builds on Node 22).
+## Where to edit
 
-## Project structure
+| What | File |
+| --- | --- |
+| Page text (headings, intro, footer address) | `src/i18n/en.ts` and `src/i18n/ko.ts` |
+| Members, alumni | `src/data/members.json`, `src/data/alumni.json` |
+| Papers | `src/data/publications.bib` (see the comment at its top) |
+| Patents | `src/data/patents.json` |
+| News on the home page | `src/data/news.json` (newest six are shown) |
+| Research areas, figures | `src/data/research.ts`, `public/assets/research/` |
+| Funded projects | `src/data/projects.json` |
+| Colors, fonts | `src/styles/site.css` (DaisyUI theme) |
 
+`en.ts` and `ko.ts` must have the same keys. The editor marks a missing key in
+`ko.ts`, and `npm run build` stops with `i18n: ko.ts lacks …` if they differ.
+Data files carry both languages in `_en` / `_kr` fields; papers are listed once,
+under their original titles.
+
+To add a paper, copy its BibTeX from DBLP or Google Scholar into
+`publications.bib`. LaTeX in the export (`{\"u}`, `Sang{-}Won`, `\&`, `--`) is
+converted for display by `src/bib.ts`.
+
+## Layout
+
+```text
+src/
+├── pages/
+│   ├── [...lang]/   one file per page; each builds /page and /ko/page
+│   └── 404.astro
+├── i18n/            en.ts, ko.ts (UI text), index.ts (helpers, nav, langPaths)
+├── data/            content (publications.bib, JSON, research.ts)
+├── layouts/         Base.astro: head, header, footer
+├── bib.ts           BibTeX reader for publications.bib
+├── format.ts        author lists, dates
+└── styles/          site.css
 ```
-├── astro.config.mjs         # site URL, trailingSlash, i18n (en default, ko prefixed)
-├── public/
-│   ├── favicon.svg          # DB-cylinder mark (theme-aware)
-│   ├── robots.txt
-│   └── assets/              # photos, SSU logo (local files only)
-├── src/
-│   ├── assets/              # source images processed by Astro/Vite
-│   ├── components/          # reusable Astro UI components
-│   │   └── pages/           # shared, lang-aware page components
-│   ├── data/                # ← content lives here (see CONTRIBUTING.md)
-│   │   ├── publications.json
-│   │   ├── members.json / alumni.json
-│   │   ├── projects.json / news.json / software.json / courses.json
-│   │   └── research.ts      # the four research-area blurbs
-│   ├── i18n/                # ui.ts (string tables), utils.ts (t() helper)
-│   ├── layouts/
-│   │   └── BaseLayout.astro # <head>, header, footer, theme boot
-│   ├── lib/format.ts        # author bolding, date formatting
-│   ├── pages/               # Astro file-based routes
-│   │   ├── index.astro, people.astro, research.astro, publications.astro,
-│   │   │   software.astro, news.astro, join.astro, console.astro, 404.astro
-│   │   └── ko/              # Korean routes for the shared page components
-│   └── styles/              # tokens.css (design tokens), global.css
-└── scripts/postbuild.mjs    # de-collides file+directory routes after `astro build`
-```
 
-Every public page is a shared component in `src/components/pages/` that takes
-`{ lang: 'en' | 'ko' }`; `src/pages/` remains responsible for Astro routing and
-locale-specific entry points. Content is data-driven: to change what the site says,
-edit `src/data/*.json` — not the page templates.
+Old URLs (`/people`, `/professor`, `/alumni`, `/news`, `/gallery`, `/software`,
+`/patents`, `/join`) redirect to their new pages; see `astro.config.mjs`.
+`scripts/postbuild.mjs` copies `X.html` to `X/index.html` where a route and a
+directory share a name, so every host serves them.
 
-## Updating content
-
-See **[CONTRIBUTING.md](CONTRIBUTING.md)** — it walks through adding a paper, a news item,
-or a member in a single small PR, with schema cheat-sheets.
-
-Provenance for every fact on the site, the design rationale, and the build contract live
-in the lab's internal `docs/` folder, which is deliberately **not** tracked in this public
-repository (it contains original department documents and research notes). Ask the site
-maintainer for access.
-
-## Deployment
-
-Deploys are automatic: every push to `main` runs
-[`.github/workflows/deploy.yml`](.github/workflows/deploy.yml), which builds the site with
-the official [`withastro/action`](https://github.com/withastro/action) and publishes it
-with `actions/deploy-pages`. The workflow can also be started manually from the Actions
-tab (`workflow_dispatch`).
-
-One-time repository setup: **Settings → Pages → Source: "GitHub Actions"**.
-
-### Custom domain (db.ssu.ac.kr)
-
-The university has granted the lab the subdomain **`db.ssu.ac.kr`** (and offers a public IP;
-the site stays on GitHub Pages — the IP is reserved for future dynamic demos/APIs).
-`public/CNAME` already contains the domain and `site` in `astro.config.mjs` is set.
-Remaining steps:
-
-1. Ask SSU 정보화팀 (IT office) to create a **DNS CNAME record: `db.ssu.ac.kr` →
-   `ssu-database-lab.github.io`** (same pattern as reality.ssu.ac.kr).
-2. In the GitHub repository: **Settings → Pages → Custom domain: `db.ssu.ac.kr`**, then
-   tick **Enforce HTTPS** once the certificate is issued (a few minutes after DNS resolves).
-3. `public/robots.txt` already advertises `https://db.ssu.ac.kr/sitemap-index.xml`
-   (generated by `@astrojs/sitemap` on every build).
-
-**Until DNS is live there is no usable GitHub preview**: `public/CNAME` registers the
-custom domain on the first deploy, so the github.io project URL redirects to the
-not-yet-resolving domain (and the site is built for the domain root anyway). Use the lab's
-VPS preview during that window.
-
-## Contact
-
-Database Lab, School of Computer Science & Engineering, Soongsil University,
-369 Sangdo-ro, Dongjak-gu, Seoul — <djpark@ssu.ac.kr>
+The previous design (2026-07 to 2026-11) is kept in `_obsolete/site_v1/`.

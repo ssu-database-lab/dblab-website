@@ -1,0 +1,693 @@
+% Lab publications, newest first; the site groups them by year in this order.
+%
+% To add a paper, paste the BibTeX from DBLP or Google Scholar at the right
+% place and keep the citation key unique. Optional fields the site reads:
+%
+%   doi, url, pdf   links under the entry (url is shown only without a doi)
+%   kci             KCI article id (ART...) for Korean journals
+%   dataset         link to a dataset
+%   award           badge text, e.g. award = {Outstanding Paper Award, KCC 2022}
+%   keywords        research areas: nlp-metadata, vishing, forensics, flash-ftl, indexing, systems-other
+%   comment         internal note; never shown on the site
+%
+% Work under review or in preparation: use the unpublished entry type with the
+% status in note, e.g. note = {IEEE Access, under review}.
+
+@inproceedings{iceeecs2026-ner-llm,
+  author       = {Milandu Keith Moussavou Boussougou and SeongHun Hwang and Dong-Joo Park},
+  title        = {Arbitrating Two Extractors: A NER-LLM Consolidation Pipeline for Metadata Extraction from Korean Public Domain Right Documents},
+  booktitle    = {IC-EEECS 2026},
+  note         = {short paper, to appear},
+  year         = {2026},
+  keywords     = {nlp-metadata},
+}
+
+@inproceedings{iceeecs2026-klue-bio,
+  author       = {SeongHun Hwang and Milandu Keith Moussavou Boussougou and Dong-Joo Park},
+  title        = {Performance Analysis of KLUE-BERT with B-I-O Training Data Composition for Metadata Extraction from Rights Documents as Korean Openly Licensed Works},
+  booktitle    = {IC-EEECS 2026},
+  note         = {companion short paper, to appear},
+  year         = {2026},
+  keywords     = {nlp-metadata},
+}
+
+@inproceedings{kcc2026-klue-bio,
+  author       = {황성훈 and others},
+  title        = {한국어 공공저작물 권리문서 메타데이터 추출을 위한 B-I-O 태깅 기반 학습데이터 구성에 따른 Klue BERT 성능 분석},
+  booktitle    = {KCC 2026 (한국컴퓨터종합학술대회) — short paper, submitted},
+  year         = {2026},
+  keywords     = {nlp-metadata},
+  comment      = {author list incomplete (황성훈 et al.) — confirm},
+}
+
+@unpublished{ur2026-lightweight-acoustic,
+  author       = {Milandu Keith Moussavou Boussougou and Dong-Joo Park},
+  title        = {Lightweight Acoustic Approaches for Real-Time Voice-Phishing Detection on Mobile Devices},
+  note         = {IEEE Access — revise \& resubmit},
+  year         = {2026},
+  keywords     = {vishing},
+}
+
+@unpublished{ur2026-cross-attention,
+  title        = {Multi-Branch Cross-Attention for Audio-Text Fusion in Korean Vishing Detection},
+  note         = {In preparation},
+  year         = {2026},
+  keywords     = {vishing},
+  comment      = {in preparation — author list to be confirmed},
+}
+
+@unpublished{ur2026-metadata-journal,
+  title        = {Division of Labor for Trustworthy Metadata: Consolidating Fine-Tuned Korean NER and LLM Extraction for Public-Domain Rights Documents},
+  note         = {Journal article — in preparation},
+  year         = {2026},
+  keywords     = {nlp-metadata},
+  comment      = {in preparation — author list to be confirmed},
+}
+
+@article{jsav2025-ner,
+  author       = {황성훈 and Milandu Keith Moussavou Boussougou and 박동주},
+  title        = {공유저작물 자동 정보 추출을 위한 미세조정 BERT-BiLSTM-CRF NER 모델의 성능 및 안정성 분석},
+  journal      = {한국소프트웨어감정평가학회 논문지 (Journal of Software Assessment and Valuation)},
+  volume       = {21},
+  number       = {4},
+  pages        = {53--61},
+  year         = {2025},
+  doi          = {10.29056/jsav.2025.12.05},
+  kci          = {ART003277346},
+  keywords     = {nlp-metadata},
+  comment      = {source PDF abstract discrepancy (XLM-RoBERTa-Large-CRF avg F1 0.9641 KR vs 0.998 EN) — confirm},
+}
+
+@inproceedings{kcc2025-multimodal,
+  author       = {Milandu Keith Moussavou Boussougou and Minhyuk Song and Bongchan Jeong and YuSeok Hwang and Dong-Joo Park},
+  title        = {Multimodal Detection of Korean Voice Phishing Using Audio and Text Fusion},
+  booktitle    = {KCC 2025 (한국컴퓨터종합학술대회)},
+  year         = {2025},
+  keywords     = {vishing},
+}
+
+@article{access2025-bt,
+  author       = {Milandu Keith Moussavou Boussougou and Prince Hamandawana and Dong-Joo Park},
+  title        = {Enhancing Voice Phishing Detection Using Multilingual Back-Translation and SMOTE: An Empirical Study},
+  journal      = {IEEE Access},
+  volume       = {13},
+  pages        = {37946--37965},
+  year         = {2025},
+  doi          = {10.1109/ACCESS.2025.3545250},
+  keywords     = {vishing},
+  comment      = {Crossref metadata misspells 'Moussavou' as 'Moussovou'},
+}
+
+@misc{dataport2024-korccvi,
+  author       = {Milandu Keith Moussavou Boussougou and Prince Hamandawana and Dong-Joo Park},
+  title        = {Korean Voice Phishing Detection Dataset with Multilingual Back-Translation and SMOTE Augmentations},
+  howpublished = {IEEE DataPort},
+  year         = {2024},
+  doi          = {10.21227/163c-0542},
+  keywords     = {vishing},
+}
+
+@article{electronics2024-hyperledger,
+  author       = {Muhammad Saad and Saqib Ali Haidery and Aavash Bhandari and Muhammad Raheel Bhutta and Dong-Joo Park and Tae-Sun Chung},
+  title        = {An Efficient Privacy and Anonymity Setup on Hyperledger Fabric for Blockchain-Enabled Internet of Things (IoT) Devices},
+  journal      = {Electronics},
+  volume       = {13},
+  number       = {13},
+  pages        = {2652},
+  year         = {2024},
+  doi          = {10.3390/electronics13132652},
+  keywords     = {systems-other},
+}
+
+@article{math2023-cnn-bilstm,
+  author       = {Milandu Keith Moussavou Boussougou and Dong-Joo Park},
+  title        = {Attention-Based 1D CNN-BiLSTM Hybrid Model Enhanced with FastText Word Embedding for Korean Voice Phishing Detection},
+  journal      = {Mathematics (MDPI)},
+  volume       = {11},
+  number       = {14},
+  pages        = {3217},
+  year         = {2023},
+  doi          = {10.3390/math11143217},
+  pdf          = {https://www.mdpi.com/2227-7390/11/14/3217/pdf},
+  keywords     = {vishing},
+}
+
+@inproceedings{kcc2023-federated,
+  author       = {Milandu Keith Moussavou Boussougou and Chang Kyun Hong and Soyeon Hong and Dong-Joo Park},
+  title        = {Towards Privacy-Preserving Korean Voice Phishing Detection: A Federated Learning Approach with RoBERTA},
+  booktitle    = {KCC 2023},
+  pages        = {626--628},
+  year         = {2023},
+  url          = {https://www.dbpia.co.kr/journal/articleDetail?nodeId=NODE11488126},
+  keywords     = {vishing},
+  comment      = {possible camera-ready variant PDF ('Changing the Paradigm…') on disk — confirm},
+}
+
+@article{ktsde2022-kobert,
+  author       = {Milandu Keith Moussavou Boussougou and Dong-Joo Park},
+  title        = {한국어 언어 모델을 활용한 보이스피싱 탐지 기능 개선},
+  journal      = {KIPS Transactions on Software and Data Engineering},
+  volume       = {11},
+  number       = {10},
+  pages        = {437--446},
+  year         = {2022},
+  doi          = {10.3745/KTSDE.2022.11.10.437},
+  kci          = {ART002889534},
+  keywords     = {vishing},
+}
+
+@inproceedings{kcc2022-cnn-bilstm,
+  author       = {Milandu Keith Moussavou Boussougou and Myoung-Gyu Park and Dong-Joo Park},
+  title        = {An Attention-Based CNN-BiLSTM Model for Korean Voice Phishing Detection},
+  booktitle    = {KCC 2022},
+  address      = {Jeju},
+  pages        = {1139--1141},
+  year         = {2022},
+  url          = {https://www.dbpia.co.kr/journal/articleDetail?nodeId=NODE11113590},
+  award        = {Outstanding Paper Award (우수논문상), KCC 2022 — KIISE},
+  keywords     = {vishing},
+}
+
+@inproceedings{ack2021-ml,
+  author       = {Milandu Keith Moussavou Boussougou and Sangyoon Jin and Daeho Chang and Dong-Joo Park},
+  title        = {Korean Voice Phishing Text Classification Performance Analysis Using Machine Learning Techniques},
+  booktitle    = {ACK 2021 (한국정보처리학회 학술발표대회)},
+  address      = {Yeosu},
+  volume       = {28},
+  number       = {2},
+  pages        = {297--299},
+  year         = {2021},
+  doi          = {10.3745/PKIPS.y2021m11a.297},
+  url          = {https://koreascience.kr/article/CFKO202133649085984.page},
+  award        = {Encouragement Paper Award (장려논문상), ACK 2021 — KIPS},
+  keywords     = {vishing},
+}
+
+@inproceedings{kcc2021-realtime,
+  author       = {Milandu Keith Moussavou Boussougou and Dong-Joo Park},
+  title        = {A Real-time Efficient Detection Technique of Voice Phishing with AI},
+  booktitle    = {KCC 2021 (한국정보과학회 한국컴퓨터종합학술대회)},
+  address      = {Jeju},
+  pages        = {768--770},
+  year         = {2021},
+  url          = {https://www.dbpia.co.kr/journal/articleDetail?nodeId=NODE10583070},
+  keywords     = {vishing},
+}
+
+@article{electronics2021-crash,
+  author       = {Jong-Hyeok Park and Dong-Joo Park and Tae-Sun Chung and Sang-Won Lee},
+  title        = {A Crash Recovery Scheme for a Hybrid Mapping FTL in NAND Flash Storage Devices},
+  journal      = {Electronics},
+  volume       = {10},
+  number       = {3},
+  pages        = {327},
+  year         = {2021},
+  doi          = {10.3390/electronics10030327},
+  keywords     = {flash-ftl},
+}
+
+@inproceedings{cccis2020-recovery,
+  author       = {Van-Dai Tran and Dong-Joo Park},
+  title        = {An Efficient Data Recovery Scheme with Block-level Mapping Approach on NAND Flash Memory},
+  booktitle    = {CCCIS 2020 (ACM)},
+  pages        = {6--9},
+  year         = {2020},
+  doi          = {10.1145/3418994.3418997},
+  keywords     = {forensics},
+}
+
+@inproceedings{kse2019-mlc,
+  author       = {Tran Van Dai and Jingi Park and Dong-Joo Park},
+  title        = {A Novel Recovery Data Technique on MLC NAND Flash Memory},
+  booktitle    = {KSE 2019 (11th Int. Conf. on Knowledge and Systems Engineering)},
+  pages        = {1--5},
+  year         = {2019},
+  doi          = {10.1109/KSE.2019.8919382},
+  keywords     = {forensics},
+}
+
+@article{dbr2019-sqlite,
+  author       = {김찬규 and 이상호 and 박동주},
+  title        = {Journaling of Journal 기반 SQLite 파일 복구 기법},
+  journal      = {데이타베이스연구},
+  volume       = {35},
+  number       = {3},
+  pages        = {29--39},
+  year         = {2019},
+  kci          = {ART002536394},
+  keywords     = {forensics},
+}
+
+@article{dbr2019-messenger,
+  author       = {정승주 and 이상호 and 박동주},
+  title        = {회복 관점에서의 5가지 인스턴트 메신저 분석},
+  journal      = {데이타베이스연구},
+  volume       = {35},
+  number       = {3},
+  pages        = {98--108},
+  year         = {2019},
+  kci          = {ART002536490},
+  keywords     = {forensics},
+}
+
+@article{symmetry2018-wpcb,
+  author       = {Van Phi Ho and Dong-Joo Park},
+  title        = {WPCB-Tree: A Novel Flash-Aware B-Tree Index Using a Write Pattern Converter},
+  journal      = {Symmetry},
+  volume       = {10},
+  number       = {1},
+  pages        = {18},
+  year         = {2018},
+  doi          = {10.3390/sym10010018},
+  pdf          = {https://www.mdpi.com/2073-8994/10/1/18/pdf},
+  keywords     = {flash-ftl, indexing},
+}
+
+@inproceedings{ic2016-recovery,
+  title        = {AN EFFICIENT RECOVERY SCHEME FOR BUFFER-BASED B-TREE INDEXES ON FLASH MEMORY},
+  booktitle    = {International conference, Dec 2016},
+  year         = {2016},
+  keywords     = {indexing, flash-ftl},
+  comment      = {authorship incomplete — confirm},
+}
+
+@inproceedings{ic2016-btree,
+  title        = {A NOVEL B-TREE SCHEME FOR FLASH MEMORY},
+  booktitle    = {International conference, Apr 2016},
+  year         = {2016},
+  keywords     = {indexing, flash-ftl},
+  comment      = {authorship incomplete — confirm},
+}
+
+@article{info2015-recommender,
+  author       = {S. Park and Dong-Joo Park},
+  title        = {A recommender system for smartphone users},
+  journal      = {Information (Japan)},
+  volume       = {18},
+  number       = {5},
+  pages        = {1829--1845},
+  year         = {2015},
+  keywords     = {systems-other},
+}
+
+@article{jcsc2015-ftl,
+  author       = {Tae-Sun Chung and Dong-Joo Park and Jongik Kim},
+  title        = {An Efficient Flash Translation Layer for Large Block NAND Flash Devices},
+  journal      = {Journal of Circuits, Systems and Computers},
+  volume       = {24},
+  number       = {9},
+  pages        = {1550138},
+  year         = {2015},
+  doi          = {10.1142/S0218126615501388},
+  keywords     = {flash-ftl},
+}
+
+@article{ktccs2015-trim,
+  author       = {황현호 and 박동주},
+  title        = {디지털 포렌식 관점에서 SSD TRIM 명령의 선별적 복구},
+  journal      = {정보처리학회논문지: 컴퓨터 및 통신 시스템},
+  volume       = {4},
+  number       = {9},
+  pages        = {307--314},
+  year         = {2015},
+  doi          = {10.3745/KTCCS.2015.4.9.307},
+  kci          = {ART002034646},
+  keywords     = {forensics},
+}
+
+@article{info2014-lcftl,
+  author       = {A.B.M.R. Islam and Dong-Joo Park and Tae-Sun Chung},
+  title        = {Locality competent flash translation layer (LC-FTL) for NAND flash memory},
+  journal      = {Information (Japan)},
+  volume       = {17},
+  number       = {8},
+  pages        = {3741--3767},
+  year         = {2014},
+  keywords     = {flash-ftl},
+}
+
+@article{kiise2014-yaffs2,
+  author       = {서형운 and 박동주 and 신명섭},
+  title        = {YAFFS2 플래시 파일시스템의 효율적인 마운트를 위한 메타데이터 관리기법},
+  journal      = {정보과학회논문지: 데이타베이스},
+  volume       = {41},
+  number       = {2},
+  pages        = {122--131},
+  year         = {2014},
+  kci          = {ART001867871},
+  keywords     = {flash-ftl},
+}
+
+@inproceedings{dc2014-carving,
+  title        = {파일 카빙 : 디지털 포렌식을 위한 JPEG 이미지 단편화 지점 감지},
+  booktitle    = {Domestic conference, Jun 2014},
+  year         = {2014},
+  keywords     = {forensics},
+  comment      = {authors not listed in inventory — confirm},
+}
+
+@article{tiis2013-localization,
+  author       = {Seong-Joong Kim and Dong-Joo Park},
+  title        = {A Self-Calibrated Localization System using Chirp Spread Spectrum in a Wireless Sensor Network},
+  journal      = {KSII Transactions on Internet and Information Systems},
+  volume       = {7},
+  number       = {2},
+  pages        = {253--270},
+  year         = {2013},
+  doi          = {10.3837/tiis.2013.02.005},
+  keywords     = {systems-other},
+}
+
+@article{kiise2012-wiping-recovery,
+  author       = {임윤빈 and 신명섭 and 박동주},
+  title        = {낸드 플래시 메모리에서 디지털 포렌식을 위한 파일 와이핑 복구 기법},
+  journal      = {정보과학회논문지: 데이타베이스},
+  volume       = {39},
+  number       = {2},
+  pages        = {100--108},
+  year         = {2012},
+  kci          = {ART001652284},
+  keywords     = {forensics},
+}
+
+@article{kiise2012-block-substitution,
+  author       = {이상호 and 신명섭 and 박동주},
+  title        = {낸드 플래시 메모리에서 블록치환을 이용한 삭제파일 복구 방지},
+  journal      = {정보과학회논문지: 데이타베이스},
+  volume       = {39},
+  number       = {6},
+  pages        = {372--379},
+  year         = {2012},
+  kci          = {ART001718445},
+  keywords     = {forensics},
+  comment      = {repository's English alt-title field corrupted/misfiled},
+}
+
+@inproceedings{kiise2012-block-permutation-conf,
+  title        = {The Prevention Technique of Wiping File Recovery on NAND Flash Memory Using Block Permutation},
+  booktitle    = {KIISE Conference, 2012},
+  year         = {2012},
+  keywords     = {forensics},
+  comment      = {authors not listed in inventory — conference version of KCI ART001718445},
+}
+
+@article{kiise2012-wiping-evidence,
+  author       = {신명섭 and 오지현 and 박동주},
+  title        = {플래시 메모리에서 디지털 포렌식을 위한 파일 와이핑 증거 확보 기법},
+  journal      = {정보과학회논문지: 데이타베이스},
+  volume       = {39},
+  number       = {5},
+  pages        = {271--278},
+  year         = {2012},
+  kci          = {ART001704886},
+  keywords     = {forensics},
+}
+
+@inproceedings{dc2012-yaffs2,
+  title        = {YAFFS2 플래시 파일시스템 상에서 효율적인 마운트를 위한 메타데이터 관리기법},
+  booktitle    = {Domestic conference, Mar 2012},
+  year         = {2012},
+  keywords     = {flash-ftl},
+  comment      = {authors not listed in inventory — confirm},
+}
+
+@inproceedings{sac2011-lstaff,
+  author       = {Tae-Sun Chung and Dong-Joo Park and Jongik Kim},
+  title        = {LSTAFF*: an efficient flash translation layer for large block flash memory},
+  booktitle    = {ACM SAC 2011},
+  pages        = {589--594},
+  year         = {2011},
+  doi          = {10.1145/1982185.1982311},
+  keywords     = {flash-ftl},
+}
+
+@article{ijseke2011-spytec,
+  author       = {Dong-Joo Park and Dong-Ho Lee},
+  title        = {Spy-Tec+ : an Integrated Index Structure for k-Nearest Neighbor Queries with Semantic Predicates in Multimedia Database},
+  journal      = {Int. J. Software Engineering and Knowledge Engineering},
+  volume       = {21},
+  number       = {7},
+  pages        = {989--1011},
+  year         = {2011},
+  doi          = {10.1142/S0218194011005529},
+  keywords     = {indexing},
+}
+
+@inproceedings{kiise2011-datawipe,
+  title        = {Recovering Files Deleted by Data Wipe on NAND Flash Memory},
+  booktitle    = {KIISE Conference, 2011},
+  year         = {2011},
+  url          = {https://koreascience.kr/article/CFKO201128451825648.page},
+  keywords     = {forensics},
+  comment      = {authors not listed in inventory — confirm},
+}
+
+@inproceedings{seus2010-crash,
+  author       = {Sungup Moon and Sang-Phil Lim and Dong-Joo Park and Sang-Won Lee},
+  title        = {Crash Recovery in FAST FTL},
+  booktitle    = {SEUS 2010 (LNCS 6399)},
+  pages        = {13--22},
+  year         = {2010},
+  doi          = {10.1007/978-3-642-16256-5_4},
+  keywords     = {flash-ftl},
+}
+
+@article{kiise2010-filerecovery,
+  author       = {신명섭 and 박동주},
+  title        = {NAND 플래시 메모리에서 디지털 포렌식을 위한 파일 복구기법},
+  journal      = {정보과학회논문지: 데이타베이스},
+  volume       = {37},
+  number       = {6},
+  pages        = {292--299},
+  year         = {2010},
+  kci          = {ART001501650},
+  keywords     = {forensics},
+}
+
+@article{jsa2009-survey,
+  author       = {Tae-Sun Chung and Dong-Joo Park and Sangwon Park and Dong-Ho Lee and Sang-Won Lee and Ha-Joo Song},
+  title        = {A survey of Flash Translation Layer},
+  journal      = {Journal of Systems Architecture},
+  volume       = {55},
+  number       = {5-6},
+  pages        = {332--343},
+  year         = {2009},
+  doi          = {10.1016/j.sysarc.2009.03.005},
+  keywords     = {flash-ftl},
+}
+
+@article{kiise2009-hybrid-ftl,
+  author       = {박동주 and 곽경훈},
+  title        = {향상된 혼합 사상기법을 이용한 효율적인 대블록 플래시 메모리 변환계층 설계 및 구현},
+  journal      = {정보과학회 컴퓨팅의 실제 논문지},
+  volume       = {15},
+  number       = {1},
+  pages        = {1--13},
+  year         = {2009},
+  kci          = {ART001312423},
+  keywords     = {flash-ftl},
+}
+
+@article{kiise2009-btree-wpc,
+  author       = {박동주 and 최해기},
+  title        = {낸드 플래시 메모리 상에서 쓰기 패턴 변환을 통한 효율적인 B-트리 관리},
+  journal      = {정보과학회논문지: 시스템 및 이론},
+  volume       = {36},
+  number       = {6},
+  pages        = {521--531},
+  year         = {2009},
+  kci          = {ART001396448},
+  keywords     = {indexing, flash-ftl},
+}
+
+@article{kips2008-btree-node,
+  author       = {박동주 and 최해기},
+  title        = {플래시 메모리 상에서 B+-트리 노드 크기 증가에 따른 성능 평가},
+  journal      = {정보처리학회논문지A},
+  volume       = {15},
+  number       = {6},
+  pages        = {325--334},
+  year         = {2008},
+  kci          = {ART001308021},
+  keywords     = {indexing, flash-ftl},
+}
+
+@article{tecs2007-fast,
+  author       = {Sang-Won Lee and Dong-Joo Park and Tae-Sun Chung and Dong-Ho Lee and Sangwon Park and Ha-Joo Song},
+  title        = {A log buffer-based flash translation layer using fully-associative sector translation},
+  journal      = {ACM Transactions on Embedded Computing Systems},
+  volume       = {6},
+  number       = {3},
+  eid          = {18},
+  year         = {2007},
+  doi          = {10.1145/1275986.1275990},
+  keywords     = {flash-ftl},
+}
+
+@article{kiise2007-buffer,
+  author       = {박종민 and 박동주},
+  title        = {플래시 메모리상에서 시스템 소프트웨어의 효율적인 버퍼 페이지 교체 기법},
+  journal      = {정보과학회논문지: 데이타베이스},
+  volume       = {34},
+  number       = {2},
+  pages        = {133--140},
+  year         = {2007},
+  kci          = {ART001046107},
+  keywords     = {flash-ftl},
+}
+
+@article{kiise2007-btree,
+  author       = {남정현 and 박동주},
+  title        = {플래시 메모리 상에서 B-트리 설계 및 구현},
+  journal      = {정보과학회논문지: 데이타베이스},
+  volume       = {34},
+  number       = {2},
+  pages        = {109--118},
+  year         = {2007},
+  kci          = {ART001046105},
+  keywords     = {indexing, flash-ftl},
+}
+
+@inproceedings{dc2007-btree-wpc,
+  title        = {낸드 플래시 메모리상에서 쓰기 패턴 변환을 이용한 효율적인 B-트리 관리},
+  booktitle    = {Domestic conference, Jun 2007},
+  year         = {2007},
+  keywords     = {indexing, flash-ftl},
+  comment      = {authors not listed in inventory — confirm},
+}
+
+@inproceedings{euc2006-fast,
+  author       = {Sang-Won Lee and Won-Kyoung Choi and Dong-Joo Park},
+  title        = {FAST: An Efficient Flash Translation Layer for Flash Memory},
+  booktitle    = {EUC 2006 Workshops (LNCS)},
+  pages        = {879--887},
+  year         = {2006},
+  doi          = {10.1007/11807964_88},
+  keywords     = {flash-ftl},
+}
+
+@inproceedings{euc2006-survey,
+  author       = {Tae-Sun Chung and Dong-Joo Park and Sangwon Park and Dong-Ho Lee and Sang-Won Lee and Ha-Joo Song},
+  title        = {System Software for Flash Memory: A Survey},
+  booktitle    = {EUC 2006 (LNCS)},
+  pages        = {394--404},
+  year         = {2006},
+  doi          = {10.1007/11802167_41},
+  keywords     = {flash-ftl},
+}
+
+@inproceedings{dc2006-btree-node,
+  title        = {플래시 메모리 상에서 B+트리 노드 크기 증가에 따른 성능 평가},
+  booktitle    = {Domestic conference, Nov 2006},
+  year         = {2006},
+  keywords     = {indexing, flash-ftl},
+  comment      = {authors not listed in inventory — confirm},
+}
+
+@inproceedings{airs2005-knn,
+  author       = {Dong-Ho Lee and Dong-Joo Park},
+  title        = {An Efficient Incremental Nearest Neighbor Algorithm for Processing k-Nearest Neighbor Queries with Visal and Semantic Predicates in Multimedia Information Retrieval System},
+  booktitle    = {AIRS 2005},
+  pages        = {653--658},
+  year         = {2005},
+  doi          = {10.1007/11562382_63},
+  keywords     = {indexing},
+}
+
+@article{kips2005-fast,
+  author       = {박동주 and 최원경 and 이상원},
+  title        = {FAST : 플래시 메모리 FTL을 위한 완전연관섹터변환에 기반한 로그 버퍼 기법},
+  journal      = {정보처리학회논문지A},
+  volume       = {12A},
+  number       = {3},
+  pages        = {205--214},
+  year         = {2005},
+  kci          = {ART000966443},
+  keywords     = {flash-ftl},
+}
+
+@article{kips2005-distance,
+  author       = {박동주 and 박상원 and 정태선 and 이상원},
+  title        = {질의 결과를 이용한 거리 브라우징 질의의 처리},
+  journal      = {정보처리학회논문지D},
+  volume       = {12},
+  number       = {5},
+  pages        = {673--682},
+  year         = {2005},
+  kci          = {ART001181468},
+  keywords     = {indexing},
+}
+
+@inproceedings{dc2005-buffer,
+  title        = {플래시 메모리 상에서 효율적인 버퍼 페이지 교체 기법},
+  booktitle    = {Domestic conference, Nov 2005},
+  year         = {2005},
+  keywords     = {flash-ftl},
+  comment      = {authors not listed in inventory — confirm},
+}
+
+@inproceedings{dc2005-btree,
+  title        = {플래시 메모리 상에서 효율적인 B-트리 설계 및 구현},
+  booktitle    = {Domestic conference, Nov 2005},
+  year         = {2005},
+  keywords     = {indexing, flash-ftl},
+  comment      = {authors not listed in inventory — confirm},
+}
+
+@article{kips2005-ftl,
+  author       = {정태선 and 박동주 and 조세형},
+  title        = {대용량 플래시 메모리를 위한 효율적인 플래시 변환 계층 시스템 소프트웨어},
+  journal      = {정보처리학회논문지A},
+  volume       = {12},
+  number       = {7},
+  pages        = {621--626},
+  year         = {2005},
+  kci          = {ART001187366},
+  keywords     = {flash-ftl},
+}
+
+@inproceedings{asiasim2004-lstaff,
+  author       = {Tae-Sun Chung and Dong-Joo Park and Yeonseung Ryu and Sugwon Hong},
+  title        = {LSTAFF: System Software for Large Block Flash Memory},
+  booktitle    = {AsiaSim 2004},
+  pages        = {704--712},
+  year         = {2004},
+  doi          = {10.1007/978-3-540-30585-9_78},
+  keywords     = {flash-ftl},
+}
+
+@article{mtap2003-knn,
+  author       = {Dong-Joo Park and Hyoung-Joo Kim},
+  title        = {An Enhanced Technique for k-Nearest Neighbor Queries with Non-Spatial Selection Predicates},
+  journal      = {Multimedia Tools and Applications},
+  volume       = {19},
+  number       = {1},
+  pages        = {79--103},
+  year         = {2003},
+  doi          = {10.1023/A:1021121030238},
+  keywords     = {indexing},
+}
+
+@article{ipl2001-rstree,
+  author       = {Dong-Joo Park and Shin Heu and Hyoung-Joo Kim},
+  title        = {The RS-tree: An efficient data structure for distance browsing queries},
+  journal      = {Information Processing Letters},
+  volume       = {80},
+  number       = {4},
+  pages        = {195--203},
+  year         = {2001},
+  doi          = {10.1016/S0020-0190(01)00163-6},
+  keywords     = {indexing},
+}
+
+@article{dke2001-prefetch,
+  author       = {Dong-Joo Park and Hyoung-Joo Kim},
+  title        = {Prefetch policies for large objects in a Web-enabled GIS application},
+  journal      = {Data \& Knowledge Engineering},
+  volume       = {37},
+  number       = {1},
+  pages        = {65--84},
+  year         = {2001},
+  doi          = {10.1016/S0169-023X(01)00002-7},
+  keywords     = {systems-other},
+}

@@ -1,0 +1,32 @@
+[
+  {
+    "id": "kr-2640315",
+    "number_app": "10-2022-0141286",
+    "number_reg": "10-2640315",
+    "title_kr": "딥 러닝 기반 보이스 피싱 감지 장치 및 그 방법",
+    "title_en": "Deep learning-based voice phishing detection apparatus and method therefor",
+    "inventors": ["Dong-Joo Park (박동주)", "Milandu Keith Moussavou Boussougou (밀란두)", "Myoung-Gyu Park (박명규)"],
+    "applicant_kr": "숭실대학교 산학협력단",
+    "applicant_en": "Foundation of Soongsil University-Industry Cooperation",
+    "filed": "2022-10-28",
+    "registered": "2024-02-20",
+    "status": "granted",
+    "link": "https://patents.google.com/patent/KR102640315B1/ko",
+    "review": null
+  },
+  {
+    "id": "kr-app-2023-0164736",
+    "number_app": "10-2023-0164736",
+    "number_reg": null,
+    "title_kr": "한국어 보이스피싱 탐지를 위한 연합 학습 방법 및 그 시스템",
+    "title_en": "Federated learning method and system for detecting Korean voice phishing",
+    "inventors": ["Dong-Joo Park (박동주)", "Milandu Keith Moussavou Boussougou (밀란두)", "Chang-Kyun Hong (홍창균)", "So-Yeon Hong (홍소연)"],
+    "applicant_kr": "숭실대학교 산학협력단",
+    "applicant_en": "Foundation of Soongsil University-Industry Cooperation",
+    "filed": "2023-11-23",
+    "registered": null,
+    "status": "pending",
+    "link": "https://patents.google.com/patent/KR20250077179A/ko",
+    "review": null
+  }
+]

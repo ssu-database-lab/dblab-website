@@ -1,0 +1,48 @@
+@import 'tailwindcss';
+@import 'pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css';
+
+@plugin 'daisyui' {
+  themes: light --default;
+}
+
+/* DaisyUI light theme in Soongsil blue (#1f54a2, from ssu.ac.kr). */
+@plugin 'daisyui/theme' {
+  name: 'light';
+  default: true;
+  --color-base-100: #ffffff;
+  --color-base-200: #f5f7fa;
+  --color-base-300: #e3e7ee;
+  --color-base-content: #1c2330;
+  --color-primary: #1f54a2;
+  --color-primary-content: #ffffff;
+  --color-neutral: #193d74;
+  --color-neutral-content: #ffffff;
+  --radius-box: 0.5rem;
+  --radius-field: 0.375rem;
+  --radius-selector: 0.25rem;
+  --depth: 0;
+  --noise: 0;
+}
+
+@theme {
+  --font-sans: 'Pretendard Variable', Pretendard, system-ui, -apple-system, 'Segoe UI',
+    'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+}
+
+@layer base {
+  body {
+    @apply bg-base-100 text-base-content antialiased;
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+  h1 {
+    @apply text-3xl font-bold tracking-tight sm:text-4xl;
+  }
+}
+
+@layer components {
+  /* Section heading with a hairline under it, as on most lab sites. */
+  .section-title {
+    @apply mb-6 border-b border-base-300 pb-2 text-2xl font-bold;
+  }
+}
